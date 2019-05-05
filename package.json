@@ -1,0 +1,19 @@
+{
+  "name": "dashboard",
+  "version": "1.0.0",
+  "description": "A dashboard where the user can configure what and where to monitor. Monitor results are visualized to the user in real time.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Laetitia Fesselier",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "ws": "^7.0.0"
+  },
+  "devDependencies": {}
+}
