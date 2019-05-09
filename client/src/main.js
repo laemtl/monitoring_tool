@@ -6,6 +6,8 @@ Vue.config.productionTip = false;
 
 require("./assets/main.scss");
 
+export const configBus = new Vue();
+
 new Vue({
   render: h => h(App)
 }).$mount("#app");
