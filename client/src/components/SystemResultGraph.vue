@@ -1,10 +1,8 @@
 <template>
-<v-flex xs12 sm6 md6>
-      <v-card>
-        <v-toolbar dense dark color="blue-grey darken-1">
+<v-flex xs12 sm6 md3 class="pa-0">
+    <v-card flat>
+        <v-toolbar dense flat color="brown lighten-4">
             <v-toolbar-title>{{ name }}</v-toolbar-title>
-            <v-spacer></v-spacer>
-            {{displayedValues[0]}}
           </v-toolbar>
           <v-card-text>
             <p class="error" v-if="error">{{ error }}</p>
@@ -14,6 +12,7 @@
                 <div :id="'y_axis_'+ucid" class="y_axis"></div>
                 <div :id="'demo_chart_'+ucid" class="demo_chart" ref="panel"></div>
                 <div :id="'x_axis_'+ucid" class="x_axis"></div>
+                <div :id="'legend'+ucid"></div>
               </div>
               <!-- End of chart container -->
             </div>
@@ -37,18 +36,26 @@ export default {
     data() {
         return {
             messageSeries: [],
-            renderEveryNth: 3,
+            renderEveryNth: 1,
             updateInterval: 100,
             streamFrequency: 10,
             messageIndex: 0,
             displayedValues: [],
+            colors: [],
             error: null,
             chart: []
         }
     },
+    beforeDestroy() {
+        // Unregister the event listener before destroying this Vue instance
+        window.removeEventListener('resize', this.onResize)
+    },
     mounted() {
         this.initChart();
-        this.openSocketListeners();
+
+        configBus.$on('message', message => {
+            this.processMessage(message);
+        });
     },
     watch: {
         renderEveryNth: function() {
@@ -57,6 +64,23 @@ export default {
         }
     },
     methods: {
+        getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        },
+        onResize(event) {
+            this.resizeChart(this.chart[0]) 
+        },
+        resizeChart(chart) {
+            chart.configure({
+                width: this.$refs.panel.clientWidth,
+            });
+            chart.render();
+        },
         /* Rickshaw.js initialization */
         initChart() {
             var el = this;
@@ -68,15 +92,25 @@ export default {
                 renderer: "line",
                 min: 0,
                 max: 20,
-                series: new Rickshaw.Series.FixedDuration([{
-                    name: this.name,
-                    color: '#EC644B'
-                }], 
+                series: new Rickshaw.Series.FixedDuration([
+                    {
+                        color: this.getRandomColor(),
+                        name: 'netInt1'
+                    }, 
+                    {
+                        color: this.getRandomColor(),
+                        name: 'netInt2'
+                    }, 
+                    {
+                        color: this.getRandomColor(),
+                        name: 'netInt3'
+                    }
+                ], 
                 undefined, 
                 {
                     timeInterval: this.updateInterval,
                     maxDataPoints: 50,
-                    timeBase: 0
+                    timeBase: 0.1
                 })
             });
 
@@ -100,27 +134,38 @@ export default {
                 }
             });
 
+            var legend = new Rickshaw.Graph.Legend({
+            	graph: this.chart[0],
+	            element: document.getElementById('legend' + this.ucid)
+            });
+
+            var shelving = new Rickshaw.Graph.Behavior.Series.Toggle({
+                graph: this.chart[0],
+                legend: legend
+            });
+
+            var highlighter = new Rickshaw.Graph.Behavior.Series.Highlight({
+                graph: this.chart[0],
+                legend: legend
+            });
+
+            var hoverDetail = new Rickshaw.Graph.HoverDetail({
+                graph: this.chart[0],
+                xFormatter: function(x) { return x.toFixed(2) },
+                yFormatter: function(y) { return y }
+            });
+
             this.resizeChart(this.chart[0]);
 
-            window.addEventListener('resize', () => {
-                el.resizeChart(el.chart[0])
-            });
-        },
-        resizeChart(chart) {
-            var el = this;
-            console.log(el.$refs.panel);
-            console.log(el.$refs.panel.clientWidth);
-            
-            chart.configure({
-                width: el.$refs.panel.clientWidth,
-            });
-            chart.render();
+            window.addEventListener('resize', this.onResize);
         },
         /* Insert received datapoints into the chart */
         insertDatapoints(messages, chart) {
             for (let i = 0; i < messages.length; i++) {
                 chart.series.addData({
-                    value: parseInt(messages[i])
+                    netInt1: parseInt(messages[i]),
+                    netInt2: parseInt(messages[i])*Math.random(),
+                    netInt3: parseInt(messages[i])*Math.random()
                 })
             }
             chart.render();
@@ -148,35 +193,19 @@ export default {
                 this.messageIndex++;
             }
         },
-        openSocketListeners() {
-            this.ws = new WebSocket('ws://localhost:40510');
-            var el = this;
+        processMessage(message) {
+            /* Check if displayed values have to be updated */
+            this.updateDisplayedValues();
 
-            // event emmited when connected
-            this.ws.onopen = function () {
-                console.log('websocket is connected ...')
-
-                // sending a send event to websocket server
-                el.ws.send('connected')
+            /* Push stream data to current series, if it's not yet render-time */
+            if (this.messageSeries.length < this.renderEveryNth) {
+                this.messageSeries.push(message);
             }
 
-            // event emmited when receiving message 
-            this.ws.onmessage = function (message) {
-                var message = message.data;
-        
-                /* Check if displayed values have to be updated */
-                el.updateDisplayedValues();
-
-                /* Push stream data to current series, if it's not yet render-time */
-                if (el.messageSeries.length < el.renderEveryNth) {
-                    el.messageSeries.push(message);
-                }
-
-                /* Render-time! */
-                if (el.messageSeries.length == el.renderEveryNth) {
-                    el.insertDatapoints(el.messageSeries, el.chart[0]);
-                    el.messageSeries = [];
-                }
+            /* Render-time! */
+            if (this.messageSeries.length == this.renderEveryNth) {
+                this.insertDatapoints(this.messageSeries, this.chart[0]);
+                this.messageSeries = [];
             }
         }
     }

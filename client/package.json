@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "accurate-interval": "^1.0.9",
     "chart.js": "^2.8.0",
     "chartjs-plugin-streaming": "^1.8.0",
     "core-js": "^2.6.5",
