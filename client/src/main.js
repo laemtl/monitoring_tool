@@ -1,3 +1,4 @@
+import 'material-design-icons-iconfont/dist/material-design-icons.css' // Ensure you are using css-loader
 import Vue from "vue";
 import './plugins/vuetify'
 import App from "./App.vue";
@@ -12,27 +13,8 @@ new Vue({
   render: h => h(App)
 }).$mount("#app");
 
+Vue.use(Vuetify, {
+  iconfont: 'md'
+})
+
 var origin = new Date().getTime();
-
-function accuTime(timer, max, repeatArgument, callbackArgument){
-  var counter = 1;
-
-  var init = (t) => {
-    let timeStart = new Date().getTime();
-    setTimeout(function () {
-      if (counter < max) {
-        let fix = (new Date().getTime() - timeStart) - timer;
-        init(t - fix);
-        counter++;
-      
-      // event to be repeated max times
-        repeatArgument();
-        
-      } else {
-      // event to be executed at animation end
-        callbackArgument();
-      }
-    }, t);
-  }
-init(timer);
-}
