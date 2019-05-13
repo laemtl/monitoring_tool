@@ -6,11 +6,13 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/../client/dist'));
 
 require('./ws.js');
 
-app.get('/', (req, res) => {res.send("index page");});
+app.get('*', (req, res) => {
+  res.sendFile(__dirname, '/../dist/index.html');
+});
 
 const dashboard = require('./routes/dashboard');
 app.use('/dashboard', dashboard);
