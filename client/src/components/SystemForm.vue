@@ -12,13 +12,19 @@
                         <v-toolbar-title>System analysis</v-toolbar-title>
                     </v-toolbar>
                     
-                        <p class="error" v-if="error">{{ error }}</p>
                         <v-form class="pa-3" ref="systemForm" v-on:submit="submit">
                             <v-container class="px-0">
-                                <v-layout v-for="(item, i) in netInt">
+                                <p class="error" v-if="error">{{ error }}</p>                        
+                                
+                                <v-card-text class="text-xs-center">
+                                    <v-btn color="primary" class="my-0 ml-0" v-on:click="submit">Run</v-btn>
+                                    <v-btn outline color="primary" class="my-0" v-on:click="stop">Stop</v-btn>
+                                </v-card-text>
+                                
+                                <v-layout v-for="i in netInt.length">
                                     <v-flex xs12 md11>
                                         <v-text-field class="pa-0"
-                                            v-model="item.name"
+                                            v-model="netInt[i-1]"
                                             label="Network Interface (name)"
                                             required
                                         ></v-text-field>
@@ -43,8 +49,8 @@
                                             required
                                         ></v-text-field>
                                     </v-flex>-->
-                                    <v-icon v-if="i > 0 && (i != netInt.length - 1 || netInt.length < 3)" v-on:click="removeNetInt(i)">close</v-icon>
-                                    <v-icon v-if="i == netInt.length - 1" v-on:click="addNetInt">add_circle</v-icon>
+                                    <v-icon v-if="netInt.length > 1" v-on:click="removeNetInt(i-1)">close</v-icon>
+                                    <v-icon v-if="i == netInt.length" v-on:click="addNetInt">add_circle</v-icon>
                                 </v-layout>
                                 
                                 <!--<v-layout>
@@ -71,18 +77,36 @@
                                     </v-flex>
                                 </v-layout>
                                 <v-switch class="ma-0" color="info" 
-                                    v-model="stats" 
-                                    v-for="stat in statistics" 
-                                    :name="supertrim(stat.toLowerCase())" 
+                                    v-model="statsid" 
+                                    v-for="(stat, id) in statistics" 
+                                    :name="`${ id }`" 
                                     :label="`${ stat }`" 
-                                    :value="`${ stat }`"
+                                    :value="`${ id }`"
                                     v-on:change="configChange"
                                 ></v-switch>
+
+                                <!--<v-flex xs12 md9>
+                                    <v-text-field class="pa-0"
+                                        v-model="ip"
+                                        :rules="ipRules"
+                                        validate-on-blur
+                                        :counter=ipLength
+                                        label="IP"
+                                        required
+                                    ></v-text-field>
+                                </v-flex>
+                                <v-flex xs12 md3>
+                                    <v-text-field class="pa-0"
+                                        v-model="port"
+                                        :rules="portRules"
+                                        validate-on-blur
+                                        :counter=portLength
+                                        label="Port"
+                                        required
+                                    ></v-text-field>
+                                </v-flex>-->
                             </v-container>
-                            <v-btn color="primary" class="my-0 ml-0" v-on:click="submit">Run</v-btn>
-                            <v-btn outline color="primary" class="my-0" v-on:click="stop">Stop</v-btn>
                         </v-form>
-                    
             </v-flex>
         </v-navigation-drawer>
         <v-btn
@@ -104,8 +128,9 @@ export default {
     data() {
       return {
         drawer: null,
-        netInt: [], // network interfaces
-        stats: this.statistics, 
+        netInt: [],
+        statsid:  Object.keys(this.statistics), 
+
         interval: null,
         duration: null,
         ipLength: ipLength,
@@ -131,7 +156,8 @@ export default {
             if(this.$refs.systemForm.validate()) {
                 configBus.$emit('run', { 
                     interval: this.interval, 
-                    duration: this.duration 
+                    duration: this.duration,
+                    netInt: this.netInt
                 });
                 this.drawer = false;
             }
@@ -141,7 +167,7 @@ export default {
         },
         configChange: function () {
             // Using the config bus
-            configBus.$emit('configSelected', this.stats);
+            configBus.$emit('configSelected', this.statsid);
         }
     },
     created: function() {

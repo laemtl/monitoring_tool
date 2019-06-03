@@ -2,23 +2,16 @@
 <v-flex xs12 sm6 md3 class="pa-0">
     <v-card flat>
         <v-toolbar dense flat color="brown lighten-4">
-            <v-toolbar-title>{{ name }}</v-toolbar-title>
-          </v-toolbar>
-          <v-card-text>
+            <v-toolbar-title>{{ graph.name }}</v-toolbar-title>
+        </v-toolbar>
+        <v-card-text>
             <p class="error" v-if="error">{{ error }}</p>
-            <div class="panel-body">
-              <!-- Chart container -->
-              <div class="chart_container">
-                <div :id="'y_axis_'+ucid" class="y_axis"></div>
-                <div :id="'demo_chart_'+ucid" class="demo_chart" ref="panel"></div>
-                <div :id="'x_axis_'+ucid" class="x_axis"></div>
-                <div :id="'legend'+ucid"></div>
-              </div>
-              <!-- End of chart container -->
+            <div class="panel-body" ref="panel">
+              <div :class="'chart_container ref'+ucid" v-html="template"></div>
             </div>
-          </v-card-text>
-      </v-card>
-  </v-flex>
+        </v-card-text>
+    </v-card>
+</v-flex>
 </template>
 
 <script>
@@ -32,18 +25,19 @@ export default {
     mixins: [
         ucid
     ],
-    props: ['name'],
+    props: ['graph'],
     data() {
         return {
             messageSeries: [],
             renderEveryNth: 1,
-            updateInterval: 100,
-            streamFrequency: 10,
+            //streamFrequency: 500,
             messageIndex: 0,
             displayedValues: [],
             colors: [],
             error: null,
-            chart: []
+            chart: [],
+            template: "<div class='y_axis'></div><div class='chart'></div><div class='x_axis'></div><div class='legend'></div>",
+            legend: []
         }
     },
     beforeDestroy() {
@@ -53,14 +47,19 @@ export default {
     mounted() {
         this.initChart();
 
-        configBus.$on('message', message => {
+        configBus.$on(this.graph.id, message => {
             this.processMessage(message);
         });
     },
     watch: {
-        renderEveryNth: function() {
-            this.messageSeries = [];
-            this.messageIndex = 0;
+        graph: {
+            handler: function(newValue, oldValue) {
+                //console.log(oldValue);
+                //console.log(newValue);
+                if(oldValue.netInt === newValue.netInt) return
+                this.clearChart();
+            },
+            deep: true
         }
     },
     methods: {
@@ -81,77 +80,88 @@ export default {
             });
             chart.render();
         },
+        getSeriesConfig() {
+            var params = [];
+            var len = this.graph.netInt.length;
+            for (var i = 0; i < len; i++) {
+                params.push({
+                    color: this.getRandomColor(),
+                    name: this.graph.netInt[i]
+                });
+            }
+
+            return new Rickshaw.Series.FixedDuration(
+                params, 
+                undefined, 
+                {
+                    timeInterval: this.graph.interval *  1000,
+                    maxDataPoints: 100,
+                    timeBase: 0
+                }
+            )
+        },
+        clearChart() {
+            let p = this.chart[0].series.active; // preserve this 'needed' function
+            this.chart[0].series = this.getSeriesConfig();
+            this.chart[0].series.active = p; // unpreserve
+            this.chart[0].update();
+            this.legend[0].render();
+            this.resizeChart(this.chart[0]);
+        },
         /* Rickshaw.js initialization */
         initChart() {
             var el = this;
-                
             this.chart[0] = new Rickshaw.Graph({
-                element: document.querySelector("#demo_chart_" + this.ucid),
-                width: "500",
+                element: document.querySelector(".chart_container.ref" + this.ucid + " .chart"),
+                width: "360",
                 height: "180",
                 renderer: "line",
                 min: 0,
-                max: 20,
-                series: new Rickshaw.Series.FixedDuration([
-                    {
-                        color: this.getRandomColor(),
-                        name: 'netInt1'
-                    }, 
-                    {
-                        color: this.getRandomColor(),
-                        name: 'netInt2'
-                    }, 
-                    {
-                        color: this.getRandomColor(),
-                        name: 'netInt3'
-                    }
-                ], 
-                undefined, 
-                {
-                    timeInterval: this.updateInterval,
-                    maxDataPoints: 50,
-                    timeBase: 0.1
-                })
+                max: 0.015,
+                series: this.getSeriesConfig()
             });
 
             var y_axis = new Rickshaw.Graph.Axis.Y({
                 graph: this.chart[0],
                 orientation: 'left',
                 tickFormat: function(y) {
-                    return y.toFixed(1);
+                    return y.toFixed(4);
                 },
                 ticks: 5,
-                element: document.getElementById('y_axis_' + this.ucid)
+                element: document.querySelector(".chart_container.ref" + this.ucid + " .y_axis")
             });
             
             var x_axis = new Rickshaw.Graph.Axis.X({
                 graph: this.chart[0],
-                element: document.getElementById('x_axis_' + this.ucid),
+                element: document.querySelector(".chart_container.ref" + this.ucid + " .x_axis"),
                 orientation: 'bottom',
                 tickFormat: function(x){
                     if(x < 0)  return '';
-                    return el.parseTime(x);
+                    //return el.parseTime(x);
+                    return x //return x/100*60*2;
                 }
             });
 
-            var legend = new Rickshaw.Graph.Legend({
+            this.legend[0] = new Rickshaw.Graph.Legend({
             	graph: this.chart[0],
-	            element: document.getElementById('legend' + this.ucid)
+	            element: document.querySelector(".chart_container.ref" + this.ucid + " .legend")
             });
 
             var shelving = new Rickshaw.Graph.Behavior.Series.Toggle({
                 graph: this.chart[0],
-                legend: legend
+                legend: el.legend[0]
             });
 
             var highlighter = new Rickshaw.Graph.Behavior.Series.Highlight({
                 graph: this.chart[0],
-                legend: legend
+                legend: el.legend[0]
             });
 
             var hoverDetail = new Rickshaw.Graph.HoverDetail({
                 graph: this.chart[0],
-                xFormatter: function(x) { return x.toFixed(2) },
+                xFormatter: function(x) { return x 
+                    //return x/100*60*2 
+                },
                 yFormatter: function(y) { return y }
             });
 
@@ -162,11 +172,11 @@ export default {
         /* Insert received datapoints into the chart */
         insertDatapoints(messages, chart) {
             for (let i = 0; i < messages.length; i++) {
-                chart.series.addData({
-                    netInt1: parseInt(messages[i]),
-                    netInt2: parseInt(messages[i])*Math.random(),
-                    netInt3: parseInt(messages[i])*Math.random()
-                })
+                var params = {};
+                for (var j = 0; j < this.graph.netInt.length; j++) {
+                    params[this.graph.netInt[j]] = messages[i];
+                }
+                chart.series.addData(params);
             }
             chart.render();
         },
@@ -195,11 +205,11 @@ export default {
         },
         processMessage(message) {
             /* Check if displayed values have to be updated */
-            this.updateDisplayedValues();
-
+            //this.updateDisplayedValues();
+            
             /* Push stream data to current series, if it's not yet render-time */
             if (this.messageSeries.length < this.renderEveryNth) {
-                this.messageSeries.push(message);
+                this.messageSeries.push(message.data);
             }
 
             /* Render-time! */
@@ -213,22 +223,30 @@ export default {
 </script>
 
 <style>
+.panel-body{
+    margin-left: 40px;
+}
+
 .chart_container {
     margin-top: 20px;
     position: relative;
 }
 
-.demo_chart, .x_axis {
+.chart, .x_axis {
     position: relative;
-    margin-left: 40px;
+    /**/
     overflow:hidden;
 }
 
-.y_axis {
+div.y_axis {
     position: absolute;
     top: 0;
     bottom: 0;
     width: 40px;
+    margin-left: -40px;
+}
+
+.y_axis {
     overflow: visible !important;
 }
 </style>

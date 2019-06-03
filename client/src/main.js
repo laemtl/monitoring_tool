@@ -13,8 +13,8 @@ new Vue({
   render: h => h(App)
 }).$mount("#app");
 
-Vue.use(Vuetify, {
+/*Vue.use(Vuetify, {
   iconfont: 'md'
-})
+})*/
 
 var origin = new Date().getTime();

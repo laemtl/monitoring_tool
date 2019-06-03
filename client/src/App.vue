@@ -7,7 +7,12 @@
             <v-flex xs12 v-for="i in 1">
               <span> Analysis {{ status }} </span>
               <v-layout class="pa-2" row wrap>
-                <SystemResultGraph v-bind:name="stat" v-for="stat in stats" />
+                <SystemResultGraph v-bind:graph="{
+                  name: statistics[id],
+                  id: id,
+                  netInt: netInt,
+                  interval: interval
+                }" v-for="id in statsid" />
               </v-layout>
             </v-flex>
           </v-layout>
@@ -32,27 +37,44 @@ export default {
   },
   props: { 
     statistics: {
-      type: Array,
+      type: Object,
       default: function () {
-        return [
-          "Request service time",
-          "Throughput",
-          "Error rate",
-          "Host load"
-        ]
+        var stats = {};
+        stats["rst"] = { 
+          label: "Request service time",
+          status: 1
+        };
+        stats["tp"] = { 
+          label: "Throughput",
+          status: 1,
+          from: { ip: null, port: null },
+          to: { ip: null, port: null }
+        };
+        stats["erate"] = { 
+          label: "Error rate",
+          status: 1   
+        };
+        stats["hload"] = { 
+          label: "Host load",
+          status: 1,
+          from: { ip: null, port: null } 
+        };
+        return stats;
       }
     }
   },
   data () {
     return {
-      stats: this.statistics,
+      statsid: Object.keys(this.statistics),
       ws: null,
-      status: 'not started'
+      status: 'not started',
+      netInt: [],
+      interval: -1
     }
   },
   methods: {
     openSocketListeners() {
-      this.ws = new WebSocket('ws://localhost:40510');
+      this.ws = new WebSocket('ws://localhost:3001/ws/');
       var el = this;
 
       // event emmited when connected
@@ -60,12 +82,19 @@ export default {
         console.log('websocket is connected ...')
 
         // sending a send event to websocket server
-        el.ws.send('connected')
+        //el.ws.send('connected')
       }
       
       // event emmited when receiving message 
       this.ws.onmessage = function (message) {
-        configBus.$emit('message', message.data);
+        var data = JSON.parse(message.data);
+
+        for(var i = 0; i < el.statsid.length; i++) {
+          configBus.$emit(el.statsid[i], {
+            netInt: data.netInt, 
+            data: parseFloat(data[el.statsid[i]])
+          });
+        }
       }
     },
     closeSocketListeners() {
@@ -75,12 +104,14 @@ export default {
   },
   created() {
     // Using the server bus
-    configBus.$on('configSelected', (stats) => {
-      this.stats = stats;
+    configBus.$on('configSelected', (statsid) => {
+      this.statsid = statsid;
     });
 
     configBus.$on('run', (params) => {
       var el = this;
+      this.netInt = params.netInt;
+      this.interval = params.interval;
       this.status = 'is running';
       var duration = parseInt(params.duration, 10) * 1000;
       
@@ -91,9 +122,19 @@ export default {
       }, duration);
       
       this.openSocketListeners();
+      this.ws.addEventListener('open', function (event) {
+        //console.log("opened");
+        el.ws.send(JSON.stringify({
+          type: "Init",
+          net_int: params.netInt,
+          interval: parseInt(params.interval),
+          duration: parseInt(params.duration)
+        }));
+      });
     });
 
     configBus.$on('stop', () => {
+      console.log("stop");
       this.closeSocketListeners();
     });
   }

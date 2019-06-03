@@ -13,8 +13,10 @@ module.exports = {
       .set("@", path.join(__dirname, "./client/src"))
   },
   configureWebpack: config => {
-    config.optimization.minimizer[0].options.terserOptions.mangle = {
-      reserved: ['$super'],
-    }
+    if(process.env.NODE_ENV === 'production') {
+        config.optimization.minimizer[0].options.terserOptions.mangle = {
+          reserved: ['$super'],
+        }
+     }
   }
 }
