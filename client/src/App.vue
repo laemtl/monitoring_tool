@@ -87,14 +87,16 @@ export default {
       
       // event emmited when receiving message 
       this.ws.onmessage = function (message) {
-        var data = JSON.parse(message.data);
+        console.log(message.data);
+
+        /*var data = JSON.parse(message.data);
 
         for(var i = 0; i < el.statsid.length; i++) {
           configBus.$emit(el.statsid[i], {
             netInt: data.netInt, 
             data: parseFloat(data[el.statsid[i]])
           });
-        }
+        }*/
       }
     },
     closeSocketListeners() {
