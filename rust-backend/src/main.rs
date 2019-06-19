@@ -311,8 +311,8 @@ fn main() -> io::Result<()> {
             .service(fs::Files::new("/", "static/").index_file("index.html"))
     })
     
-    // start http server on 127.0.0.1:3001
-    .bind("127.0.0.1:3001")?
+    // start http server on 0.0.0.0:80
+    .bind("0.0.0.0:80")?
     .start();
 
     sys.run()
