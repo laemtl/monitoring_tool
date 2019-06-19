@@ -1,0 +1,10 @@
+bin/*
+.idea/
+*.iml
+
+*.a
+*.dblite
+lib/*
+*.txt
+*.o
+*~

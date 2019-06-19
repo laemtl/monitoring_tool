@@ -1,0 +1,28 @@
+syntax = "proto2";
+
+package analysis;
+
+message Init {
+    required uint32 interval = 1;
+    required uint32 duration = 2;
+    repeated string netInt = 3;    
+};
+
+message Data {
+    required int64 time = 1;
+    required string netInt = 2;
+    
+    optional double rstAvg = 3;
+    optional double rstMin = 4;
+    optional double rstMax = 5;
+    optional double rstClient = 6;
+
+    optional double tp = 7;
+
+    optional double errRate = 8;
+
+    optional double reqRate = 9;
+    optional double reqRateMin = 10;
+    optional double reqRateMax = 11;
+    optional double reqRateClient = 12;
+};

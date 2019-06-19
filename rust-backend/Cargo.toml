@@ -1,0 +1,38 @@
+[package]
+name = "rust-backend"
+version = "0.1.0"
+authors = ["Laetitia Fesselier <laetitia@leeroy.ca>"]
+edition = "2018"
+
+[dependencies]
+actix = "0.8.2"
+actix-web = "1.0.0"
+actix-web-actors = "1.0.0"
+actix-files = "0.1.1"
+actix-connector = "0.3.0"
+
+env_logger = "0.6"
+serde = "1.0"
+serde_json = "1.0"
+serde_derive = "1.0"
+json = "*"
+
+listenfd = "0.3"
+byteorder = "1.1"
+bytes = "0.4"
+protobuf = "2.6.1"
+
+bincode = "1.1.4"
+retry = "0.5.0"
+log = "0.4.6"
+futures = "0.1"
+
+tokio = "0.1.21"
+tokio-codec = "0.1"
+tokio-io = "0.1"
+tokio-tcp = "0.1"
+
+chrono = "0.4"
+
+[build-dependencies]
+protoc-rust = "2.0"
