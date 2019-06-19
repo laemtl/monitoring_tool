@@ -5,9 +5,10 @@ WORKDIR /home/lfesse/www/rust-backend
 
 COPY . .
 
-RUN cargo install --path .
+# build for release
+RUN cargo build --release
 
 # Expose ports
 EXPOSE 80
 
-CMD ["rust-backend"]
+CMD ["./target/release/rust-backend"]
