@@ -1,4 +1,4 @@
-FROM rust:1.31
+FROM rust:1.35
 
 # Set the directory we want to run the next commands for
 WORKDIR /home/lfesse/www/rust-backend
@@ -10,5 +10,4 @@ RUN cargo build --release
 
 # Expose ports
 EXPOSE 80
-
 CMD ["./target/release/rust-backend"]
