@@ -165,7 +165,7 @@ impl StreamHandler<ws::Message, ws::ProtocolError> for Ws {
                         println!("{:?}", init);
 
                         let ws_addr: Addr<_> = ctx.address();
-                        SnifferServer::connect("0.0.0.0:3000", init, ws_addr);
+                        SnifferServer::connect("bmj-cluster.cs.mcgill.ca:15430", init, ws_addr);
                     }
                     Msg::Data { time, netInt, rst, tp, errRate, reqRate } => println!("Got Data")
                 }

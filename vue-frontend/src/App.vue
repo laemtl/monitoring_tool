@@ -88,7 +88,7 @@ export default {
   },
   methods: {
     openSocketListeners() {
-      this.ws = new WebSocket('ws://localhost:3001/ws/');
+      this.ws = new WebSocket('ws://bmj-cluster.cs.mcgill.ca:15480/ws/');
       var el = this;
 
       // event emmited when connected

@@ -234,7 +234,7 @@ void print_data(Result* result) {
 
 // save DS and counter
 
-void parseURI(const char *line)
+/*void parseURI(const char *line)
 {
   start_of_path=strchr(line, '?');
   len= start_of_path-line;
@@ -259,4 +259,4 @@ void parseURI(const char *line)
         }
         (void)strncpy(query, start_of_path, len);
         query[len] = '\0';
-}
+}*/
