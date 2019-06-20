@@ -76,7 +76,7 @@ enum Msg {
         #[serde(skip_serializing_if = "Option::is_none")]
         tp: ::std::option::Option<f64>,
         #[serde(skip_serializing_if = "Option::is_none")]
-        errRate: ::std::option::Option<f64>,
+        errRate: ::std::option::Option<Params>,
         #[serde(skip_serializing_if = "Option::is_none")]
         reqRate: ::std::option::Option<Params>
     }
@@ -196,7 +196,7 @@ impl Handler<Data> for Ws {
                     avg: Some(data.get_rstAvg()),
                     min: Some(data.get_rstMin()),
                     max: Some(data.get_rstMax()),
-                    client: Some(data.get_rstClient())
+                    client: None
                 }),
                 _ => None
             },
@@ -205,7 +205,12 @@ impl Handler<Data> for Ws {
                 _ => None
             },
             errRate: match data.has_errRate() {
-                true => Some(data.get_errRate()),
+                true => Some(Params { 
+                    avg: Some(data.get_errRate()),
+                    min: Some(data.get_errRateMin()),
+                    max: Some(data.get_errRateMax()),
+                    client: None
+                }),
                 _ => None
             },
             reqRate: match data.has_reqRate() {
@@ -213,7 +218,7 @@ impl Handler<Data> for Ws {
                     avg: Some(data.get_reqRate()),
                     min: Some(data.get_reqRateMin()),
                     max: Some(data.get_reqRateMax()),
-                    client: Some(data.get_reqRateClient())
+                    client: None
                 }),
                 _ => None
             }
