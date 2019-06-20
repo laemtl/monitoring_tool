@@ -23,6 +23,8 @@ void init_data(Data* data) {
 	pthread_mutex_init(&(data->lock), NULL);
 	data->running = TRUE;
 	data->rst_min = DBL_MAX;
+	data->err_rate_min = DBL_MAX;
+	data->req_rate_min = DBL_MAX;
 }
 
 static void thread_key_setup() {
@@ -175,14 +177,23 @@ Result* get_result(Result* result) {
     }	
     result->rst_max = data->rst_max;
 
-	result->err_rate_min = data->err_rate_min;
+	if( data->err_rate_min == DBL_MAX) {
+	    result->err_rate_min = -1;
+    } else {
+		result->err_rate_min = data->err_rate_min;
+	}
 	result->err_rate_max = data->err_rate_max;
 
 	double req_rate = (double)data->req_t/data->interval;
 	result->req_rate = req_rate; 
-	update_err_rate_min(req_rate);
-	update_err_rate_max(req_rate);
-	result->req_rate_min = data->req_rate_min;
+	update_req_rate_min(req_rate);
+	update_req_rate_max(req_rate);
+
+	if(data->req_rate_min == DBL_MAX) {
+		result->req_rate_min = -1;
+	} else {
+		result->req_rate_min = data->req_rate_min;
+	}
 	result->req_rate_max = data->req_rate_max;
 
 	result->tp = (double)(data->req_t - data->err_t)/data->interval;
