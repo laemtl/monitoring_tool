@@ -66,10 +66,22 @@ int send_data(Result* result) {
 	msg.rstmax = result->rst_max;
 
 	msg.has_errrate = 1;
-	msg.errrate = result->errrate;
+	msg.errrate = result->err_rate;
+
+	msg.has_errratemin = 1;
+	msg.errratemin = result->err_rate_min;
+
+	msg.has_errratemax = 1;
+	msg.errratemax = result->err_rate_max;
 
 	msg.has_reqrate = 1;
-	msg.reqrate = result->hl;
+	msg.reqrate = result->req_rate;
+
+	msg.has_reqratemin = 1;
+	msg.reqratemin = result->req_rate_min;
+
+	msg.has_reqratemax = 1;
+	msg.reqratemax = result->req_rate_max;
 		
 	msg_len = analysis__data__get_packed_size(&msg);
 	

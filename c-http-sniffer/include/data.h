@@ -25,8 +25,15 @@ struct _data {
     uint32_t req_t;
     uint32_t err_t;
     double rst_t;
+    
     double rst_min;
     double rst_max;
+
+    double err_rate_min;
+    double err_rate_max;
+
+    double req_rate_min;
+    double req_rate_max;
 
     bool server_mode;
     int client_sock;
@@ -56,14 +63,20 @@ struct _data {
 typedef struct _result Result;
 struct _result {
     const char* interface;
-
     int client_sock;
+
 	double rst_avg;
     double rst_min;
     double rst_max;
 
-	double errrate;
-    double hl;
+	double err_rate;
+    double err_rate_min;
+    double err_rate_max;
+
+    double req_rate;
+    double req_rate_min;
+    double req_rate_max;
+    
     double tp;
 };
 

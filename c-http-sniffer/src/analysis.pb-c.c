@@ -161,7 +161,7 @@ const ProtobufCMessageDescriptor analysis__init__descriptor =
   (ProtobufCMessageInit) analysis__init__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor analysis__data__field_descriptors[12] =
+static const ProtobufCFieldDescriptor analysis__data__field_descriptors[15] =
 {
   {
     "time",
@@ -260,8 +260,44 @@ static const ProtobufCFieldDescriptor analysis__data__field_descriptors[12] =
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "reqRate",
+    "errRateMin",
     9,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_DOUBLE,
+    offsetof(Analysis__Data, has_errratemin),
+    offsetof(Analysis__Data, errratemin),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "errRateMax",
+    10,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_DOUBLE,
+    offsetof(Analysis__Data, has_errratemax),
+    offsetof(Analysis__Data, errratemax),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "errRateClient",
+    11,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_DOUBLE,
+    offsetof(Analysis__Data, has_errrateclient),
+    offsetof(Analysis__Data, errrateclient),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "reqRate",
+    12,
     PROTOBUF_C_LABEL_OPTIONAL,
     PROTOBUF_C_TYPE_DOUBLE,
     offsetof(Analysis__Data, has_reqrate),
@@ -273,7 +309,7 @@ static const ProtobufCFieldDescriptor analysis__data__field_descriptors[12] =
   },
   {
     "reqRateMin",
-    10,
+    13,
     PROTOBUF_C_LABEL_OPTIONAL,
     PROTOBUF_C_TYPE_DOUBLE,
     offsetof(Analysis__Data, has_reqratemin),
@@ -285,7 +321,7 @@ static const ProtobufCFieldDescriptor analysis__data__field_descriptors[12] =
   },
   {
     "reqRateMax",
-    11,
+    14,
     PROTOBUF_C_LABEL_OPTIONAL,
     PROTOBUF_C_TYPE_DOUBLE,
     offsetof(Analysis__Data, has_reqratemax),
@@ -297,7 +333,7 @@ static const ProtobufCFieldDescriptor analysis__data__field_descriptors[12] =
   },
   {
     "reqRateClient",
-    12,
+    15,
     PROTOBUF_C_LABEL_OPTIONAL,
     PROTOBUF_C_TYPE_DOUBLE,
     offsetof(Analysis__Data, has_reqrateclient),
@@ -310,11 +346,14 @@ static const ProtobufCFieldDescriptor analysis__data__field_descriptors[12] =
 };
 static const unsigned analysis__data__field_indices_by_name[] = {
   7,   /* field[7] = errRate */
+  10,   /* field[10] = errRateClient */
+  9,   /* field[9] = errRateMax */
+  8,   /* field[8] = errRateMin */
   1,   /* field[1] = netInt */
-  8,   /* field[8] = reqRate */
-  11,   /* field[11] = reqRateClient */
-  10,   /* field[10] = reqRateMax */
-  9,   /* field[9] = reqRateMin */
+  11,   /* field[11] = reqRate */
+  14,   /* field[14] = reqRateClient */
+  13,   /* field[13] = reqRateMax */
+  12,   /* field[12] = reqRateMin */
   2,   /* field[2] = rstAvg */
   5,   /* field[5] = rstClient */
   4,   /* field[4] = rstMax */
@@ -325,7 +364,7 @@ static const unsigned analysis__data__field_indices_by_name[] = {
 static const ProtobufCIntRange analysis__data__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 0, 12 }
+  { 0, 15 }
 };
 const ProtobufCMessageDescriptor analysis__data__descriptor =
 {
@@ -335,7 +374,7 @@ const ProtobufCMessageDescriptor analysis__data__descriptor =
   "Analysis__Data",
   "analysis",
   sizeof(Analysis__Data),
-  12,
+  15,
   analysis__data__field_descriptors,
   analysis__data__field_indices_by_name,
   1,  analysis__data__number_ranges,

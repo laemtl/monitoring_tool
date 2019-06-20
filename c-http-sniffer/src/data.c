@@ -93,6 +93,54 @@ void* update_rst_min(double rst) {
 	pthread_mutex_unlock(&data->lock); 
 }
 
+void* update_req_rate_min(double req_rate) {
+    Data* data = {0};
+	get_data(&data);
+
+	// TODO: lock are not efficient. Doesn't allow 2 concurent different writes
+	// We can probaly remove them, as only one thread write these values 
+	pthread_mutex_lock(&data->lock);
+	if(req_rate < data->req_rate_min) 
+		data->req_rate_min = req_rate;
+	pthread_mutex_unlock(&data->lock); 
+}
+
+void* update_req_rate_max(double req_rate) {
+    Data* data = {0};
+	get_data(&data);
+
+	// TODO: lock are not efficient. Doesn't allow 2 concurent different writes
+	// We can probaly remove them, as only one thread write these values 
+	pthread_mutex_lock(&data->lock);
+	if(req_rate > data->req_rate_max) 
+		data->req_rate_max = req_rate;
+	pthread_mutex_unlock(&data->lock); 
+}
+
+void* update_err_rate_min(double err_rate) {
+    Data* data = {0};
+	get_data(&data);
+
+	// TODO: lock are not efficient. Doesn't allow 2 concurent different writes
+	// We can probaly remove them, as only one thread write these values 
+	pthread_mutex_lock(&data->lock);
+	if(err_rate < data->err_rate_min) 
+		data->err_rate_min = err_rate;
+	pthread_mutex_unlock(&data->lock); 
+}
+
+void* update_err_rate_max(double err_rate) {
+    Data* data = {0};
+	get_data(&data);
+
+	// TODO: lock are not efficient. Doesn't allow 2 concurent different writes
+	// We can probaly remove them, as only one thread write these values 
+	pthread_mutex_lock(&data->lock);
+	if(err_rate > data->err_rate_max) 
+		data->err_rate_max = err_rate;
+	pthread_mutex_unlock(&data->lock); 
+}
+
 void* update_rst_max(double rst) {
     Data* data = {0};
 	get_data(&data);
@@ -114,9 +162,12 @@ Result* get_result(Result* result) {
 
 	if (data->rst_t > 0){
 		result->rst_avg = data->rst_t/data->req_t;
-		result->errrate = data->err_t/data->req_t;
+		double err_rate = data->err_t/data->req_t;
+		update_err_rate_min(err_rate);
+		update_err_rate_max(err_rate);
+		result->err_rate = err_rate;
 	}    
-    
+	
     if( data->rst_min == DBL_MAX) {
 	    result->rst_min = -1;
     } else {
@@ -124,7 +175,16 @@ Result* get_result(Result* result) {
     }	
     result->rst_max = data->rst_max;
 
-	result->hl = (double)data->req_t/data->interval;
+	result->err_rate_min = data->err_rate_min;
+	result->err_rate_max = data->err_rate_max;
+
+	double req_rate = (double)data->req_t/data->interval;
+	result->req_rate = req_rate; 
+	update_err_rate_min(req_rate);
+	update_err_rate_max(req_rate);
+	result->req_rate_min = data->req_rate_min;
+	result->req_rate_max = data->req_rate_max;
+
 	result->tp = (double)(data->req_t - data->err_t)/data->interval;
 	
 	init();
@@ -177,7 +237,7 @@ void extract_data(const flow_t *flow){
 					response_t *rsp = h->response_header;
 
 					// Compute response time
-					double rst = ((h->rsp_fb_sec + h->rsp_fb_usec) - (h->req_fb_sec + h->req_fb_usec)) * 0.000001;
+					double rst = (h->rsp_fb_sec + h->rsp_fb_usec * 0.000001) - (h->req_fb_sec + h->req_fb_usec * 0.000001);
 
 					inc_rst_t(rst);
 					update_rst_max(rst);
@@ -227,7 +287,7 @@ void print_data(Result* result) {
 	memset(time_buf, 0, sizeof(time_buf));
 	strftime(time_buf, sizeof(time_buf), "%Y%m%d %H:%M:%S", timeinfo);
 
-	printf("%s - %f %f %f %f \n", time_buf, result->rst_avg, result->rst_min, result->rst_max, result->errrate);
+	printf("%s - %f %f %f %f \n", time_buf, result->rst_avg, result->rst_min, result->rst_max, result->err_rate);
 }
 
 // install online

@@ -284,6 +284,9 @@ pub struct Data {
     rstClient: ::std::option::Option<f64>,
     tp: ::std::option::Option<f64>,
     errRate: ::std::option::Option<f64>,
+    errRateMin: ::std::option::Option<f64>,
+    errRateMax: ::std::option::Option<f64>,
+    errRateClient: ::std::option::Option<f64>,
     reqRate: ::std::option::Option<f64>,
     reqRateMin: ::std::option::Option<f64>,
     reqRateMax: ::std::option::Option<f64>,
@@ -473,7 +476,64 @@ impl Data {
         self.errRate = ::std::option::Option::Some(v);
     }
 
-    // optional double reqRate = 9;
+    // optional double errRateMin = 9;
+
+
+    pub fn get_errRateMin(&self) -> f64 {
+        self.errRateMin.unwrap_or(0.)
+    }
+    pub fn clear_errRateMin(&mut self) {
+        self.errRateMin = ::std::option::Option::None;
+    }
+
+    pub fn has_errRateMin(&self) -> bool {
+        self.errRateMin.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_errRateMin(&mut self, v: f64) {
+        self.errRateMin = ::std::option::Option::Some(v);
+    }
+
+    // optional double errRateMax = 10;
+
+
+    pub fn get_errRateMax(&self) -> f64 {
+        self.errRateMax.unwrap_or(0.)
+    }
+    pub fn clear_errRateMax(&mut self) {
+        self.errRateMax = ::std::option::Option::None;
+    }
+
+    pub fn has_errRateMax(&self) -> bool {
+        self.errRateMax.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_errRateMax(&mut self, v: f64) {
+        self.errRateMax = ::std::option::Option::Some(v);
+    }
+
+    // optional double errRateClient = 11;
+
+
+    pub fn get_errRateClient(&self) -> f64 {
+        self.errRateClient.unwrap_or(0.)
+    }
+    pub fn clear_errRateClient(&mut self) {
+        self.errRateClient = ::std::option::Option::None;
+    }
+
+    pub fn has_errRateClient(&self) -> bool {
+        self.errRateClient.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_errRateClient(&mut self, v: f64) {
+        self.errRateClient = ::std::option::Option::Some(v);
+    }
+
+    // optional double reqRate = 12;
 
 
     pub fn get_reqRate(&self) -> f64 {
@@ -492,7 +552,7 @@ impl Data {
         self.reqRate = ::std::option::Option::Some(v);
     }
 
-    // optional double reqRateMin = 10;
+    // optional double reqRateMin = 13;
 
 
     pub fn get_reqRateMin(&self) -> f64 {
@@ -511,7 +571,7 @@ impl Data {
         self.reqRateMin = ::std::option::Option::Some(v);
     }
 
-    // optional double reqRateMax = 11;
+    // optional double reqRateMax = 14;
 
 
     pub fn get_reqRateMax(&self) -> f64 {
@@ -530,7 +590,7 @@ impl Data {
         self.reqRateMax = ::std::option::Option::Some(v);
     }
 
-    // optional double reqRateClient = 12;
+    // optional double reqRateClient = 15;
 
 
     pub fn get_reqRateClient(&self) -> f64 {
@@ -622,23 +682,44 @@ impl ::protobuf::Message for Data {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_double()?;
-                    self.reqRate = ::std::option::Option::Some(tmp);
+                    self.errRateMin = ::std::option::Option::Some(tmp);
                 },
                 10 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_double()?;
-                    self.reqRateMin = ::std::option::Option::Some(tmp);
+                    self.errRateMax = ::std::option::Option::Some(tmp);
                 },
                 11 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_double()?;
-                    self.reqRateMax = ::std::option::Option::Some(tmp);
+                    self.errRateClient = ::std::option::Option::Some(tmp);
                 },
                 12 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_double()?;
+                    self.reqRate = ::std::option::Option::Some(tmp);
+                },
+                13 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_double()?;
+                    self.reqRateMin = ::std::option::Option::Some(tmp);
+                },
+                14 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_double()?;
+                    self.reqRateMax = ::std::option::Option::Some(tmp);
+                },
+                15 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
@@ -679,6 +760,15 @@ impl ::protobuf::Message for Data {
             my_size += 9;
         }
         if let Some(v) = self.errRate {
+            my_size += 9;
+        }
+        if let Some(v) = self.errRateMin {
+            my_size += 9;
+        }
+        if let Some(v) = self.errRateMax {
+            my_size += 9;
+        }
+        if let Some(v) = self.errRateClient {
             my_size += 9;
         }
         if let Some(v) = self.reqRate {
@@ -723,17 +813,26 @@ impl ::protobuf::Message for Data {
         if let Some(v) = self.errRate {
             os.write_double(8, v)?;
         }
-        if let Some(v) = self.reqRate {
+        if let Some(v) = self.errRateMin {
             os.write_double(9, v)?;
         }
-        if let Some(v) = self.reqRateMin {
+        if let Some(v) = self.errRateMax {
             os.write_double(10, v)?;
         }
-        if let Some(v) = self.reqRateMax {
+        if let Some(v) = self.errRateClient {
             os.write_double(11, v)?;
         }
-        if let Some(v) = self.reqRateClient {
+        if let Some(v) = self.reqRate {
             os.write_double(12, v)?;
+        }
+        if let Some(v) = self.reqRateMin {
+            os.write_double(13, v)?;
+        }
+        if let Some(v) = self.reqRateMax {
+            os.write_double(14, v)?;
+        }
+        if let Some(v) = self.reqRateClient {
+            os.write_double(15, v)?;
         }
         os.write_unknown_fields(self.get_unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -818,6 +917,21 @@ impl ::protobuf::Message for Data {
                     |m: &mut Data| { &mut m.errRate },
                 ));
                 fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
+                    "errRateMin",
+                    |m: &Data| { &m.errRateMin },
+                    |m: &mut Data| { &mut m.errRateMin },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
+                    "errRateMax",
+                    |m: &Data| { &m.errRateMax },
+                    |m: &mut Data| { &mut m.errRateMax },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
+                    "errRateClient",
+                    |m: &Data| { &m.errRateClient },
+                    |m: &mut Data| { &mut m.errRateClient },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
                     "reqRate",
                     |m: &Data| { &m.reqRate },
                     |m: &mut Data| { &mut m.reqRate },
@@ -867,6 +981,9 @@ impl ::protobuf::Clear for Data {
         self.rstClient = ::std::option::Option::None;
         self.tp = ::std::option::Option::None;
         self.errRate = ::std::option::Option::None;
+        self.errRateMin = ::std::option::Option::None;
+        self.errRateMax = ::std::option::Option::None;
+        self.errRateClient = ::std::option::Option::None;
         self.reqRate = ::std::option::Option::None;
         self.reqRateMin = ::std::option::Option::None;
         self.reqRateMax = ::std::option::Option::None;
@@ -890,14 +1007,16 @@ impl ::protobuf::reflect::ProtobufValue for Data {
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0eanalysis.proto\x12\x08analysis\":\n\x04Init\x12\x10\n\x08interval\
     \x18\x01\x20\x02(\r\x12\x10\n\x08duration\x18\x02\x20\x02(\r\x12\x0e\n\
-    \x06netInt\x18\x03\x20\x03(\t\"\xd4\x01\n\x04Data\x12\x0c\n\x04time\x18\
+    \x06netInt\x18\x03\x20\x03(\t\"\x93\x02\n\x04Data\x12\x0c\n\x04time\x18\
     \x01\x20\x02(\x03\x12\x0e\n\x06netInt\x18\x02\x20\x02(\t\x12\x0e\n\x06rs\
     tAvg\x18\x03\x20\x01(\x01\x12\x0e\n\x06rstMin\x18\x04\x20\x01(\x01\x12\
     \x0e\n\x06rstMax\x18\x05\x20\x01(\x01\x12\x11\n\trstClient\x18\x06\x20\
     \x01(\x01\x12\n\n\x02tp\x18\x07\x20\x01(\x01\x12\x0f\n\x07errRate\x18\
-    \x08\x20\x01(\x01\x12\x0f\n\x07reqRate\x18\t\x20\x01(\x01\x12\x12\n\nreq\
-    RateMin\x18\n\x20\x01(\x01\x12\x12\n\nreqRateMax\x18\x0b\x20\x01(\x01\
-    \x12\x15\n\rreqRateClient\x18\x0c\x20\x01(\x01\
+    \x08\x20\x01(\x01\x12\x12\n\nerrRateMin\x18\t\x20\x01(\x01\x12\x12\n\ner\
+    rRateMax\x18\n\x20\x01(\x01\x12\x15\n\rerrRateClient\x18\x0b\x20\x01(\
+    \x01\x12\x0f\n\x07reqRate\x18\x0c\x20\x01(\x01\x12\x12\n\nreqRateMin\x18\
+    \r\x20\x01(\x01\x12\x12\n\nreqRateMax\x18\x0e\x20\x01(\x01\x12\x15\n\rre\
+    qRateClient\x18\x0f\x20\x01(\x01\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {

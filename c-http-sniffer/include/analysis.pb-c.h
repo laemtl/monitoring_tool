@@ -54,6 +54,12 @@ struct  _Analysis__Data
   double tp;
   protobuf_c_boolean has_errrate;
   double errrate;
+  protobuf_c_boolean has_errratemin;
+  double errratemin;
+  protobuf_c_boolean has_errratemax;
+  double errratemax;
+  protobuf_c_boolean has_errrateclient;
+  double errrateclient;
   protobuf_c_boolean has_reqrate;
   double reqrate;
   protobuf_c_boolean has_reqratemin;
@@ -65,7 +71,7 @@ struct  _Analysis__Data
 };
 #define ANALYSIS__DATA__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&analysis__data__descriptor) \
-    , 0, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+    , 0, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 
 
 /* Analysis__Init methods */

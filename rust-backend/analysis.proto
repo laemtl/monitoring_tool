@@ -20,9 +20,12 @@ message Data {
     optional double tp = 7;
 
     optional double errRate = 8;
+    optional double errRateMin = 9;
+    optional double errRateMax = 10;
+    optional double errRateClient = 11;
 
-    optional double reqRate = 9;
-    optional double reqRateMin = 10;
-    optional double reqRateMax = 11;
-    optional double reqRateClient = 12;
+    optional double reqRate = 12;
+    optional double reqRateMin = 13;
+    optional double reqRateMax = 14;
+    optional double reqRateClient = 15;
 };
