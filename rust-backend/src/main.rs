@@ -29,7 +29,9 @@ use actix_web::{
 use actix_web_actors::ws;
 use actix::Context;
 
-use std::net;
+use std::net::{
+    ToSocketAddrs, IpAddr, SocketAddr
+};
 use std::io;
 
 /// How often heartbeat pings are sent
@@ -165,7 +167,9 @@ impl StreamHandler<ws::Message, ws::ProtocolError> for Ws {
                         println!("{:?}", init);
 
                         let ws_addr: Addr<_> = ctx.address();
-                        SnifferServer::connect("bmj-cluster.cs.mcgill.ca:15430", init, ws_addr);
+                        
+                        //let ip = resolve("bmj-cluster.cs.mcgill.ca:15430");
+                        SnifferServer::connect("132.206.55.112:15430", init, ws_addr);
                     }
                     Msg::Data { time, netInt, rst, tp, errRate, reqRate } => println!("Got Data")
                 }
@@ -235,10 +239,14 @@ struct SnifferServer {
     recipient: Recipient<Data>
 }
 
+fn resolve(host: &str) -> io::Result<Vec<IpAddr>> {
+    (host, 0).to_socket_addrs().map(|iter| iter.map(|socket_address| socket_address.ip()).collect())
+}
+
 impl SnifferServer {
     pub fn connect(_s: &str, init: Init, ws_addr: Addr<Ws>) {
         // Create server listener
-        let addr = net::SocketAddr::from_str(_s).unwrap();
+        let addr = SocketAddr::from_str(_s).unwrap();
 
         Arbiter::spawn(
             TcpStream::connect(&addr)
