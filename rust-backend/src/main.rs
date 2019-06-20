@@ -169,7 +169,7 @@ impl StreamHandler<ws::Message, ws::ProtocolError> for Ws {
                         let ws_addr: Addr<_> = ctx.address();
                         
                         //let ip = resolve("bmj-cluster.cs.mcgill.ca:15430");
-                        SnifferServer::connect("132.206.55.112:15430", init, ws_addr);
+                        SnifferServer::connect("127.0.0.1:3000", init, ws_addr);
                     }
                     Msg::Data { time, netInt, rst, tp, errRate, reqRate } => println!("Got Data")
                 }
