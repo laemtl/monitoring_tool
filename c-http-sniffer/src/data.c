@@ -116,8 +116,13 @@ Result* get_result(Result* result) {
 		result->rst_avg = data->rst_t/data->req_t;
 		result->errrate = data->err_t/data->req_t;
 	}    
-	result->rst_min = data->rst_min;
-	result->rst_max = data->rst_max;
+    
+    if( data->rst_min == DBL_MAX) {
+	    result->rst_min = -1;
+    } else {
+	    result->rst_min = data->rst_min;
+    }	
+    result->rst_max = data->rst_max;
 
 	result->hl = (double)data->req_t/data->interval;
 	result->tp = (double)(data->req_t - data->err_t)/data->interval;

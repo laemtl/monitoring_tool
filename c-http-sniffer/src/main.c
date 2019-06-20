@@ -435,6 +435,7 @@ int main(int argc, char *argv[]){
 		if(data == NULL) return EXIT_FAILURE;		
 		init_data(data);
 		data->interface = interface;
+        data->interval = 1;
 		start_analysis(ipaddress, data);
 	}
 

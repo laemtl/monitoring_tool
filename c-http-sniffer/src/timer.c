@@ -105,12 +105,17 @@ void start_duration_timer(Data* data) {
 
 void start_timer(Data* data) {
 	thread_init(data);
-
-	pthread_t timer_duration;
-	pthread_create(&timer_duration, NULL, (void*)start_duration_timer, data);
+        
+    pthread_t timer_duration;
+    if(data->duration > 0) {	    
+	    pthread_create(&timer_duration, NULL, (void*)start_duration_timer, data);
+    }
 
 	start_interval_timer(data->interval);
-	pthread_join(timer_duration, NULL);
+	
+    if(data->duration > 0) {
+        pthread_join(timer_duration, NULL);
+    }
 }
 
 void start_interval_timer(uint32_t interval) {
