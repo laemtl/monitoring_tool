@@ -19,12 +19,37 @@ void destr_fn(void *param) {
    //free(param);
 }
 
+void init_once_metric(Metric* metric) {
+	pthread_mutex_init(&(metric->total.mutex), NULL);
+	pthread_mutex_init(&(metric->subtotal.mutex), NULL);
+	pthread_mutex_init(&(metric->min.mutex), NULL);
+	pthread_mutex_init(&(metric->max.mutex), NULL);
+}
+
+void reset_metric(Metric* metric) {
+	metric->total.value = 0;
+	metric->min.value = DBL_MAX;
+	metric->max.value = 0;
+}
+
+void reset(Data* data) {
+	reset_metric(&(data->rst));
+	reset_metric(&(data->err_rate));
+	reset_metric(&(data->req_rate));
+	reset_metric(&(data->tp));
+
+	data->int_step = 0;
+}
+
 void init_data(Data* data) {
-	pthread_mutex_init(&(data->lock), NULL);
+	init_once_metric(&(data->rst));
+	init_once_metric(&(data->err_rate));
+	init_once_metric(&(data->req_rate));
+	init_once_metric(&(data->tp));
+
+	reset(data);
+	
 	data->running = TRUE;
-	data->rst_min = DBL_MAX;
-	data->err_rate_min = DBL_MAX;
-	data->req_rate_min = DBL_MAX;
 }
 
 static void thread_key_setup() {
@@ -42,8 +67,6 @@ void thread_init(Data* d) {
 		printf("pthread_setspecific failed, errno %d", errno);
 		pthread_exit((void *)12);
 	}
-
-	//init();
 }
 
 void print_tid() {
@@ -59,158 +82,77 @@ void get_data(Data** d) {
 	}
 }
 
-void* inc_req_t() {
-    Data* data = {0};
-	get_data(&data);
-    pthread_mutex_lock(&data->lock);
-	data->req_t++;
-	pthread_mutex_unlock(&data->lock); 
+double get_metric_min(Metric metric) {
+    if( metric.min.value == DBL_MAX) {
+	    return -1;
+    }
+	return metric.min.value;
 }
 
-void* inc_err_t() {
-    Data* data = {0};
+double get_rst_avg(Metric metric) {
+	Data* data = {0};
 	get_data(&data);
-    pthread_mutex_lock(&data->lock);
-	data->err_t++;
-	pthread_mutex_unlock(&data->lock); 
-}    
 
-void* inc_rst_t(double rst_t) {
-    Data* data = {0};
-	get_data(&data);
-    pthread_mutex_lock(&data->lock);
-	data->rst_t += rst_t;
-	pthread_mutex_unlock(&data->lock); 
+	double req_total = data->req_rate.total.value; 
+	if (req_total > 0) return metric.total.value/req_total;
+	return 0;
 }
 
-void* update_rst_min(double rst) {
-    Data* data = {0};
+double get_err_rate() {
+	Data* data = {0};
 	get_data(&data);
 
-	// TODO: lock are not efficient. Doesn't allow 2 concurent different writes
-	// We can probaly remove them, as only one thread write these values 
-	pthread_mutex_lock(&data->lock);
-	if(rst < data->rst_min) 
-		data->rst_min = rst;
-	pthread_mutex_unlock(&data->lock); 
+	double req_total = data->req_rate.total.value; 
+	if (req_total > 0) return data->err_rate.total.value/req_total;
+	return 0;
 }
 
-void* update_req_rate_min(double req_rate) {
-    Data* data = {0};
+// Get error rate with subtotals
+double get_err_rate_subtotals() {
+	Data* data = {0};
 	get_data(&data);
 
-	// TODO: lock are not efficient. Doesn't allow 2 concurent different writes
-	// We can probaly remove them, as only one thread write these values 
-	pthread_mutex_lock(&data->lock);
-	if(req_rate < data->req_rate_min) 
-		data->req_rate_min = req_rate;
-	pthread_mutex_unlock(&data->lock); 
+	double req_subtotal = data->req_rate.subtotal.value; 
+	if (req_subtotal > 0) return data->err_rate.subtotal.value/req_subtotal;
+	return 0;
 }
 
-void* update_req_rate_max(double req_rate) {
-    Data* data = {0};
+double get_req_rate() {
+	Data* data = {0};
 	get_data(&data);
 
-	// TODO: lock are not efficient. Doesn't allow 2 concurent different writes
-	// We can probaly remove them, as only one thread write these values 
-	pthread_mutex_lock(&data->lock);
-	if(req_rate > data->req_rate_max) 
-		data->req_rate_max = req_rate;
-	pthread_mutex_unlock(&data->lock); 
+	double req_total = data->req_rate.total.value; 
+	return (double)req_total/data->interval;
 }
 
-void* update_err_rate_min(double err_rate) {
-    Data* data = {0};
-	get_data(&data);
-
-	// TODO: lock are not efficient. Doesn't allow 2 concurent different writes
-	// We can probaly remove them, as only one thread write these values 
-	pthread_mutex_lock(&data->lock);
-	if(err_rate < data->err_rate_min) 
-		data->err_rate_min = err_rate;
-	pthread_mutex_unlock(&data->lock); 
+void inc_metric_total(Metric* metric, double amt) {
+    pthread_mutex_lock(&(metric->total.mutex));
+	metric->total.value += amt;
+	pthread_mutex_unlock(&(metric->total.mutex));
 }
 
-void* update_err_rate_max(double err_rate) {
-    Data* data = {0};
-	get_data(&data);
-
-	// TODO: lock are not efficient. Doesn't allow 2 concurent different writes
-	// We can probaly remove them, as only one thread write these values 
-	pthread_mutex_lock(&data->lock);
-	if(err_rate > data->err_rate_max) 
-		data->err_rate_max = err_rate;
-	pthread_mutex_unlock(&data->lock); 
+void inc_metric_subtotal(Metric* metric, double amt) {
+	pthread_mutex_lock(&(metric->subtotal.mutex));
+	metric->subtotal.value += amt;
+	pthread_mutex_unlock(&(metric->subtotal.mutex)); 
 }
 
-void* update_rst_max(double rst) {
-    Data* data = {0};
-	get_data(&data);
-
-	// TODO: lock are not efficient. Doesn't allow 2 concurent different writes
-	// We can probaly remove them, as only one thread write these values 
-	pthread_mutex_lock(&data->lock);
-	if(rst > data->rst_max) 
-		data->rst_max = rst;
-	pthread_mutex_unlock(&data->lock); 
+void reset_metric_subtotal(Metric* metric) {
+	pthread_mutex_lock(&(metric->subtotal.mutex));
+	metric->subtotal.value = 0;
+	pthread_mutex_unlock(&(metric->subtotal.mutex)); 
 }
 
-Result* get_result(Result* result) {
-    Data* data = {0};
-	get_data(&data);
-
-	result->interface = data->interface;	
-	result->client_sock = data->client_sock;
-
-	if (data->rst_t > 0){
-		result->rst_avg = data->rst_t/data->req_t;
-		double err_rate = data->err_t/data->req_t;
-		update_err_rate_min(err_rate);
-		update_err_rate_max(err_rate);
-		result->err_rate = err_rate;
-	}    
-	
-    if( data->rst_min == DBL_MAX) {
-	    result->rst_min = -1;
-    } else {
-	    result->rst_min = data->rst_min;
-    }	
-    result->rst_max = data->rst_max;
-
-	if( data->err_rate_min == DBL_MAX) {
-	    result->err_rate_min = -1;
-    } else {
-		result->err_rate_min = data->err_rate_min;
-	}
-	result->err_rate_max = data->err_rate_max;
-
-	double req_rate = (double)data->req_t/data->interval;
-	result->req_rate = req_rate; 
-	update_req_rate_min(req_rate);
-	update_req_rate_max(req_rate);
-
-	if(data->req_rate_min == DBL_MAX) {
-		result->req_rate_min = -1;
-	} else {
-		result->req_rate_min = data->req_rate_min;
-	}
-	result->req_rate_max = data->req_rate_max;
-
-	result->tp = (double)(data->req_t - data->err_t)/data->interval;
-	
-	init();
-
-	return result;
+void update_metric_min(Metric* metric, double value) {
+	pthread_mutex_lock(&(metric->min.mutex));
+	if(value < metric->min.value) metric->min.value = value;
+	pthread_mutex_unlock(&(metric->min.mutex)); 
 }
 
-void init () {
-    Data* data = {0};
-	get_data(&data);
-    data->req_t = 0;
-    data->err_t = 0;
-    data->rst_t = 0;
-	//data->rst_min = DBL_MAX;
-	//data->rst_max = 0;
+void update_metric_max(Metric* metric, double value) {
+	pthread_mutex_lock(&(metric->max.mutex));
+	if(value > metric->max.value) metric->max.value = value;
+	pthread_mutex_unlock(&(metric->max.mutex)); 
 }
 
 bool is_server_mode() {
@@ -219,12 +161,11 @@ bool is_server_mode() {
 	return data->server_mode;
 }
 
-// TODO: add an array like DS to compute avg per source/dest?
-// TODO: Rename to flow_save (don't print anymore)
-// TODO: Be sure to lock before editing global variable
 void extract_data(const flow_t *flow){	
+	Data* data = {0};
+	get_data(&data);
+
 	/*Convert IP addr */
-	//TODO: Check if malloc is necessary
 	//char *saddr = malloc(sizeof("aaa.bbb.ccc.ddd"));
 	//char *daddr = malloc(sizeof("aaa.bbb.ccc.ddd"));
 	
@@ -239,8 +180,10 @@ void extract_data(const flow_t *flow){
 	if (flow->http_f != NULL){        	
 		http_pair_t *h = flow->http_f;
     	
-		while(h != NULL){
-			inc_req_t();
+		while(h != NULL) {
+			inc_metric_subtotal(&(data->req_rate), 1);
+			inc_metric_total(&(data->req_rate), 1);
+
 			if(h->request_header != NULL) {
 				request_t *req = h->request_header;
 				
@@ -250,14 +193,17 @@ void extract_data(const flow_t *flow){
 					// Compute response time
 					double rst = (h->rsp_fb_sec + h->rsp_fb_usec * 0.000001) - (h->req_fb_sec + h->req_fb_usec * 0.000001);
 
-					inc_rst_t(rst);
-					update_rst_max(rst);
-					update_rst_min(rst);
-
+					inc_metric_total(&(data->rst), rst);
+					update_metric_min(&(data->rst), rst);
+					update_metric_max(&(data->rst), rst);
+					
 					// Extract first digit of status code
 					int i=rsp->status;
 					while (i>=10) i=i/10;  
-					if (i==4 || i==5) inc_err_t();
+					if (i==4 || i==5) {
+						inc_metric_subtotal(&(data->err_rate), 1);
+						inc_metric_total(&(data->err_rate), 1);
+					}
 				}
 			}	   
 			h = h->next;
@@ -265,26 +211,68 @@ void extract_data(const flow_t *flow){
 	}
 }
 
+
+// TODO: check if status active
+Result* get_result(Result* result) {
+    Data* data = {0};
+	get_data(&data);
+
+	result->interface = data->interface;	
+	result->client_sock = data->client_sock;
+
+	result->rst_avg = get_rst_avg(data->rst);
+	result->rst_min = get_metric_min(data->rst);
+    result->rst_max = data->rst.max.value;
+	
+	result->err_rate = get_err_rate();    
+	result->err_rate_min = get_metric_min(data->err_rate);   
+	result->err_rate_max = data->req_rate.max.value;   
+	
+	result->req_rate = get_req_rate(); 
+	result->req_rate_min = get_metric_min(data->req_rate);
+	result->req_rate_max = data->req_rate.max.value;
+	
+	return result;
+}
+
+// TODO: check if status active
+void process_rate(Data* data) {
+	double req_subtotal = data->req_rate.subtotal.value;
+	update_metric_min(&(data->req_rate), req_subtotal);
+	update_metric_max(&(data->req_rate), req_subtotal);
+	
+	double err_rate_subtotals = get_err_rate_subtotals();
+	update_metric_min(&(data->err_rate), err_rate_subtotals);
+	update_metric_max(&(data->err_rate), err_rate_subtotals);
+	
+	reset_metric_subtotal(&(data->req_rate));
+	reset_metric_subtotal(&(data->err_rate));	
+}
+
 void process_data() {
 	Data* data = {0};
 	get_data(&data);
 	
+	data->int_step++;
+	process_rate(data);
+	if(data->int_step < data->interval) return;
+
 	Result* result = calloc(1, sizeof(Result));
 	get_result(result);
+	reset(data);
 
 #if DEBUGGING == 2
 	print_data(result);
 	fflush(stdout);
 #endif
 
-	// TODO: Callback with registered events??
 	// Struct are passed by value so the code below will execute correctly in an MT env
 	if(is_server_mode()) {
 		send_data(result);
 	} 
 
 	free(result);
-	if(!data->running) pthread_exit(NULL);
+	if(!data->running) pthread_exit(NULL);		
 }
 
 void print_data(Result* result) {
@@ -310,29 +298,30 @@ void print_data(Result* result) {
 
 // save DS and counter
 
-/*void parseURI(const char *line)
-{
-  start_of_path=strchr(line, '?');
-  len= start_of_path-line;
-  path=malloc(sizeof(char) * (len + 1));
-  if ( NULL == path ){ 
-                   free(path);
-                   return;
-}
-             else
-             {        
-               (void)strncpy(path, line, len);
-               path[len] = '\0';}
-             //  printf("%s\n", path);
-               start_of_path++;
-               end_of_query=strchr(start_of_path, '\0');
-               //printf("%s\n",end_of_query);
-               len=end_of_query-start_of_path;
-               query=malloc(sizeof(char) * (len + 1));
-               if ( NULL == query ) {
-                       free(query);
-            
-        }
-        (void)strncpy(query, start_of_path, len);
-        query[len] = '\0';
+/*void parseURI(const char *line) {
+	start_of_path=strchr(line, '?');
+	len = start_of_path-line;
+	path = malloc(sizeof(char) * (len + 1));
+	
+	if ( NULL == path ){ 
+        free(path);
+        return;
+	} else {        
+        (void)strncpy(path, line, len);
+        path[len] = '\0';
+	}
+    
+	//  printf("%s\n", path);
+    start_of_path++;
+    end_of_query=strchr(start_of_path, '\0');
+    //printf("%s\n",end_of_query);
+    len=end_of_query-start_of_path;
+	query=malloc(sizeof(char) * (len + 1));
+	
+	if ( NULL == query ) {
+		free(query);
+	}
+    
+	(void)strncpy(query, start_of_path, len);
+    query[len] = '\0';
 }*/

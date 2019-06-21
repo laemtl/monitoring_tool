@@ -11,7 +11,6 @@
 #include "util.h"
 #include "server.h"
 
-// TODO: Be sure to lock before editing global variable
 //int GP_CAP_FIN = 0; /* Flag for offline PCAP sniffing */
 
 void
@@ -209,8 +208,6 @@ process_packet_queue(Data* data){
 	thread_init(data);
 	
 	while(1){
-		// TODO: check how to handle the offline mode
-		// Change was made
 		pkt = packet_queue_deq();
 		if ( !data->running ) {
 			break;
@@ -236,8 +233,6 @@ process_flow_queue(Data* data){
 	while(1){
 		flow = flow_queue_deq();
 
-		// TODO: check how to handle the offline mode
-		// Change was made
 		if (!data->running) {
 			break;
 		} else if(flow != NULL){
@@ -297,7 +292,6 @@ capture_main(void* p){
 	
 	thread_init(data);
 
-	//TODO: offline mode doesn't exist anymore
 	if ( livemode==1 ) {
 		cap = pcap_open_live(interface, 65535, 0, 1000, errbuf);
 	} else {
@@ -316,9 +310,9 @@ capture_main(void* p){
 			if (NULL!= packet){
 				pkt_handler(packet);
 
-				//TODO: Check with this is commented! Memory leak.
+				// Check with this is commented! Memory leak.
 				// Is it to solve the seg Fault?
-				//packet_free(packet);
+				// packet_free(packet);
 			}
 		} else if ( livemode==0 || !data->running) {
 			//GP_CAP_FIN = 1;
@@ -334,7 +328,6 @@ capture_main(void* p){
 	return 0;
 }
 
-//TODO: check if sending is done to the correct client
 void start_analysis(char* ipaddress, Data* data) {
 	void *thread_result;
 	time_t start, end;
@@ -371,7 +364,6 @@ void start_analysis(char* ipaddress, Data* data) {
 	/* Start flow processing thread */
 	pthread_create(&job_flow_q, NULL, (void*)process_flow_queue, data);
 
-	// TODO, uniformize error handling	
 	pthread_create(&timer, NULL, start_timer, data);
 
 #if DEBUGGING == 1
@@ -379,7 +371,6 @@ void start_analysis(char* ipaddress, Data* data) {
 #endif
 
 	/* Start main capture in live or offline mode */
-	//TODO: check if we need the offline mode
 	pthread_create(&capture, NULL, (void*)capture_main, param);
 
 	// Wait for all threads to finish
@@ -403,8 +394,6 @@ void start_analysis(char* ipaddress, Data* data) {
  */
 int main(int argc, char *argv[]){
 	char* interface = NULL;
-	//TODO: check if we need the offline mode
-
 	char* ipaddress = NULL;
 	int opt;
 
@@ -429,8 +418,6 @@ int main(int argc, char *argv[]){
 	
 	// Interface is provided - RUN in app mode
 	} else {		
-		// TODO: move this call in a thread (can be a botte neck in case of high-traffic)
-		// Be sure this is thread specific
 		Data* data = (Data*)calloc(1, sizeof(Data));
 		if(data == NULL) return EXIT_FAILURE;		
 		init_data(data);

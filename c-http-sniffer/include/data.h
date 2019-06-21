@@ -2,11 +2,11 @@
 #define DATA_H
 
 #include <stdint.h>
-#include "flow.h"
 #include <errno.h>
 #include <pthread.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include "flow.h"
 
 #define HASH_SIZE	13200
 
@@ -14,32 +14,51 @@
 #define DEBUGGING 2 
 #endif
 
+typedef struct _addr Addr;
+struct _addr {
+	u_int32_t	ip;
+	u_int16_t	port;
+//    int		    elm_cnt;
+};
+
+typedef struct _path Path;
+struct _path {
+	char*       path;
+    int		    elm_cnt;
+};
+
+typedef struct _metric_el Metric_el;
+struct _metric_el {
+    double value;
+	pthread_mutex_t mutex;
+};
+
+typedef struct _metric Metric;
+struct _metric {
+    int status;
+    Metric_el subtotal;
+    Metric_el total;
+    Metric_el min;
+    Metric_el max;
+};
+
 // memset to 0 on init
 typedef struct _data Data;
 struct _data {
+    bool server_mode;
+    int client_sock;
     bool running;
     const char* interface;
     uint32_t interval;
+    uint32_t int_step;
     uint32_t duration;
 
-    uint32_t req_t;
-    uint32_t err_t;
-    double rst_t;
+    Addr destination;
     
-    double rst_min;
-    double rst_max;
-
-    double err_rate_min;
-    double err_rate_max;
-
-    double req_rate_min;
-    double req_rate_max;
-
-    bool server_mode;
-    int client_sock;
-
-    // data.c
-    pthread_mutex_t lock;
+    Metric rst;
+    Metric err_rate;
+    Metric req_rate;
+    Metric tp;
     
     // flow_queue.c
     /* Queue vars */
@@ -55,9 +74,15 @@ struct _data {
     packet_t *pkt_last;
     pthread_mutex_t mutex;
  
-    // hash_table.c
+    // flow_hash_table.c
     hash_mb_t *flow_hash_table[HASH_SIZE];
     int flow_cnt;	/* flows live in hash table */
+
+    Addr *addr_hash_table[HASH_SIZE];
+    int addr_cnt;
+    
+    Path *path_hash_table[HASH_SIZE];
+    int path_cnt;
 };
 
 typedef struct _result Result;

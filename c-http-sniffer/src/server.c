@@ -108,14 +108,13 @@ int send_data(Result* result) {
 /*
  * This will handle connection for each client
  * */
-void *connection_handler(int *socket) {
+void* connection_handler(int *socket) {
 	int status;
 	uint64_t msg_len;
 	Analysis__Init *init;
 	
 	//Receive a message from client
-	//TODO: check the message type if we expect other msg than init!!
-    //do {
+	//do {
 		// Read the prefix length (varint)
 		msg_len = decode_varint(*socket);
 		printf("msg_len: %d\n", msg_len);
@@ -140,8 +139,6 @@ void *connection_handler(int *socket) {
 			printf("Received: interval: %d\n", init->interval);  // required field
 			printf("Received: duration: %d\n", init->duration);  // required field
 
-			// TODO: Each connection run on a different thread
-			// TODO: Start new threads to handle different network interfaces 
 			for (unsigned i = 0; i < init->n_netint; i++) { // Iterate through all repeated string
 				printf ("netInt: %s\n\n", init->netint[i]);
 		
@@ -172,9 +169,7 @@ void *connection_handler(int *socket) {
         perror("recv failed\n");
     }
 
-	// TODO: think where we should close the socket
-	// TODO : close once the timer expire
-    //Free the socket pointer    
+	//Free the socket pointer    
     close(*socket);
 
 	printf("Socket was closed \n \n \n");
@@ -186,7 +181,7 @@ void *connection_handler(int *socket) {
 
 	pthread_cancel(pthread_t thread);
 
-	// TODO: close connection
+	// add close connection functionnality
 	//signal(SIG_IGN);
 }*/
 
@@ -296,7 +291,6 @@ void start_server() {
         //Now join the thread , so that we dont terminate before the thread
         printf("Handler assigned\n");
 
-		// TODO: does this block the loop? 
 		pthread_detach(sniffer_thread);
 	}
 

@@ -111,7 +111,8 @@ void start_timer(Data* data) {
 	    pthread_create(&timer_duration, NULL, (void*)start_duration_timer, data);
     }
 
-	start_interval_timer(data->interval);
+	// satrt an interval timer wich fires every seconds to compute rates
+	start_interval_timer(1);
 	
     if(data->duration > 0) {
         pthread_join(timer_duration, NULL);
