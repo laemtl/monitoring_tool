@@ -18,7 +18,7 @@ debugging_print(Data* data){
 	thread_init(data);
 
 	while(1){
-		if ( data->status < 1) {
+		if ( data->status < 0) {
 			break;
 		} else {
 			packet_queue_print();
@@ -216,7 +216,7 @@ process_packet_queue(Data* data){
 	
 	while(1){
 		pkt = packet_queue_deq();
-		if ( data->status < 1 ) {
+		if ( data->status < 0 ) {
 			break;
 		} else if (pkt != NULL){
 			flow_hash_add_packet(pkt);
@@ -240,7 +240,7 @@ process_flow_queue(Data* data){
 	while(1){
 		flow = flow_queue_deq();
 
-		if (data->status < 1) {
+		if (data->status < 0) {
 			break;
 		} else if(flow != NULL){
 			flow_extract_http(flow);
@@ -268,7 +268,7 @@ scrubbing_flow_htbl(Data* data){
 		sleep(10);
 		if (data->status == 1){
 			num = flow_scrubber(60*10);	/* flow timeout in seconds */
-		} else {
+		} else if (data->status == -1){{
 			num = flow_scrubber(-1); /* cleanse all flows */
 			break;
 		}
@@ -321,7 +321,7 @@ capture_main(void* p){
 				// Is it to solve the seg Fault?
 				// packet_free(packet);
 			}
-		} else if ( livemode==0 || data->status < 1) {
+		} else if ( livemode==0 || data->status < 0) {
 			//GP_CAP_FIN = 1;
 			break;
 		} else {
@@ -361,6 +361,7 @@ void start_analysis(char* ipaddress, Data* data) {
 	
 	packet_queue_init((void*) data);
 	flow_init((void*) data);
+	data->status = 1;
 
 	/* Start packet receiving thread */
 	pthread_create(&job_pkt_q, NULL, (void*)process_packet_queue, data);

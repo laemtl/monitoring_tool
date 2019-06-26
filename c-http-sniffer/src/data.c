@@ -269,7 +269,7 @@ void process_data() {
 	} 
 
 	free(result);
-	if(data->status < 1) pthread_exit(NULL);		
+	if(data->status < 0) pthread_exit(NULL);		
 }
 
 void print_data(Result* result) {
