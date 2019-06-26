@@ -268,7 +268,7 @@ scrubbing_flow_htbl(Data* data){
 		sleep(10);
 		if (data->status == 1){
 			num = flow_scrubber(60*10);	/* flow timeout in seconds */
-		} else if (data->status == -1){{
+		} else if (data->status == -1){
 			num = flow_scrubber(-1); /* cleanse all flows */
 			break;
 		}
