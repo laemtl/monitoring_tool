@@ -118,9 +118,30 @@ struct _capt {
     Data* data;
 };
 
-void extract_data(const flow_t *flow);
-void process_data ();
-void print_data();
+void destr_fn(void *param);
+void init_once_metric(Metric* metric);
+void reset_metric(Metric* metric);
+void reset(Data* data);
+void init_data(Data* data);
+static void thread_key_setup();
 void thread_init(Data* d);
+void print_tid();
+void get_data(Data** d);
+double get_metric_min(Metric metric);
+double get_rst_avg(Metric metric);
+double get_err_rate();
+double get_err_rate_subtotals();
+double get_req_rate();
+void inc_metric_total(Metric* metric, double amt);
+void inc_metric_subtotal(Metric* metric, double amt);
+void reset_metric_subtotal(Metric* metric);
+void update_metric_min(Metric* metric, double value);
+void update_metric_max(Metric* metric, double value);
+bool is_server_mode();
+void extract_data(const flow_t *flow);
+Result* get_result(Result* result);
+void process_rate(Data* data);
+void process_data();
+void print_data(Result* result);
 
 #endif

@@ -190,7 +190,7 @@ void extract_data(const flow_t *flow){
 					// Compute response time
 					double rst = (h->rsp_fb_sec + h->rsp_fb_usec * 0.000001) - (h->req_fb_sec + h->req_fb_usec * 0.000001);
 
-					inc_metric_total(&(data->rst), rst);
+					//inc_metric_total(&(data->rst), rst);
 					update_metric_min(&(data->rst), rst);
 					update_metric_max(&(data->rst), rst);
 					
@@ -283,7 +283,8 @@ void print_data(Result* result) {
 	memset(time_buf, 0, sizeof(time_buf));
 	strftime(time_buf, sizeof(time_buf), "%Y%m%d %H:%M:%S", timeinfo);
 
-	printf("%s - %f %f %f %f %f %f %f %f %f %f \n", time_buf, result->rst_avg, result->rst_min, result->rst_max, result->err_rate, 
+	printf("%s - %f %f %f %f %f %f %f %f %f %f \n", time_buf, 
+		result->rst_avg, result->rst_min, result->rst_max, 
     	result->req_rate, result->req_rate_min, result->req_rate_max,
         result->err_rate, result->err_rate_min, result->err_rate_max
     );
