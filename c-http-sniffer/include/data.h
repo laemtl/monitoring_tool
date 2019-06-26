@@ -15,7 +15,7 @@
 #endif
 
 #define EPSILON	1e-7
-#define CLOSE(a,b,e) (fabs(a,b)<EPSILON)
+#define CLOSE(a,b) (fabs(a - b)<EPSILON)
 
 typedef struct _addr Addr;
 struct _addr {
