@@ -104,7 +104,7 @@ int flow_add_http(flow_t *f, http_pair_t *h);	            /* Add a http_pair_t o
 
 /**
  * Functions of flow hash table
- * hash_table.c
+ * flow_hash_table.c
  */
 int flow_hash_init(void* data);			        /* Initiate the flow hash table with no flows */
 flow_t* flow_hash_new(flow_s s);		    /* Create a new record in hash table according to flow's socket */

@@ -18,7 +18,7 @@ debugging_print(Data* data){
 	thread_init(data);
 
 	while(1){
-		if ( !data->running ) {
+		if ( data->status < 1) {
 			break;
 		} else {
 			packet_queue_print();
@@ -155,6 +155,13 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 			if( head_end != NULL ){
 				/* First packet of request. */
 				//total++;
+
+				Data* data = {0};
+				get_data(&data);
+
+				inc_metric_subtotal(&(data->req_rate), 1);
+				inc_metric_total(&(data->req_rate), 1);
+
 				//printf("%d\n",total);
 				hdl = head_end - cp + 1;
 				pkt->http = HTTP_REQ;
@@ -209,7 +216,7 @@ process_packet_queue(Data* data){
 	
 	while(1){
 		pkt = packet_queue_deq();
-		if ( !data->running ) {
+		if ( data->status < 1 ) {
 			break;
 		} else if (pkt != NULL){
 			flow_hash_add_packet(pkt);
@@ -233,7 +240,7 @@ process_flow_queue(Data* data){
 	while(1){
 		flow = flow_queue_deq();
 
-		if (!data->running) {
+		if (data->status < 1) {
 			break;
 		} else if(flow != NULL){
 			flow_extract_http(flow);
@@ -259,7 +266,7 @@ scrubbing_flow_htbl(Data* data){
 
 	while(1){
 		sleep(10);
-		if (data->running){
+		if (data->status == 1){
 			num = flow_scrubber(60*10);	/* flow timeout in seconds */
 		} else {
 			num = flow_scrubber(-1); /* cleanse all flows */
@@ -305,7 +312,7 @@ capture_main(void* p){
 
 	while(1){
 		raw = pcap_next(cap, &pkthdr);
-		if( NULL != raw && data->running){
+		if( NULL != raw && data->status == 1){
 			packet = packet_preprocess(raw, &pkthdr);
 			if (NULL!= packet){
 				pkt_handler(packet);
@@ -314,7 +321,7 @@ capture_main(void* p){
 				// Is it to solve the seg Fault?
 				// packet_free(packet);
 			}
-		} else if ( livemode==0 || !data->running) {
+		} else if ( livemode==0 || data->status < 1) {
 			//GP_CAP_FIN = 1;
 			break;
 		} else {

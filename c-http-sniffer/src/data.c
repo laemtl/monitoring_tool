@@ -47,9 +47,8 @@ void init_data(Data* data) {
 	init_once_metric(&(data->req_rate));
 	init_once_metric(&(data->tp));
 
-	reset(data);
-	
-	data->running = TRUE;
+	reset(data);	
+	data->status = 0;
 }
 
 static void thread_key_setup() {
@@ -83,7 +82,7 @@ void get_data(Data** d) {
 }
 
 double get_metric_min(Metric metric) {
-    if( metric.min.value == DBL_MAX) {
+	if(CLOSE(metric.min.value, DBL_MAX)) {
 	    return -1;
     }
 	return metric.min.value;
@@ -94,7 +93,7 @@ double get_rst_avg(Metric metric) {
 	get_data(&data);
 
 	double req_total = data->req_rate.total.value; 
-	if (req_total > 0) return metric.total.value/req_total;
+	if (!CLOSE(req_total, 0)) return metric.total.value/req_total;
 	return 0;
 }
 
@@ -121,7 +120,7 @@ double get_req_rate() {
 	Data* data = {0};
 	get_data(&data);
 
-	double req_total = data->req_rate.total.value; 
+	double req_total = data->req_rate.total.value;
 	return (double)req_total/data->interval;
 }
 
@@ -181,8 +180,6 @@ void extract_data(const flow_t *flow){
 		http_pair_t *h = flow->http_f;
     	
 		while(h != NULL) {
-			inc_metric_subtotal(&(data->req_rate), 1);
-			inc_metric_total(&(data->req_rate), 1);
 
 			if(h->request_header != NULL) {
 				request_t *req = h->request_header;
@@ -226,7 +223,7 @@ Result* get_result(Result* result) {
 	
 	result->err_rate = get_err_rate();    
 	result->err_rate_min = get_metric_min(data->err_rate);   
-	result->err_rate_max = data->req_rate.max.value;   
+	result->err_rate_max = data->err_rate.max.value;   
 	
 	result->req_rate = get_req_rate(); 
 	result->req_rate_min = get_metric_min(data->req_rate);
@@ -272,7 +269,7 @@ void process_data() {
 	} 
 
 	free(result);
-	if(!data->running) pthread_exit(NULL);		
+	if(data->status < 1) pthread_exit(NULL);		
 }
 
 void print_data(Result* result) {
@@ -286,7 +283,10 @@ void print_data(Result* result) {
 	memset(time_buf, 0, sizeof(time_buf));
 	strftime(time_buf, sizeof(time_buf), "%Y%m%d %H:%M:%S", timeinfo);
 
-	printf("%s - %f %f %f %f \n", time_buf, result->rst_avg, result->rst_min, result->rst_max, result->err_rate);
+	printf("%s - %f %f %f %f %f %f %f %f %f %f \n", time_buf, result->rst_avg, result->rst_min, result->rst_max, result->err_rate, 
+    	result->req_rate, result->req_rate_min, result->req_rate_max,
+        result->err_rate, result->err_rate_min, result->err_rate_max
+    );
 }
 
 // install online

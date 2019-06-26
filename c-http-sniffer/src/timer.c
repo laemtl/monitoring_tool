@@ -22,7 +22,7 @@
 void stop_analysis() {
 	Data* data = {0};
 	get_data(&data);
-	data->running = FALSE;
+	data->status = -1;
 	pthread_exit(NULL);
 }
 
@@ -36,7 +36,7 @@ static pid_t gettid(void) {
 	return syscall(SYS_gettid);
 }
 
-void create_timer(long start, long interval, void (*callback) (void)) {
+void create_timer(long start, long interval, int* status, void (*callback) (void)) {
 	sigset_t mask;
 	int sig;
 	timer_t timerid;
@@ -48,6 +48,9 @@ void create_timer(long start, long interval, void (*callback) (void)) {
 	its.it_value.tv_nsec = 0;
 	its.it_interval.tv_sec = interval;
 	its.it_interval.tv_nsec = 0;
+
+	while(status < 1) 
+		nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
 
 	// by default, SIGCHLD is set to be ignored so unless we happen
     // to be blocked on sigwaitinfo() at the time that SIGCHLD
@@ -100,7 +103,7 @@ void create_timer(long start, long interval, void (*callback) (void)) {
 
 void start_duration_timer(Data* data) {
 	thread_init(data);
-	create_timer(data->duration, 0, stop_analysis);
+	create_timer(data->duration, 0, &(data->status), stop_analysis);
 }
 
 void start_timer(Data* data) {
@@ -111,14 +114,14 @@ void start_timer(Data* data) {
 	    pthread_create(&timer_duration, NULL, (void*)start_duration_timer, data);
     }
 
-	// satrt an interval timer wich fires every seconds to compute rates
-	start_interval_timer(1);
+	// start an interval timer wich fires every seconds to compute rates
+	start_interval_timer(1, &(data->status));
 	
     if(data->duration > 0) {
         pthread_join(timer_duration, NULL);
     }
 }
 
-void start_interval_timer(uint32_t interval) {
-	create_timer(interval, interval, process_data);
+void start_interval_timer(uint32_t interval, int* status) {
+	create_timer(interval, interval, status, process_data);
 }

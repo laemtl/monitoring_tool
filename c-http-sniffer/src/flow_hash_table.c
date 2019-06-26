@@ -16,7 +16,6 @@
 #include "data.h"
 #include "packet.h"
 
-#define HASH_SIZE	13200
 #define HASH_FLOW(flow_socket) ( \
 ( (flow_socket.sport & 0xff) | ((flow_socket.dport & 0xff) << 8) | \
   ((flow_socket.saddr & 0xff) << 16) | ((flow_socket.daddr & 0xff) << 24) \

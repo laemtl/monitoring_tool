@@ -14,6 +14,9 @@
 #define DEBUGGING 2 
 #endif
 
+#define EPSILON	1e-7
+#define CLOSE(a,b,e) (fabs(a,b)<EPSILON)
+
 typedef struct _addr Addr;
 struct _addr {
 	u_int32_t	ip;
@@ -47,7 +50,9 @@ typedef struct _data Data;
 struct _data {
     bool server_mode;
     int client_sock;
-    bool running;
+    
+    // 0: started, 1: running, -1: stopped
+    int status;
     const char* interface;
     uint32_t interval;
     uint32_t int_step;
