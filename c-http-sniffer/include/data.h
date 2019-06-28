@@ -7,27 +7,21 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "flow.h"
-
-#define HASH_SIZE	13200
+#include "hash_table.h"
+#include "clients.h"
 
 #ifndef DEBUGGING
 #define DEBUGGING 2 
 #endif
 
+
 #define EPSILON	1e-7
 #define CLOSE(a,b) (fabs(a - b)<EPSILON)
-
-typedef struct _addr Addr;
-struct _addr {
-	u_int32_t	ip;
-	u_int16_t	port;
-//    int		    elm_cnt;
-};
 
 typedef struct _path Path;
 struct _path {
 	char*       path;
-    int		    elm_cnt;
+   // int		    elm_cnt;
 };
 
 typedef struct _metric_el Metric_el;
@@ -43,6 +37,14 @@ struct _metric {
     Metric_el total;
     Metric_el min;
     Metric_el max;
+};
+
+typedef struct _top_list Top_list;
+struct _top_list {
+	void** top_list;
+    pthread_mutex_t mutex;
+    int size;
+    int count;
 };
 
 // memset to 0 on init
@@ -83,12 +85,16 @@ struct _data {
     hash_mb_t *flow_hash_table[HASH_SIZE];
     int flow_cnt;	/* flows live in hash table */
 
-    Addr *addr_hash_table[HASH_SIZE];
-    int addr_cnt;
+    hash_t* clients_ht;
+    Client** clients_top;
+    pthread_mutex_t ct_mutex;
+    int clients_top_size;
+    Client** clients_top_min;
     
-    Path *path_hash_table[HASH_SIZE];
-    int path_cnt;
+
+    hash_t* paths_ht;
 };
+
 
 typedef struct _result Result;
 struct _result {
@@ -108,6 +114,8 @@ struct _result {
     double req_rate_max;
     
     double tp;
+
+    int clients_tot;
 };
 
 typedef struct _capt Capture;

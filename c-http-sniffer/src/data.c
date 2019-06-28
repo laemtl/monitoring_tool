@@ -39,6 +39,7 @@ void reset(Data* data) {
 	reset_metric(&(data->tp));
 
 	data->int_step = 0;
+	hash_clear(data->clients_ht); 
 }
 
 void init_data(Data* data) {
@@ -49,6 +50,8 @@ void init_data(Data* data) {
 
 	reset(data);	
 	data->status = 0;
+
+	client_init(data);
 }
 
 static void thread_key_setup() {
@@ -168,17 +171,16 @@ void extract_data(const flow_t *flow){
 	//char *saddr = malloc(sizeof("aaa.bbb.ccc.ddd"));
 	//char *daddr = malloc(sizeof("aaa.bbb.ccc.ddd"));
 	
-	/*int n = sizeof("aaa.bbb.ccc.ddd") + 1;
+	int n = sizeof("aaa.bbb.ccc.ddd") + 1;
 	char *saddr[n];
 	char *daddr[n];
 	strncpy(saddr, ip_ntos(flow->socket.saddr), n);
 	strncpy(daddr, ip_ntos(flow->socket.daddr), n);
 	saddr[n] = '\0';
-	daddr[n] = '\0';*/
+	daddr[n] = '\0';
     
 	if (flow->http_f != NULL){        	
 		http_pair_t *h = flow->http_f;
-    	
 		while(h != NULL) {
 
 			if(h->request_header != NULL) {
@@ -190,7 +192,7 @@ void extract_data(const flow_t *flow){
 					// Compute response time
 					double rst = (h->rsp_fb_sec + h->rsp_fb_usec * 0.000001) - (h->req_fb_sec + h->req_fb_usec * 0.000001);
 
-					//inc_metric_total(&(data->rst), rst);
+					inc_metric_total(&(data->rst), rst);
 					update_metric_min(&(data->rst), rst);
 					update_metric_max(&(data->rst), rst);
 					
@@ -228,6 +230,8 @@ Result* get_result(Result* result) {
 	result->req_rate = get_req_rate(); 
 	result->req_rate_min = get_metric_min(data->req_rate);
 	result->req_rate_max = data->req_rate.max.value;
+
+	result->clients_tot = data->clients_ht->cnt;
 	
 	return result;
 }
@@ -283,10 +287,11 @@ void print_data(Result* result) {
 	memset(time_buf, 0, sizeof(time_buf));
 	strftime(time_buf, sizeof(time_buf), "%Y%m%d %H:%M:%S", timeinfo);
 
-	printf("%s - %f %f %f %f %f %f %f %f %f %f \n", time_buf, 
+	printf("%s - %f %f %f %f %f %f %f %f %f %f %d \n", time_buf, 
 		result->rst_avg, result->rst_min, result->rst_max, 
     	result->req_rate, result->req_rate_min, result->req_rate_max,
-        result->err_rate, result->err_rate_min, result->err_rate_max
+        result->err_rate, result->err_rate_min, result->err_rate_max,
+		result->clients_tot
     );
 }
 

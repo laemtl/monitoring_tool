@@ -6,6 +6,7 @@
 #include <unistd.h> /* getopt() */
 #include <pcap.h>
 #include <errno.h>
+#include <inttypes.h>
 
 #include "flow.h"
 #include "util.h"
@@ -161,6 +162,35 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 
 				inc_metric_subtotal(&(data->req_rate), 1);
 				inc_metric_total(&(data->req_rate), 1);
+
+				//printf("source infos: %s %" PRIu16 "\n", saddr, pkt->sport);
+
+				Client* c = MALLOC(Client, 1);
+				c->addr.ip = pkt->saddr;
+				c->addr.port = pkt->sport;
+				c->req_tot = 1;
+				pthread_mutex_init(&(c->mutex), NULL);
+
+				hash_add(c, data->clients_ht);
+
+				node* nd = hash_find(c, data->clients_ht);
+
+				/*if(nd != NULL) {
+					Addr* value = nd->value;
+
+					int n = sizeof("aaa.bbb.ccc.ddd") + 1;
+					char *saddr[n];
+					strncpy(saddr, ip_ntos(value->ip), n);
+					saddr[n] = '\0';
+
+					printf("source infos: %s %" PRIu16 "\n", saddr, value->port);
+				} else {
+					printf("nd is NULL \n");
+				}*/
+
+				//Addr* popular_clients;
+
+
 
 				//printf("%d\n",total);
 				hdl = head_end - cp + 1;
@@ -431,6 +461,7 @@ int main(int argc, char *argv[]){
 		init_data(data);
 		data->interface = interface;
         data->interval = 1;
+		data->clients_top_size = 5;
 		start_analysis(ipaddress, data);
 	}
 

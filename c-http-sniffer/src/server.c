@@ -151,6 +151,7 @@ void* connection_handler(int *socket) {
 				data->interval = init->interval;
 				data->duration = init->duration;
 				data->interface = init->netint[i];
+				data->clients_top_size = 5;
 
 				start_analysis(NULL, data);
 			}

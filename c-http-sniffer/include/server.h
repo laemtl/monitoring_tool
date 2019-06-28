@@ -20,8 +20,8 @@
 void start_log(char* ipaddress);
 void start_server();
   
-typedef struct analysis_conn_ {
+/*typedef struct analysis_conn_ {
     uint32_t socket;
-} Client;
+} Client;*/
 
 #endif

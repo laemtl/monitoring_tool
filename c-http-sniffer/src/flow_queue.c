@@ -42,6 +42,7 @@ flow_queue_enq(flow_t *flow)
 	get_data(&data);
 	pthread_mutex_lock(&(data->mutex_queue));
 
+
 	if (data->flow_qlen == 0){
 		data->flow_queue_first = flow;
 		data->flow_queue_last = flow;
