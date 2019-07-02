@@ -39,7 +39,7 @@ struct _hash_t {
     void (*update_fn)(void*);
 };
 
-int hash_init(hash_t* ht, int size /*, int type*/);
+int hash_init(hash_t* ht /* , int size /*, int type*/);
 node* hash_new(void *value, hash_t* ht);
 node* hash_find(void *value, hash_t* ht);
 node* hash_delete(void *value, hash_t* ht);

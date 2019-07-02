@@ -45,7 +45,7 @@ struct _top_list {
     pthread_mutex_t mutex;
     int size;
     int count;
-};
+};   
 
 // memset to 0 on init
 typedef struct _data Data;
@@ -86,12 +86,8 @@ struct _data {
     int flow_cnt;	/* flows live in hash table */
 
     hash_t* clients_ht;
-    Client** clients_top;
-    pthread_mutex_t ct_mutex;
-    int clients_top_size;
-    Client** clients_top_min;
+    Top_list clients_tl;
     
-
     hash_t* paths_ht;
 };
 

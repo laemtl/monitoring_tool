@@ -1,4 +1,5 @@
 #include <sys/types.h>
+#include <stdbool.h>
 #include "hash_table.h"
 
 #ifndef CLIENTS_H
@@ -15,7 +16,7 @@ struct _client {
 	Addr addr;
 	int	req_tot;
     pthread_mutex_t mutex;
-    //bool is_top;
+    bool is_top;
 };
 
 #endif
