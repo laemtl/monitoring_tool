@@ -1,6 +1,16 @@
 #include "clients.h";
 #include "data.h";
+#include <inttypes.h>
 
+
+bool is_top(void** tl, int count, void* c, int (*compare_fn)(void*, void*)) {
+    int i = 0;
+    while (i < count) {
+        if (compare_fn(c, tl[i]) == 0) return TRUE;
+        i = i++;
+    }
+    return FALSE;
+}
 
 extern int client_hash_fn(Client* c) {
     Data* data = {0};
@@ -8,74 +18,164 @@ extern int client_hash_fn(Client* c) {
     return ((c->addr.port & 0xff) | ((c->addr.ip & 0xff) << 8)) % data->clients_ht->size;
 }
 
-extern int client_compare(Client* c1, Client* c2) {
+extern int addr_compare(Client* c1, Client* c2) {
     if((c1->addr.ip == c2->addr.ip) && (c1->addr.port == c2->addr.port)) return 0;
     return 1;
 }
 
+extern int req_compare(Client* c1, Client* c2) {
+    if(c1->req_tot == c2->req_tot) return 0;
+    else if (c1->req_tot > c2->req_tot) return 1;
+    return -1;
+}
+
 extern void client_update(Client* c) {
-    /*int i, n;
-    printf("Beginning of update \n");
-
-    // if the client is already in the top list, return
-    if(c->is_top) return;
-
-    Data* data = {0};
-	get_data(&data);
+    int n;
 
     pthread_mutex_lock(&(c->mutex));
 	c->req_tot += 1;
-	pthread_mutex_unlock(&(c->mutex));
+	pthread_mutex_unlock(&(c->mutex));    
     
-    n = data->clients_top_size;
-    pthread_mutex_lock(&(data->ct_mutex));
+    // if the client is already in the top list, return
+    Data* data = {0};
+	get_data(&data);
+    int count = data->clients_tl.count;
+   
+    if(is_top(data->clients_tl.top_list, count, c, addr_compare)) return;
 
-	for(i = 0; i<n; i++) {
-        printf("i: %d \n", i);
-        printf("client pointer: %p \n", c);
-    */
-        /*if(
-            data->clients_top[i] == NULL 
-            || c->req_tot > data->clients_top[i]->req_tot
-        ) {*/
+    //printf("Not already in top \n");
 
-        // we have a spot left, add the client in the list
-    /*  if(data->clients_top[i] == NULL) {
-            data->clients_top[i] = c;
-            pthread_mutex_unlock(&(data->ct_mutex));
-            return;
-        }
 
-        int tot1 = c->req_tot;
-        printf("pointer of client_top at i: %p \n", data->clients_top[i]);
-        int tot2 = data->clients_top[i]->req_tot;
+    
+    n = data->clients_tl.size;
+    pthread_mutex_lock(&(data->clients_tl.mutex));
+    
+    // We have a spot left, add the client in the list
+    int size = data->clients_tl.size;
+    if(count < 5) {
+        data->clients_tl.top_list[count] = MALLOC(Client, 1);
+        memcpy(data->clients_tl.top_list[count], c, sizeof(c));
+                
+        //c->is_top = TRUE;
+        sort_tl(data->clients_tl.top_list, count, req_compare);
+        data->clients_tl.count++;
 
-        // the client is a new top client
-        if(tot1 > tot2) {
-            data->clients_top[i] = c;
-            pthread_mutex_unlock(&(data->ct_mutex));
-            return;
-        }
-
-        // sort_array()
-// compare and insert on the last slot (replace min)
-// sort the inserted element
+        pthread_mutex_unlock(&(data->clients_tl.mutex));
+        return;
     }
 
-    pthread_mutex_unlock(&(data->ct_mutex));
-    */
+    Client* min = data->clients_tl.top_list[size-1]; 
+
+    printf("pointer of min client: %p \n", data->clients_tl.top_list[size-1]);
+   
+    if(min->req_tot < c->req_tot) {
+
+        // Remove last element from top list
+        //((Client*)data->clients_tl.top_list[size-1])->is_top = FALSE;
+        
+        // Insert new element in top list
+        memcpy(data->clients_tl.top_list[size-1], c, sizeof(c));
+        //data->clients_tl.top_list[size-1] = c;
+        //c->is_top = TRUE;
+
+        // Sort top list
+        sort_tl(data->clients_tl.top_list, data->clients_tl.size, req_compare);
+
+        pthread_mutex_unlock(&(data->clients_tl.mutex));
+        return;
+    }
+
+    pthread_mutex_unlock(&(data->clients_tl.mutex));
 }
 
 void client_init(Data* data) {
     if(data == NULL) return;
-    
-    data->clients_ht = MALLOC(hash_t, 1);
-    data->clients_top= MALLOC(Client*, data->clients_top_size);
 
-    hash_init(data->clients_ht, HASH_SIZE);
+    data->clients_ht = MALLOC(void*, HASH_SIZE);
+    data->clients_ht->size = HASH_SIZE;
+    data->clients_tl.top_list = MALLOC(void*, data->clients_tl.size);
+
+    hash_init(data->clients_ht);
     data->clients_ht->hash_fn = &client_hash_fn;
-    data->clients_ht->compare_fn = &client_compare;
+    data->clients_ht->compare_fn = &addr_compare;
     data->clients_ht->update_fn = &client_update;
 
-    pthread_mutex_init(&(data->ct_mutex), NULL);
+    pthread_mutex_init(&(data->clients_tl.mutex), NULL);
 };
+
+// A recursive binary search function. It returns 
+// location of x in given array arr[l..r] is present, 
+// otherwise -1 
+/*int binarySearch(Client** tl, int l, int r, int x) { 
+    if (r >= l) { 
+        if(r - l == 0) return mid;
+
+        int mid = l + (r - l) / 2; 
+  
+        // equal case
+
+
+
+        // If element is smaller than mid, then 
+        // it can only be present in right subarray 
+        if (arr[mid] > x) 
+            return binarySearch(arr, mid + 1, r, x);
+  
+        // Else the element can only be present in left subarray 
+        return binarySearch(arr, l, mid - 1, x); 
+    } else {
+
+    }
+  
+    // We reach here when element is not 
+    // present in array 
+    return -1; 
+} 
+
+void sort_tl(void** tl, int n_index, int size) {
+    Client* new_item = tl[n_index];
+    Client* item = NULL;
+    int i = size;
+
+    binarySearch();
+
+    do {
+    } while(new_item->req_tot < item->req_total);
+
+    // Now we have the index of insertion
+
+}*/
+
+int sort_tl(void** tl, int n_index, int (*compare_fn)(void*, void*)) {
+    //if(n_index == 0) return;
+    
+    int i = n_index;
+    // Element to insert is stored at the last position
+    void* e = tl[i];
+    while (i > 0 && compare_fn(e, tl[i-1]) > 0) {   
+        tl[i] = tl[i-1];
+        i = i - 1;
+    }
+    tl[i] = e; 
+
+    // Return the position where inserted.
+    return i;
+}
+
+void print_tl(void** tl, int count) {
+    printf("Count : %d \n", count);
+    int i = 0;
+    while (i < count) {   
+        int n = sizeof("aaa.bbb.ccc.ddd") + 1;
+        char *saddr[n];
+        strncpy(saddr, ip_ntos(((Client*)tl[i])->addr.ip), n);
+        saddr[n] = '\0';
+
+        printf("IP: %s Port: %" PRIu16 "\n", saddr, ((Client*)tl[i])->addr.port);
+        i++;
+    }
+}
+
+void clear_tl() {
+
+}

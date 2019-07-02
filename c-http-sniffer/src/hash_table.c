@@ -18,16 +18,15 @@
 #include "hash_table.h"
 
 /* Initiate the hash table with no elems */
-int hash_init(hash_t* ht, int size /*, int type*/) {
+int hash_init(hash_t* ht /* , int size /*, int type*/) {
 	if(ht == NULL) return 1;
 
 	int ret, i;
-    ht->size = size;
     //ht->type = type;
     ht->cnt = 0;
 	
-    ht->buckets = MALLOC(hash_mb_t2*, size);
-    for(i=0; i<size; i++){
+    ht->buckets = MALLOC(hash_mb_t2*, ht->size);
+    for(i=0; i<ht->size; i++){
 		ht->buckets[i] = MALLOC(hash_mb_t2, 1);
        	hash_mb_t2* bucket = ht->buckets[i];
 
@@ -50,8 +49,6 @@ node* hash_new(void *value, hash_t* ht) {
 	strncpy(saddr, ip_ntos(((Addr*)value)->ip), n1);
 	saddr[n1] = '\0';
 	printf("source infos: %s %" PRIu16 "\n", saddr, ((Addr*)value)->port);
-				
-
 
 	if(ht == NULL || value == NULL) return 1;
 	
@@ -148,9 +145,9 @@ int hash_add(void *value, hash_t* ht) {
 
 	e = hash_find(value, ht);
 	if(e != NULL) {
-        ht->update_fn(e->value);
+		ht->update_fn(e->value);
 	} else {
-        e = hash_new(value, ht);
+		e = hash_new(value, ht);
 		ht->update_fn(e->value);
 	}
 	return 0;
@@ -159,7 +156,6 @@ int hash_add(void *value, hash_t* ht) {
 /* Clear the flow hash table thoroughly */
 int hash_clear(hash_t* ht) {
 	if(ht == NULL) {
-		printf("ht is NULL \n");
 		return 1;
 	}
 

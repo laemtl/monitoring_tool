@@ -287,7 +287,8 @@ void print_data(Result* result) {
 	memset(time_buf, 0, sizeof(time_buf));
 	strftime(time_buf, sizeof(time_buf), "%Y%m%d %H:%M:%S", timeinfo);
 
-	printf("%s - %f %f %f %f %f %f %f %f %f %f %d \n", time_buf, 
+	printf("%s - %f %f %f %f %f %f %f %f %f %d \n", 
+		time_buf, 
 		result->rst_avg, result->rst_min, result->rst_max, 
     	result->req_rate, result->req_rate_min, result->req_rate_max,
         result->err_rate, result->err_rate_min, result->err_rate_max,

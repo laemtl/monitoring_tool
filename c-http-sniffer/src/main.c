@@ -6,7 +6,6 @@
 #include <unistd.h> /* getopt() */
 #include <pcap.h>
 #include <errno.h>
-#include <inttypes.h>
 
 #include "flow.h"
 #include "util.h"
@@ -168,7 +167,9 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 				Client* c = MALLOC(Client, 1);
 				c->addr.ip = pkt->saddr;
 				c->addr.port = pkt->sport;
-				c->req_tot = 1;
+				c->req_tot = 0;
+				//c->is_top = FALSE;
+				
 				pthread_mutex_init(&(c->mutex), NULL);
 
 				hash_add(c, data->clients_ht);
@@ -379,7 +380,7 @@ void start_analysis(char* ipaddress, Data* data) {
 	pthread_t job_debug_p;
 #endif
 
-	Capture* param = (Capture*)calloc(1, sizeof(Capture));
+	Capture* param = MALLOC(Capture, 1);
 	param->fd = ipaddress;
 	param->pkt_handler = packet_queue_enq;
 	param->livemode = 1;
@@ -423,8 +424,12 @@ void start_analysis(char* ipaddress, Data* data) {
 	
 	time(&end);
 	printf("Time elapsed: %d s\n", (int)(end - start));
+
+	//if(data == NULL) printf("Data is NULL \n");	
 	free(data);
+	data = NULL;
 	free(param);
+	param = NULL;
 }
 
 /**
@@ -457,11 +462,12 @@ int main(int argc, char *argv[]){
 	// Interface is provided - RUN in app mode
 	} else {		
 		Data* data = (Data*)calloc(1, sizeof(Data));
-		if(data == NULL) return EXIT_FAILURE;		
+		if(data == NULL) return EXIT_FAILURE;	
+		
+		data->clients_tl.size = 5;
 		init_data(data);
 		data->interface = interface;
         data->interval = 1;
-		data->clients_top_size = 5;
 		start_analysis(ipaddress, data);
 	}
 
