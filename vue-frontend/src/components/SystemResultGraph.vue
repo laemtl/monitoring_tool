@@ -16,9 +16,6 @@
                         <a class="action">✔</a>
                         <div class="swatch" :style="'background-color:'+ colors[i] +';'"></div>
                         <span class="label">{{ netInt }}</span>
-                        <span class="min">min: {{ min[i] }}</span>
-                        <span class="max">max: {{ max[i] }}</span>
-                        
                     </li>
                 </ul>
             </div>                    
@@ -41,11 +38,9 @@ export default {
     props: ['graph'],
     data() {
         return {
-            series: [],
+            msgSeries: [],
             chart: [],
             colors: [],
-            min: [],
-            max: [],
             renderEveryNth: 1,
 
             //streamFrequency: 500,
@@ -115,7 +110,7 @@ export default {
                 {
                     timeInterval: this.graph.interval *  1000,
                     maxDataPoints: 100,
-                    timeBase: 0
+                    timeBase: 2
                 }
             )
         },
@@ -191,10 +186,21 @@ export default {
         /* Insert received datapoints into the chart */
         insertDatapoints(messages, chart) {
             for (let i = 0; i < messages.length; i++) {
+                console.log(messages);
+
                 var params = {};
-                for (var j = 0; j < this.graph.netInt.length; j++) {
-                    params[this.graph.netInt[j]] = messages[i];
+                //for (var j = 0; j < this.graph.netInt.length; j++) {
+                params.Average = messages[i].avg;
+
+                if(typeof messages[i].min !== 'undefined') {
+                    params.Min = messages[i].min;
                 }
+
+                if(typeof messages[i].max !== 'undefined') {
+                    params.Max = messages[i].max;
+                }
+
+                //}
                 chart.series.addData(params);
             }
             chart.render();
@@ -214,37 +220,33 @@ export default {
         updateDisplayedValues() {
             if (this.messageIndex == this.streamFrequency) {
                 this.messageIndex = 0;
-                this.displayedValues = this.series;
+                this.displayedValues = this.msgSeries;
             } else if (this.messageIndex == 0) {
-                this.displayedValues = this.series;
+                this.displayedValues = this.msgSeries;
                 this.messageIndex++;
             } else {
                 this.messageIndex++;
             }
         },
         processMessage(message) {
-            console.log(message);
+            //if(this.graph.id == "reqRate") console.log(message);
             /* Check if displayed values have to be updated */
             //this.updateDisplayedValues();
             /* Push stream data to current series, if it's not yet render-time */
-            if (this.series.length < this.renderEveryNth) {
-                this.series.push(parseFloat(message.data.avg).toFixed(6));
+            if (this.msgSeries.length < this.renderEveryNth) {
+                this.msgSeries.push(message.data);
             }
 
-            if(typeof message.data.min !== 'undefined') {
+            /*if(typeof message.data.min !== 'undefined') {
                 var i = this.graph.netInt.indexOf(message.netInt);  
-                console.log(i);
-                console.log(this.graph.netInt);
-                console.log(message.netInt);
-
-                this.min.splice(i, 0, message.data.min.toFixed(6));
-                this.max.splice(i, 0, message.data.max.toFixed(6));
-            }
+                this.min.splice(i, 0, message.data.min.toFixed(4));
+                this.max.splice(i, 0, message.data.max.toFixed(4));
+            }*/
 
             /* Render-time! */
-            if (this.series.length == this.renderEveryNth) {
-                this.insertDatapoints(this.series, this.chart[0]);
-                this.series = [];
+            if (this.msgSeries.length == this.renderEveryNth) {
+                this.insertDatapoints(this.msgSeries, this.chart[0]);
+                this.msgSeries = [];
             }
         }
     }
@@ -280,7 +282,7 @@ div.y_axis {
 }
 
 .legend .min, .legend .max {
-    padding-left: 20px;
+    padding-left: 10px;
 }
 
 </style>

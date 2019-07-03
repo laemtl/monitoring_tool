@@ -43,12 +43,18 @@ export default {
         stats["rst"] = { 
           label: "Request service time",
           active: true,
-          max: 0.015
+          max: 0.10
+        };
+        stats["reqRate"] = { 
+          label: "Request rate",
+          active: true,
+          max: 3000,
+          from: { ip: null, port: null } 
         };
         stats["errRate"] = { 
           label: "Error rate",
           active: true,
-          max: 0.015
+          max: 1000
         };
         stats["tp"] = { 
           label: "Throughput",
@@ -56,12 +62,6 @@ export default {
           max: 5,
           from: { ip: null, port: null },
           to: { ip: null, port: null }
-        };
-        stats["hl"] = { 
-          label: "Request rate",
-          active: true,
-          max: 5,
-          from: { ip: null, port: null } 
         };
         return stats;
       }
@@ -88,7 +88,8 @@ export default {
   },
   methods: {
     openSocketListeners() {
-      this.ws = new WebSocket('ws://bmj-cluster.cs.mcgill.ca:15480/ws/');
+      //this.ws = new WebSocket('ws://bmj-cluster.cs.mcgill.ca:15480/ws/');
+      this.ws = new WebSocket('ws://127.0.0.1:8081/ws/');
       var el = this;
 
       // event emmited when connected
@@ -98,10 +99,7 @@ export default {
         // sending a send event to websocket server
         //el.ws.send('connected')
       }
-
-
-      // TODO: send a close message
-      
+ 
       // event emmited when connected
       this.ws.onclose = function () {
         console.log('websocket is closed ...')

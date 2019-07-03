@@ -64,7 +64,7 @@ extern void client_update(Client* c) {
 
     Client* min = data->clients_tl.top_list[size-1]; 
 
-    printf("pointer of min client: %p \n", data->clients_tl.top_list[size-1]);
+    //printf("pointer of min client: %p \n", data->clients_tl.top_list[size-1]);
    
     if(min->req_tot < c->req_tot) {
 

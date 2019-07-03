@@ -6,7 +6,7 @@ fn main() {
 	protoc_rust::run(protoc_rust::Args {
 	    out_dir: "src/",
 	    input: &["../analysis.proto"],
-	    includes: &[],
+	    includes: &["../"],
 	    customize: Customize {
 	      ..Default::default()
 	    },

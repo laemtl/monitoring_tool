@@ -1,0 +1,9 @@
+SNIFFER SERVER
+hostname = bmj-cluster.cs.mcgill.ca
+remote_port = "15430";
+local_port = "3000"
+
+BACKEND SERVER
+bmj-cluster.cs.mcgill.ca
+remote_port = "15480";
+local_port = "80"
