@@ -51,7 +51,7 @@ void init_data(Data* data) {
 	reset(data);	
 	data->status = 0;
 
-	client_init(data);
+	//client_init(data);
 }
 
 static void thread_key_setup() {
@@ -250,6 +250,24 @@ void process_rate(Data* data) {
 	reset_metric_subtotal(&(data->err_rate));	
 }
 
+void print_tl(Top_list tl) {
+    printf("Count : %d \n", tl.count);
+    int i = 0;
+    while (i < tl.count) {   
+        int n = sizeof("aaa.bbb.ccc.ddd") + 1;
+        char *saddr[n];
+        strncpy(saddr, ip_ntos(((Client*)tl.top_list[i])->addr.ip), n);
+        saddr[n] = '\0';
+
+        printf("IP: %s Port: %" PRIu16 "\n", saddr, ((Client*)tl.top_list[i])->addr.port);
+        i++;
+    }
+}
+
+void clear_tl() {
+
+}
+
 void process_data() {
 	Data* data = {0};
 	get_data(&data);
@@ -260,6 +278,12 @@ void process_data() {
 
 	Result* result = calloc(1, sizeof(Result));
 	get_result(result);
+
+	if(data->status = -1) {
+		print_tl(data->clients_tl);
+		//clear_tl();
+	}
+
 	reset(data);
 
 #if DEBUGGING == 2

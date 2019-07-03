@@ -164,13 +164,13 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 
 				//printf("source infos: %s %" PRIu16 "\n", saddr, pkt->sport);
 
-				/*Client* c = CALLOC(Client, 1);
+				Client* c = CALLOC(Client, 1);
 				c->addr.ip = pkt->saddr;
 				c->addr.port = pkt->sport;
 				//c->is_top = FALSE;
 				
 				pthread_mutex_init(&(c->mutex), NULL);
-				hash_add(c, data->clients_ht);*/
+				hash_add(c, data->clients_ht);
 
 				//node* nd = hash_find(c, data->clients_ht);
 

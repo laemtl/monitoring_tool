@@ -100,49 +100,6 @@ void client_init(Data* data) {
     pthread_mutex_init(&(data->clients_tl.mutex), NULL);
 };
 
-// A recursive binary search function. It returns 
-// location of x in given array arr[l..r] is present, 
-// otherwise -1 
-/*int binarySearch(Client** tl, int l, int r, int x) { 
-    if (r >= l) { 
-        if(r - l == 0) return mid;
-
-        int mid = l + (r - l) / 2; 
-  
-        // equal case
-
-
-
-        // If element is smaller than mid, then 
-        // it can only be present in right subarray 
-        if (arr[mid] > x) 
-            return binarySearch(arr, mid + 1, r, x);
-  
-        // Else the element can only be present in left subarray 
-        return binarySearch(arr, l, mid - 1, x); 
-    } else {
-
-    }
-  
-    // We reach here when element is not 
-    // present in array 
-    return -1; 
-} 
-
-void sort_tl(void** tl, int n_index, int size) {
-    Client* new_item = tl[n_index];
-    Client* item = NULL;
-    int i = size;
-
-    binarySearch();
-
-    do {
-    } while(new_item->req_tot < item->req_total);
-
-    // Now we have the index of insertion
-
-}*/
-
 int sort_tl(void** tl, int n_index, int (*compare_fn)(void*, void*)) {
     //if(n_index == 0) return;
     
@@ -157,22 +114,4 @@ int sort_tl(void** tl, int n_index, int (*compare_fn)(void*, void*)) {
 
     // Return the position where inserted.
     return i;
-}
-
-void print_tl(void** tl, int count) {
-    printf("Count : %d \n", count);
-    int i = 0;
-    while (i < count) {   
-        int n = sizeof("aaa.bbb.ccc.ddd") + 1;
-        char *saddr[n];
-        strncpy(saddr, ip_ntos(((Client*)tl[i])->addr.ip), n);
-        saddr[n] = '\0';
-
-        printf("IP: %s Port: %" PRIu16 "\n", saddr, ((Client*)tl[i])->addr.port);
-        i++;
-    }
-}
-
-void clear_tl() {
-
 }
