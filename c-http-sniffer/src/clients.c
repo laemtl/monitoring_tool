@@ -2,12 +2,11 @@
 #include "data.h";
 #include <inttypes.h>
 
-
 bool is_top(void** tl, int count, void* c, int (*compare_fn)(void*, void*)) {
     int i = 0;
     while (i < count) {
         if (compare_fn(c, tl[i]) == 0) return TRUE;
-        i = i++;
+        i++;
     }
     return FALSE;
 }
@@ -33,7 +32,7 @@ extern void client_update(Client* c) {
     int n;
 
     pthread_mutex_lock(&(c->mutex));
-	c->req_tot += 1;
+	c->req_tot++;
 	pthread_mutex_unlock(&(c->mutex));    
     
     // if the client is already in the top list, return
@@ -49,12 +48,13 @@ extern void client_update(Client* c) {
     
     // We have a spot left, add the client in the list
     int size = data->clients_tl.size;
+    
     if(count < 5) {
         data->clients_tl.top_list[count] = MALLOC(Client, 1);
         memcpy(data->clients_tl.top_list[count], c, sizeof(c));
                 
         //c->is_top = TRUE;
-        sort_tl(data->clients_tl.top_list, count, req_compare);
+        sort_tl(data->clients_tl.top_list, count-1, req_compare);
         // TODO: need a lock
         (&(data->clients_tl))->count++;
 
@@ -77,7 +77,7 @@ extern void client_update(Client* c) {
         //c->is_top = TRUE;
 
         // Sort top list
-        sort_tl(data->clients_tl.top_list, data->clients_tl.size, req_compare);
+        sort_tl(data->clients_tl.top_list, data->clients_tl.size-1, req_compare);
 
         pthread_mutex_unlock(&(data->clients_tl.mutex));
         return;
