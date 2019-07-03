@@ -23,7 +23,7 @@ void stop_analysis() {
 	Data* data = {0};
 	get_data(&data);
 
-	print_tl(data->clients_tl.top_list, data->clients_tl.count);
+	//print_tl(data->clients_tl.top_list, data->clients_tl.count);
 	//clear_tl();
 
 	data->status = -1;

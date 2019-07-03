@@ -17,6 +17,18 @@ void *check_malloc(unsigned long size)
 	return ptr;
 }
 
+/* Simple wrapper around the calloc() function */
+void *check_calloc(unsigned long size)
+{
+
+	void *ptr = NULL;
+	if ((ptr = calloc(1, size)) == NULL) {
+		printf("Out of memory!\n");
+		exit(1);
+	}
+	return ptr;
+}
+
 char *ip_ntos(u_int32_t n){
 	static char buf[sizeof("aaa.bbb.ccc.ddd")];
 	memset(buf, '\0', 15);

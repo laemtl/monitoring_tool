@@ -7,6 +7,7 @@
 
 /************************Macros*****************************/
 #define MALLOC(type, num)  (type *) check_malloc((num) * sizeof(type))
+#define CALLOC(type, num)  (type *) check_calloc((num) * sizeof(type))
 
 #ifndef BOOL
 #define BOOL int

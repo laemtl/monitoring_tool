@@ -44,12 +44,6 @@ int hash_init(hash_t* ht /* , int size /*, int type*/) {
 
 /* Create a new record in hash table */
 node* hash_new(void *value, hash_t* ht) {
-	int n1 = sizeof("aaa.bbb.ccc.ddd") + 1;
-	char *saddr[n1];
-	strncpy(saddr, ip_ntos(((Addr*)value)->ip), n1);
-	saddr[n1] = '\0';
-	printf("source infos: %s %" PRIu16 "\n", saddr, ((Addr*)value)->port);
-
 	if(ht == NULL || value == NULL) return 1;
 	
 	node* n = MALLOC(node, 1);

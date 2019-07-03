@@ -164,17 +164,15 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 
 				//printf("source infos: %s %" PRIu16 "\n", saddr, pkt->sport);
 
-				Client* c = MALLOC(Client, 1);
+				/*Client* c = CALLOC(Client, 1);
 				c->addr.ip = pkt->saddr;
 				c->addr.port = pkt->sport;
-				c->req_tot = 0;
 				//c->is_top = FALSE;
 				
 				pthread_mutex_init(&(c->mutex), NULL);
+				hash_add(c, data->clients_ht);*/
 
-				hash_add(c, data->clients_ht);
-
-				node* nd = hash_find(c, data->clients_ht);
+				//node* nd = hash_find(c, data->clients_ht);
 
 				/*if(nd != NULL) {
 					Addr* value = nd->value;
@@ -380,7 +378,7 @@ void start_analysis(char* ipaddress, Data* data) {
 	pthread_t job_debug_p;
 #endif
 
-	Capture* param = MALLOC(Capture, 1);
+	Capture* param = CALLOC(Capture, 1);
 	param->fd = ipaddress;
 	param->pkt_handler = packet_queue_enq;
 	param->livemode = 1;
