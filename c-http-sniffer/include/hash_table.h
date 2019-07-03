@@ -32,7 +32,8 @@ typedef struct _hash_t hash_t;
 struct _hash_t {
     int size;
     hash_mb_t2** buckets;
-    int cnt;
+    int tot_cnt;
+    int sub_cnt;
     int type;
     int (*hash_fn)(void*);
     int (*compare_fn)(void*, void*);

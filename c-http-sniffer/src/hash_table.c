@@ -23,7 +23,7 @@ int hash_init(hash_t* ht /* , int size /*, int type*/) {
 
 	int ret, i;
     //ht->type = type;
-    ht->cnt = 0;
+    //ht->cnt = 0;
 	
     ht->buckets = MALLOC(hash_mb_t2*, ht->size);
     for(i=0; i<ht->size; i++){
@@ -65,7 +65,8 @@ node* hash_new(void *value, hash_t* ht) {
 	hm->last->next = NULL;
 	n->hmb = hm;
 	hm->elm_cnt++;
-	ht->cnt++;
+	ht->tot_cnt++;
+	ht->sub_cnt++;
 
 	pthread_mutex_unlock(&(hm->mutex));
 	return n;
@@ -123,7 +124,8 @@ node* hash_delete(void *value, hash_t* ht) {
 	n->next = NULL;
 	n->prev = NULL;
 	hm->elm_cnt--;
-	ht->cnt--;
+	ht->tot_cnt--;
+	ht->sub_cnt--;
 	return n;
 }
 
@@ -160,7 +162,8 @@ int hash_clear(hash_t* ht) {
 	}
 
 	node* elem = NULL;
-	ht->cnt = 0;
+	ht->tot_cnt = 0;
+	ht->sub_cnt = 0;
 	for(i=0; i<ht->size; i++){
 		while(ht->buckets[i]->first != NULL ){
 			elem = ht->buckets[i]->first;
@@ -189,7 +192,7 @@ int hash_size(hash_t* ht) {
 /* Return the flow count of hash table */
 int hash_cnt(hash_t* ht) {
 	if(ht == NULL) return 1;
-	return ht->cnt;
+	return ht->tot_cnt;
 }
 
 /* Return the count of hash slots consumed */

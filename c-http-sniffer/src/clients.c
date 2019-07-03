@@ -41,7 +41,7 @@ extern void client_update(Client* c) {
 	get_data(&data);
     int count = data->clients_tl.count;
     
-    if(is_top(data->clients_tl.top_list, count, c, addr_compare)) return;
+    if(is_top(data->clients_tl.top_list, count, (void*)c, addr_compare)) return;
 
     //printf("Not already in top \n");
 
@@ -55,7 +55,8 @@ extern void client_update(Client* c) {
                 
         //c->is_top = TRUE;
         sort_tl(data->clients_tl.top_list, count, req_compare);
-        data->clients_tl.count = count++;
+        // TODO: need a lock
+        (&(data->clients_tl))->count++;
 
         pthread_mutex_unlock(&(data->clients_tl.mutex));
         return;

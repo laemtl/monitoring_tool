@@ -39,7 +39,10 @@ void reset(Data* data) {
 	reset_metric(&(data->tp));
 
 	data->int_step = 0;
-	hash_clear(&(data->clients_ht)); 
+
+	// TODO: clean on exit
+	//hash_clear(&(data->clients_ht)); 
+	data->clients_ht.sub_cnt = 0;
 }
 
 void init_data(Data* data) {
@@ -51,7 +54,7 @@ void init_data(Data* data) {
 	reset(data);	
 	data->status = 0;
 
-	//client_init(data);
+	client_init(data);
 }
 
 static void thread_key_setup() {
@@ -231,7 +234,7 @@ Result* get_result(Result* result) {
 	result->req_rate_min = get_metric_min(data->req_rate);
 	result->req_rate_max = data->req_rate.max.value;
 
-	result->clients_tot = data->clients_ht.cnt;
+	result->clients_tot = data->clients_ht.sub_cnt;
 	
 	return result;
 }
@@ -279,17 +282,17 @@ void process_data() {
 	Result* result = calloc(1, sizeof(Result));
 	get_result(result);
 
-	if(data->status = -1) {
+#if DEBUGGING == 2
+	print_data(result);
+	fflush(stdout);
+#endif
+
+	if(data->status == -1) {
 		print_tl(data->clients_tl);
 		//clear_tl();
 	}
 
 	reset(data);
-
-#if DEBUGGING == 2
-	print_data(result);
-	fflush(stdout);
-#endif
 
 	// Struct are passed by value so the code below will execute correctly in an MT env
 	if(is_server_mode()) {
