@@ -85,10 +85,10 @@ struct _data {
     hash_mb_t *flow_hash_table[HASH_SIZE];
     int flow_cnt;	/* flows live in hash table */
 
-    hash_t* clients_ht;
+    hash_t clients_ht;
     Top_list clients_tl;
     
-    hash_t* paths_ht;
+    hash_t paths_ht;
 };
 
 

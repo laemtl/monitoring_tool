@@ -170,7 +170,7 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 				//c->is_top = FALSE;
 				
 				pthread_mutex_init(&(c->mutex), NULL);
-				hash_add(c, data->clients_ht);
+				hash_add(c, &(data->clients_ht));
 
 				//node* nd = hash_find(c, data->clients_ht);
 

@@ -39,7 +39,7 @@ void reset(Data* data) {
 	reset_metric(&(data->tp));
 
 	data->int_step = 0;
-	hash_clear(data->clients_ht); 
+	hash_clear(&(data->clients_ht)); 
 }
 
 void init_data(Data* data) {
@@ -231,7 +231,7 @@ Result* get_result(Result* result) {
 	result->req_rate_min = get_metric_min(data->req_rate);
 	result->req_rate_max = data->req_rate.max.value;
 
-	result->clients_tot = data->clients_ht->cnt;
+	result->clients_tot = data->clients_ht.cnt;
 	
 	return result;
 }

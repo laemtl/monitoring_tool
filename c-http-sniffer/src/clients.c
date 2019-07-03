@@ -15,7 +15,7 @@ bool is_top(void** tl, int count, void* c, int (*compare_fn)(void*, void*)) {
 extern int client_hash_fn(Client* c) {
     Data* data = {0};
 	get_data(&data);
-    return ((c->addr.port & 0xff) | ((c->addr.ip & 0xff) << 8)) % data->clients_ht->size;
+    return ((c->addr.port & 0xff) | ((c->addr.ip & 0xff) << 8)) % data->clients_ht.size;
 }
 
 extern int addr_compare(Client* c1, Client* c2) {
@@ -88,14 +88,14 @@ extern void client_update(Client* c) {
 void client_init(Data* data) {
     if(data == NULL) return;
 
-    data->clients_ht = MALLOC(void*, HASH_SIZE);
-    data->clients_ht->size = HASH_SIZE;
+    //data->clients_ht = MALLOC(void*, HASH_SIZE);
+    data->clients_ht.size = HASH_SIZE;
     data->clients_tl.top_list = MALLOC(void*, data->clients_tl.size);
 
-    hash_init(data->clients_ht);
-    data->clients_ht->hash_fn = &client_hash_fn;
-    data->clients_ht->compare_fn = &addr_compare;
-    data->clients_ht->update_fn = &client_update;
+    hash_init(&(data->clients_ht));
+    data->clients_ht.hash_fn = &client_hash_fn;
+    data->clients_ht.compare_fn = &addr_compare;
+    data->clients_ht.update_fn = &client_update;
 
     pthread_mutex_init(&(data->clients_tl.mutex), NULL);
 };
