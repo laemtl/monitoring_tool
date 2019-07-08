@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include "flow.h"
 #include "hash_table.h"
-#include "clients.h"
+#include "client.h"
 
 #ifndef DEBUGGING
 #define DEBUGGING 2 
@@ -17,12 +17,6 @@
 
 #define EPSILON	1e-7
 #define CLOSE(a,b) (fabs(a - b)<EPSILON)
-
-typedef struct _path Path;
-struct _path {
-	char*       path;
-   // int		    elm_cnt;
-};
 
 typedef struct _metric_el Metric_el;
 struct _metric_el {
@@ -59,7 +53,8 @@ struct _data {
     uint32_t interval;
     uint32_t int_step;
     uint32_t duration;
-
+    uint32_t i;
+    
     Addr destination;
     
     Metric rst;
@@ -85,10 +80,11 @@ struct _data {
     hash_mb_t *flow_hash_table[HASH_SIZE];
     int flow_cnt;	/* flows live in hash table */
 
-    hash_t clients_ht;
-    Top_list clients_tl;
+    hash_t client_ht;
+    Top_list client_tl;
     
-    hash_t paths_ht;
+    hash_t path_ht;
+    Top_list path_tl;
 };
 
 
@@ -111,7 +107,8 @@ struct _result {
     
     double tp;
 
-    int clients_tot;
+    int client_tot;
+    int path_tot;
 };
 
 typedef struct _capt Capture;

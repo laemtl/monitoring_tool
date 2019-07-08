@@ -15,8 +15,8 @@ typedef struct _client Client;
 struct _client {
 	Addr addr;
 	int	req_tot;
+	int stamp;
     pthread_mutex_t mutex;
-    bool is_top;
 };
 
 #endif

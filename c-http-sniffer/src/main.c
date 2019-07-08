@@ -170,7 +170,7 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 				//c->is_top = FALSE;
 				
 				pthread_mutex_init(&(c->mutex), NULL);
-				hash_add(c, &(data->clients_ht));
+				hash_add(c, &(data->client_ht));
 
 				//node* nd = hash_find(c, data->clients_ht);
 
@@ -462,7 +462,7 @@ int main(int argc, char *argv[]){
 		Data* data = (Data*)calloc(1, sizeof(Data));
 		if(data == NULL) return EXIT_FAILURE;	
 		
-		data->clients_tl.size = 5;
+		data->client_tl.size = 5;
 		init_data(data);
 		data->interface = interface;
         data->interval = 1;

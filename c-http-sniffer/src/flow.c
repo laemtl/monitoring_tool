@@ -498,7 +498,7 @@ flow_extract_http(flow_t *f){
 				**/
 
 				char time[20];
-                                sprintf(time,"%ld",pkt->cap_usec);
+                sprintf(time,"%ld",pkt->cap_usec);
 				http_parse_request(req, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,time,pkt->tcp_seq+pkt->tcp_dl);
 			}else{
 				/*Omit the TCP handshake sequences.*/
@@ -564,11 +564,11 @@ flow_extract_http(flow_t *f){
 
 				
 				/** Added Functionality: assuming there's only
-                                 *  one request packet, 
-                                 *  store capture time and sequence + size of  
-                                 *  packet in http_pair->request->header when 
-                                 *  header is parsed. 
-                                **/
+				 *  one request packet, 
+				 *  store capture time and sequence + size of  
+				 *  packet in http_pair->request->header when 
+				 *  header is parsed. 
+				**/
 
 				char time[20];
 				sprintf(time,"%ld",pkt->cap_usec);
@@ -648,6 +648,11 @@ flow_extract_http(flow_t *f){
 					first_seq = seq;
 					found_http->rsp_fb_sec = seq->cap_sec;
 					found_http->rsp_fb_usec = seq->cap_usec;
+
+					//double rst = (found_http->rsp_fb_sec + found_http->rsp_fb_usec * 0.000001) - (found_http->req_fb_sec + found_http->req_fb_usec * 0.000001);
+					//if(rst < 0)
+					//	printf("time: %ld %ld %ld %ld \n", found_http->req_fb_sec, found_http->req_fb_usec, found_http->rsp_fb_sec, found_http->rsp_fb_usec);
+
 					rsp = http_response_new();
 					http_add_response(found_http, rsp);
 

@@ -39,10 +39,11 @@ void reset(Data* data) {
 	reset_metric(&(data->tp));
 
 	data->int_step = 0;
+	//data->int_count++;
 
 	// TODO: clean on exit
 	//hash_clear(&(data->clients_ht)); 
-	data->clients_ht.sub_cnt = 0;
+	data->client_ht.sub_cnt = 0;
 }
 
 void init_data(Data* data) {
@@ -55,6 +56,7 @@ void init_data(Data* data) {
 	data->status = 0;
 
 	client_init(data);
+	path_init(data);
 }
 
 static void thread_key_setup() {
@@ -189,12 +191,22 @@ void extract_data(const flow_t *flow){
 			if(h->request_header != NULL) {
 				request_t *req = h->request_header;
 				
+				//if (parseURL)
+              	parseURI(req->uri);
+
 				if(h->response_header != NULL) {
 					response_t *rsp = h->response_header;
 
 					// Compute response time
-					double rst = (h->rsp_fb_sec + h->rsp_fb_usec * 0.000001) - (h->req_fb_sec + h->req_fb_usec * 0.000001);
+					//double rst = (h->rsp_fb_sec + h->rsp_fb_usec * 0.000001) - (h->req_fb_sec + h->req_fb_usec * 0.000001);
 
+
+					double rst, rstu;
+ 					rstu = h->rsp_fb_usec - h->req_fb_usec;
+                    if (rstu < 0) rstu = 1000000 - h->rsp_fb_usec + h->req_fb_usec;
+                    rst = h->rsp_fb_sec - h->req_fb_sec + rstu*0.000001; 
+                   
+			
 					inc_metric_total(&(data->rst), rst);
 					update_metric_min(&(data->rst), rst);
 					update_metric_max(&(data->rst), rst);
@@ -234,7 +246,8 @@ Result* get_result(Result* result) {
 	result->req_rate_min = get_metric_min(data->req_rate);
 	result->req_rate_max = data->req_rate.max.value;
 
-	result->clients_tot = data->clients_ht.sub_cnt;
+	result->client_tot = data->client_ht.sub_cnt;
+	result->path_tot = data->path_ht.sub_cnt;
 	
 	return result;
 }
@@ -288,7 +301,7 @@ void process_data() {
 #endif
 
 	if(data->status == -1) {
-		print_tl(data->clients_tl);
+		print_tl(data->client_tl);
 		//clear_tl();
 	}
 
@@ -314,16 +327,16 @@ void print_data(Result* result) {
 	memset(time_buf, 0, sizeof(time_buf));
 	strftime(time_buf, sizeof(time_buf), "%Y%m%d %H:%M:%S", timeinfo);
 
-	printf("%s - %f %f %f %f %f %f %f %f %f %d \n", 
+	printf("%s - %f %f %f %f %f %f %f %f %f %d %d \n", 
 		time_buf, 
 		result->rst_avg, result->rst_min, result->rst_max, 
     	result->req_rate, result->req_rate_min, result->req_rate_max,
         result->err_rate, result->err_rate_min, result->err_rate_max,
-		result->clients_tot
+		result->client_tot,
+		result->path_tot
     );
 }
 
-// install online
 
 // Cumulated frequency of requested objects
 // For each objects, a different line
@@ -332,7 +345,21 @@ void print_data(Result* result) {
 
 // save DS and counter
 
-/*void parseURI(const char *line) {
+
+
+//bool parseURL=false;
+
+//obj_total / req_total 
+
+void parseURI(const char *line) {
+	int total = 0;
+	int totalp=0;
+	char *path;
+	char *query;
+	int len; 
+	const char *start_of_path;
+	const char *end_of_query;
+
 	start_of_path=strchr(line, '?');
 	len = start_of_path-line;
 	path = malloc(sizeof(char) * (len + 1));
@@ -345,10 +372,10 @@ void print_data(Result* result) {
         path[len] = '\0';
 	}
     
-	//  printf("%s\n", path);
+	printf("%s\n", path);
     start_of_path++;
     end_of_query=strchr(start_of_path, '\0');
-    //printf("%s\n",end_of_query);
+    printf("%s\n",end_of_query);
     len=end_of_query-start_of_path;
 	query=malloc(sizeof(char) * (len + 1));
 	
@@ -358,4 +385,4 @@ void print_data(Result* result) {
     
 	(void)strncpy(query, start_of_path, len);
     query[len] = '\0';
-}*/
+}

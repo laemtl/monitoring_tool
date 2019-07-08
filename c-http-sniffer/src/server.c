@@ -144,7 +144,7 @@ void* connection_handler(int *socket) {
 		
 				Data* data = (Data*)calloc(1, sizeof(Data));
 				if(data == NULL) return EXIT_FAILURE;		
-				data->clients_tl.size = 5;
+				data->client_tl.size = 5;
 				init_data(data);
 
 				data->server_mode = TRUE;
