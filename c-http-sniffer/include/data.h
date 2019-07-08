@@ -53,7 +53,7 @@ struct _data {
     uint32_t interval;
     uint32_t int_step;
     uint32_t duration;
-    uint32_t i;
+    uint32_t stamp;
     
     Addr destination;
     

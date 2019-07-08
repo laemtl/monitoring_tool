@@ -167,7 +167,7 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 				Client* c = CALLOC(Client, 1);
 				c->addr.ip = pkt->saddr;
 				c->addr.port = pkt->sport;
-				//c->is_top = FALSE;
+				c->stamp = data->stamp;
 				
 				pthread_mutex_init(&(c->mutex), NULL);
 				hash_add(c, &(data->client_ht));

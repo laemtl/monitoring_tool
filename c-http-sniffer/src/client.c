@@ -22,14 +22,19 @@ extern int req_compare(Client* c1, Client* c2) {
 
 extern void client_update(Client* c) {
     int n;
-
+    Data* data = {0};
+	get_data(&data);
+    
     pthread_mutex_lock(&(c->mutex));
 	c->req_tot++;
+
+    if(c->stamp < data->stamp) {
+        c->stamp = data->stamp; 
+        data->client_ht.sub_cnt++;
+    } 
 	pthread_mutex_unlock(&(c->mutex));    
     
     // if the client is already in the top list, return
-    Data* data = {0};
-	get_data(&data);
     int count = data->client_tl.count;
     
     if(is_top(data->client_tl.top_list, count, (void*)c, addr_compare)) return;

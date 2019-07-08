@@ -39,7 +39,7 @@ void reset(Data* data) {
 	reset_metric(&(data->tp));
 
 	data->int_step = 0;
-	//data->int_count++;
+	data->int_stamp++;
 
 	// TODO: clean on exit
 	//hash_clear(&(data->clients_ht)); 
