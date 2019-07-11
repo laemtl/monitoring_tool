@@ -108,7 +108,10 @@ hook_packet(flow_t *f, packet_t *packet, BOOL src){
 	return 0;
 }
 
-/* Serve for flow_add_packet(). Update flow packet number and bytes, then update the last action time of flow. */
+/* Serve for flow_add_packet(). 
+   Update flow packet number and bytes, then update the last action time of flow. 
+   Manage the http pair processing
+*/
 static int 
 cal_packet(flow_t *f, packet_t *packet, BOOL src){
 	u_int32_t *pkt_num = NULL, *byt_num = NULL;
@@ -143,7 +146,9 @@ cal_packet(flow_t *f, packet_t *packet, BOOL src){
 		 */
 		seq->pkt = NULL;
 	}
+
 	tcp_order(f->order, seq, src);
+	//flow_extract_pairs(f, seq);
 
 	return 0;
 }
@@ -200,7 +205,7 @@ flow_new(void){
 /* Free a flow_t object */
 int 
 flow_free(flow_t *f){
-        //FILE *file = fopen("log.txt","a");
+    //FILE *file = fopen("log.txt","a");
 	packet_t *cp;
 	http_pair_t	*h;
 	while(f->pkt_dst_f != NULL){
@@ -327,7 +332,6 @@ flow_add_packet(flow_t *f, packet_t *packet, register BOOL src){
 			/* syn */
 			f->syn_sec = packet->cap_sec;
 			f->syn_usec = packet->cap_usec;
-
 			cal_packet(f, packet, src);
 			packet_free(packet);
 		}else{
@@ -369,6 +373,426 @@ flow_add_packet(flow_t *f, packet_t *packet, register BOOL src){
 	}
 
 	pthread_mutex_unlock(&(f->hmb->mutex));
+	return 0;
+}
+
+/* Extract http_pair_t objects from flow's packet_t chain */
+//flow_extract_pairs(f, packet);
+
+// order list source / dest
+// add a flag + pointer to point to the last incompleted pair
+// order them
+// only if response
+
+int 
+flow_hash_extract_http(flow_t *f){
+	printf("In extract http \n");
+}
+
+
+
+/* Extract http_pair_t objects from flow's packet_t chain */
+int 
+flow_extract_pairs(flow_t *f, seq_t *s){
+	// s is the seq_t holding the new inserted packet
+
+	// s has been freed (retransmission), return
+	if(s == NULL) 
+		return 1;
+
+	// s' packet doesn't contain any payload, return
+	if(s->pkt == NULL )
+		return 1;
+
+	/* check if the flow is carrying HTTP again */
+	if( f->http == FALSE)
+		return 1;
+	
+	// s' packet is a REQUEST
+	// if(s->pkt->http == HTTP_REQ) {
+	// 	// create empty http pair
+	// 	printf("We have a request \n");
+
+	// 	packet_t *pkt;
+	// 	request_t	*req;
+	// 	http_pair_t *new_http = NULL;
+
+	// 	seq_t *seq_next = NULL;	/* for temp */
+	// 	seq_t *first_seq = NULL;
+	// 	seq_next = s->next;
+		
+	// 	/* Update flow's first byte time.
+	// 	* FBT of flow refers to the payload's FBT.
+	// 	*/
+	// 	if(f->order->src == NULL){
+	// 		f->fb_sec = s->cap_sec;
+	// 		f->fb_usec = s->cap_usec;
+	// 	}
+		
+	// 	pkt = s->pkt;
+	
+	// 	/* When a new HTTP request is found,
+	// 	* create a HTTP pair object, then add the object to
+	// 	* flow's HTTP chain.
+	// 	*/
+	// 	new_http = http_new();
+	// 	first_seq = s;
+	// 	new_http->req_fb_sec = s->cap_sec;
+	// 	new_http->req_fb_usec = s->cap_usec;
+	// 	new_http->req_lb_sec = s->cap_sec;
+	// 	new_http->req_lb_usec = s->cap_usec;
+			
+	// 	/* Add the object to flow's HTTP chain */
+	// 	flow_add_http(f, new_http);
+
+	// 	/* new request object */
+	// 	req = http_request_new();
+	// 	/* Add the request object to the foregoing HTTP pair object */
+	// 	http_add_request(new_http, req);
+
+	// 	/** Added Functionality: assuming there's only
+	// 	 *  one request packet, 
+	// 	 *  store capture time and sequence + size of  
+	// 	 *  packet in http_pair->request->header when 
+	// 	 *  header is parsed. 
+	// 	**/
+
+	// 	char time[20];
+	// 	//sprintf(time,"%ld", pkt->cap_usec);
+	// 	/* parse and write values to foregoing request object */
+	// 	//http_parse_request(req, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,time,pkt->tcp_seq + pkt->tcp_dl);
+	// 	http_parse_request(req, pkt->tcp_odata, pkt->tcp_odata+pkt->tcp_dl, time, pkt->tcp_seq, pkt->tcp_seq+pkt->tcp_dl);
+	
+	// 	/* if( new_http != NULL ){
+	// 		// Last packet of the request
+	// 		// TODO: find a solution for this
+	// 		if( seq_next == NULL || seq_next->pkt != NULL ){
+	// 			if( s->nxt_seq != 0){
+	// 				new_http->req_total_len = s->nxt_seq - first_seq->seq;
+	// 				new_http->req_body_len = 0;
+	// 			}
+
+	// 			// Update flow's last byte time.
+	// 			if ((s->cap_sec > f->lb_sec) || (s->cap_sec == f->lb_sec && s->cap_usec > f->lb_usec)){
+	// 				f->lb_sec = s->cap_sec;
+	// 				f->lb_usec = s->cap_usec;
+	// 			}
+	// 		}
+	// 	} */
+	// }
+	
+	// s' packet is a RESPONSE
+	if(s->pkt->http == HTTP_RSP) {
+		// find request
+		printf("We have a response \n");
+
+		http_pair_t *tmp = f->http_f;
+		packet_t *pkt;	
+		response_t	*rsp;
+		http_pair_t *found_http = NULL;
+		
+		seq_t *seq_next = NULL;	/* for temp */
+		seq_t *first_seq = NULL;
+		seq_next = s->next;
+		
+		// seq = f->order->dst;
+		int first_packet = 0;
+		pkt = s->pkt;
+	
+		/*
+		* Similar to the request parsing, a new response is
+		* added to the first pair without response
+		*/
+		while(tmp != NULL){
+			if(tmp->response_header == NULL)
+				break;
+			tmp = tmp->next;
+		}
+		if(tmp == NULL)
+			/* no response empty, then return */
+			return 1;
+		else{
+			/*Found!*/
+			first_packet = 1;
+			found_http = tmp;
+			first_seq = s;
+			found_http->rsp_fb_sec = s->cap_sec;
+			found_http->rsp_fb_usec = s->cap_usec;
+			rsp = http_response_new();
+			http_add_response(found_http, rsp);
+
+
+			/** Added functionality: store
+			 *  acknowledgement number in 
+			 *  response_header information.
+			**/
+
+			http_parse_response(rsp, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl, pkt->tcp_ack);
+		}
+		
+
+		if ( found_http != NULL ){
+			/*first_seq != null*/                      
+
+			/** Added functionality: Concatenate capture
+			 *  times of all response packets to string
+			 *  stored in http_pair, separated by commas.
+			**/
+
+			char temp[20];
+			sprintf(temp,",%ld",s->cap_usec);
+			strcat(found_http->response_header->time,temp);
+			if (!first_packet){
+				sprintf(temp,",%d",s->size);
+			}else{
+				sprintf(temp,"%d",s->size);
+			}
+			strcat(found_http->response_header->size,temp);
+
+			first_packet=0;
+
+			if( seq_next == NULL || seq_next->pkt != NULL ){
+				found_http->rsp_lb_sec = s->cap_sec;
+				found_http->rsp_lb_usec = s->cap_usec;
+
+				if(s->nxt_seq != 0){
+					found_http->rsp_total_len = s->nxt_seq - first_seq->seq;	
+					found_http->rsp_body_len = found_http->rsp_total_len - found_http->response_header->hdlen;
+					if (found_http->rsp_body_len < 0)
+					{
+						found_http->rsp_body_len = -1;
+					}
+				}
+				
+				/*Update flow's last byte time.*/
+				if ((s->cap_sec > f->lb_sec) || (s->cap_sec == f->lb_sec && s->cap_usec > f->lb_usec)){
+					f->lb_sec = s->cap_sec;
+					f->lb_usec = s->cap_usec;
+				}
+			}
+		}
+	}
+
+
+
+	// seq_t	*seq = f->order->src;
+	// int found = 0;
+	
+	// /* 
+	//  * First step: find requests 
+	//  */
+	// packet_t *pkt;
+	// request_t	*req;
+	// response_t	*rsp;
+	// int reqn = 0;	// Number of requests.
+	// int rspn = 0;	// Number of responses.
+	
+	// http_pair_t *new_http = NULL;
+	// seq_t *seq_next = NULL;	/* for temp */
+	// seq_t *first_seq = NULL;
+	// /* Set seq and seq_next */
+	// seq = f->order->src;
+	// if( seq != NULL){
+	// 	seq_next = seq->next;
+	// }else{
+	// 	seq_next = NULL;		/* NULL */
+	// }
+	
+	// while(seq != NULL){
+
+	// 	/* Update flow's first byte time.
+	// 	 * FBT of flow refers to the payload's FBT.
+	// 	 */
+	// 	// Use a header pointer instead
+	// 	// TODO: How to do this only once
+	// 	if(seq->pkt != NULL && found == 0){
+	// 		found = 1;
+	// 		f->fb_sec = seq->cap_sec;
+	// 		f->fb_usec = seq->cap_usec;
+	// 	}
+	
+
+	
+	// 	pkt = seq->pkt;
+	// 	if(pkt != NULL && pkt->http == HTTP_REQ){
+	// 		/* When a new HTTP request is found,
+	// 		* create a HTTP pair object, then add the object to
+	// 		* flow's HTTP chain.
+	// 		*/
+	// 		reqn++;
+			
+	// 		/* new HTTP pair object*/
+	// 		new_http = http_new();
+	// 		first_seq = seq;
+	// 		new_http->req_fb_sec = seq->cap_sec;
+	// 		new_http->req_fb_usec = seq->cap_usec;
+	// 		new_http->req_lb_sec = seq->cap_sec;
+	// 		new_http->req_lb_usec = seq->cap_usec;
+				
+	// 		/* Add the object to flow's HTTP chain */
+	// 		flow_add_http(f, new_http);
+
+	// 		/* new request object */
+	// 		req = http_request_new();
+	// 		/* Add the request object to the foregoing HTTP pair object */
+	// 		http_add_request(new_http, req);
+
+
+
+	// 		/** Added Functionality: assuming there's only
+	// 		 *  one request packet, 
+	// 		 *  store capture time and sequence + size of  
+	// 		 *  packet in http_pair->request->header when 
+	// 		 *  header is parsed. 
+	// 		**/
+
+	// 		char time[20];
+	// 		sprintf(time,"%ld",pkt->cap_usec);
+	// 		/* parse and write values to foregoing request object */
+	// 		//http_parse_request(req, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,time,pkt->tcp_seq + pkt->tcp_dl);
+	// 		http_parse_request(req, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,time,pkt->tcp_seq,pkt->tcp_seq+pkt->tcp_dl);
+	// 	}else{
+	// 		if(new_http == NULL){
+	// 			/*Omit the TCP handshake sequences.*/
+	// 			seq = seq->next;
+	// 			if(seq != NULL)
+	// 				seq_next = seq->next;
+	// 			else
+	// 				break;
+	// 			continue;
+	// 		}
+	// 	}
+	// 	if( new_http != NULL ){
+	// 		if( seq_next == NULL || seq_next->pkt != NULL ){
+	// 			//assert(seq->nxt_seq != 0);
+	// 			if( seq->nxt_seq != 0){
+	// 				new_http->req_total_len = seq->nxt_seq - first_seq->seq;
+	// 				new_http->req_body_len = 0;
+	// 			}
+	// 			/*Update flow's last byte time.*/
+	// 			if ((seq->cap_sec > f->lb_sec) || (seq->cap_sec == f->lb_sec && seq->cap_usec > f->lb_usec)){
+	// 				f->lb_sec = seq->cap_sec;
+	// 				f->lb_usec = seq->cap_usec;
+	// 			}
+	// 		}
+	// 	}
+	// 	/*Continue to next sequence.*/
+	// 	seq = seq->next;
+	// 	if(seq != NULL)
+	// 		seq_next = seq->next;
+	// 	else
+	// 		break;
+	// }
+
+	// /* If no requests found, we treat the flow as invalid and stop parsing */
+	// if(reqn == 0)
+	// 	return 1;
+		
+	// /* Second step: find responses */
+	// http_pair_t *tmp = f->http_f;
+	// http_pair_t *found_http = NULL;
+	// seq = f->order->dst;
+	// if( seq != NULL)
+	// 	seq_next = seq->next;
+	// else
+	// 	seq_next = NULL;		/* NULL */
+
+	// while(seq != NULL){
+	// 	int first_packet = 0;
+	// 	pkt = seq->pkt;
+	// 	if ( pkt != NULL && pkt->http == HTTP_RSP ){
+
+	// 		/*
+	// 		* Similar to the request parsing, a new response is
+	// 		* added to the first pair without response
+	// 		*/
+	// 		rspn++;
+	// 		/* Try to find the first pair without response */
+	// 		while(tmp != NULL){
+	// 			if(tmp->response_header == NULL)
+	// 				break;
+	// 			tmp = tmp->next;
+	// 		}
+	// 		if(tmp == NULL)
+	// 			/* no response empty, then return */
+	// 			return 1;
+	// 		else{
+	// 			/*Found!*/
+	// 			first_packet = 1;
+	// 			found_http = tmp;
+	// 			first_seq = seq;
+	// 			found_http->rsp_fb_sec = seq->cap_sec;
+	// 			found_http->rsp_fb_usec = seq->cap_usec;
+	// 			rsp = http_response_new();
+	// 			http_add_response(found_http, rsp);
+
+
+	// 			/** Added functionality: store
+	// 			 *  acknowledgement number in 
+	// 			 *  response_header information.
+	// 			**/
+
+	// 			http_parse_response(rsp, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl, pkt->tcp_ack);
+	// 		}
+	// 	}else{
+	// 		if(found_http == NULL){
+	// 			seq = seq->next;
+	// 			if(seq != NULL)
+	// 				seq_next = seq->next;
+	// 			else
+	// 				break;
+	// 			continue;
+	// 		}
+	// 	}
+
+	// 	if ( found_http != NULL ){
+	// 		/*first_seq != null*/                      
+
+	// 		/** Added functionality: Concatenate capture
+	// 		 *  times of all response packets to string
+	// 		 *  stored in http_pair, separated by commas.
+	// 		**/
+
+	// 		char temp[20];
+	// 		sprintf(temp,",%ld",seq->cap_usec);
+	// 		strcat(found_http->response_header->time,temp);
+	// 		if (!first_packet){
+	// 			sprintf(temp,",%d",seq->size);
+	// 		}else{
+	// 			sprintf(temp,"%d",seq->size);
+	// 		}
+	// 		strcat(found_http->response_header->size,temp);
+
+	// 		first_packet=0;
+
+	// 		if( seq_next == NULL || seq_next->pkt != NULL ){
+	// 			found_http->rsp_lb_sec = seq->cap_sec;
+	// 			found_http->rsp_lb_usec = seq->cap_usec;
+	// 			//assert( seq->nxt_seq != 0 );
+	// 			if(seq->nxt_seq != 0){
+	// 				found_http->rsp_total_len = seq->nxt_seq - first_seq->seq;	
+	// 				found_http->rsp_body_len = found_http->rsp_total_len - found_http->response_header->hdlen;
+	// 				if (found_http->rsp_body_len < 0)
+	// 				{
+	// 					found_http->rsp_body_len = -1;
+	// 				}
+	// 			}
+				
+	// 			/*Update flow's last byte time.*/
+	// 			if ((seq->cap_sec > f->lb_sec) || (seq->cap_sec == f->lb_sec && seq->cap_usec > f->lb_usec)){
+	// 				f->lb_sec = seq->cap_sec;
+	// 				f->lb_usec = seq->cap_usec;
+	// 			}
+	// 		}
+	// 	}
+
+	// 	seq = seq->next;
+	// 	if(seq != NULL)
+	// 		seq_next = seq->next;
+	// 	else
+	// 		break;
+	// }
+
 	return 0;
 }
 
@@ -468,6 +892,9 @@ flow_extract_http(flow_t *f){
 		while(compare_sequence_time(seq, fin_seq) < 0){
 			pkt = seq->pkt;
 			if(pkt != NULL && pkt->http == HTTP_REQ){
+				//int res = tcp_order_check(f->order);
+				//if(res == 0) printf("Unordered flow \n");
+
 				/* When a new HTTP request is found,
 				 * create a HTTP pair object, then add the object to
 				 * flow's HTTP chain.
@@ -499,7 +926,9 @@ flow_extract_http(flow_t *f){
 
 				char time[20];
                 sprintf(time,"%ld",pkt->cap_usec);
-				http_parse_request(req, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,time,pkt->tcp_seq+pkt->tcp_dl);
+				//http_parse_request(req, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,time,pkt->tcp_seq+pkt->tcp_dl);
+				http_parse_request(req, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,time,pkt->tcp_seq,pkt->tcp_seq+pkt->tcp_dl);
+
 			}else{
 				/*Omit the TCP handshake sequences.*/
 				if(new_http == NULL){
@@ -554,9 +983,10 @@ flow_extract_http(flow_t *f){
 				new_http->req_fb_usec = seq->cap_usec;
 				new_http->req_lb_sec = seq->cap_sec;
 				new_http->req_lb_usec = seq->cap_usec;
-				
+		
 				/* Add the object to flow's HTTP chain */
 				flow_add_http(f, new_http);
+
 				/* new request object */
 				req = http_request_new();
 				/* Add the request object to the foregoing HTTP pair object */
@@ -573,7 +1003,8 @@ flow_extract_http(flow_t *f){
 				char time[20];
 				sprintf(time,"%ld",pkt->cap_usec);
 				/* parse and write values to foregoing request object */
-				http_parse_request(req, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,time,pkt->tcp_seq + pkt->tcp_dl);
+				//http_parse_request(req, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,time,pkt->tcp_seq + pkt->tcp_dl);
+				http_parse_request(req, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,time,pkt->tcp_seq,pkt->tcp_seq+pkt->tcp_dl);
 			}else{
 				if(new_http == NULL){
 					/*Omit the TCP handshake sequences.*/
@@ -609,6 +1040,8 @@ flow_extract_http(flow_t *f){
 				break;
 		}
 	}
+
+	printf("total req: %d \n", reqn);
 
 	/* If no responses found, we treat the flow as invalid and stop parsing */
 	if(reqn == 0)
@@ -648,10 +1081,6 @@ flow_extract_http(flow_t *f){
 					first_seq = seq;
 					found_http->rsp_fb_sec = seq->cap_sec;
 					found_http->rsp_fb_usec = seq->cap_usec;
-
-					//double rst = (found_http->rsp_fb_sec + found_http->rsp_fb_usec * 0.000001) - (found_http->req_fb_sec + found_http->req_fb_usec * 0.000001);
-					//if(rst < 0)
-					//	printf("time: %ld %ld %ld %ld \n", found_http->req_fb_sec, found_http->req_fb_usec, found_http->rsp_fb_sec, found_http->rsp_fb_usec);
 
 					rsp = http_response_new();
 					http_add_response(found_http, rsp);
@@ -825,5 +1254,7 @@ flow_extract_http(flow_t *f){
 				break;
 		}
 	}
+
+	printf("total rsp: %d \n", rspn);
 	return 0;
 }

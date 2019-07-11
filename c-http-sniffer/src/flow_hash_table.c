@@ -255,7 +255,7 @@ flow_hash_scnt(void)
 }
 
 /*
- * Close a flow forcedly if the delta time is lower than timeout.
+ * Close a flow forcedly if the delta time is greater than timeout.
  * Then add the flow to flow queue.
  * Return the number of flows deleted forcedly.
  */

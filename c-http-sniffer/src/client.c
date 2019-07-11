@@ -15,6 +15,11 @@ extern int addr_compare(Client* c1, Client* c2) {
 }
 
 extern int req_compare(Client* c1, Client* c2) {
+    if(c1 == NULL || c2 == NULL) {
+        printf("Uninitilized value \n");
+        return;
+    }
+
     if(c1->req_tot == c2->req_tot) return 0;
     else if (c1->req_tot > c2->req_tot) return 1;
     return -1;
@@ -28,6 +33,9 @@ extern void client_update(Client* c) {
     pthread_mutex_lock(&(c->mutex));
 	c->req_tot++;
 
+    // If client stamp is smaller than current stamp
+    // the client was not active for the current interval yet
+    // Increment the subtotal count 
     if(c->stamp < data->stamp) {
         c->stamp = data->stamp; 
         data->client_ht.sub_cnt++;
@@ -51,7 +59,7 @@ extern void client_update(Client* c) {
         memcpy(data->client_tl.top_list[count], c, sizeof(c));
                 
         //c->is_top = TRUE;
-        sort_tl(data->client_tl.top_list, count-1, req_compare);
+        sort_tl(data->client_tl.top_list, count, req_compare);
         // TODO: need a lock
         (&(data->client_tl))->count++;
 

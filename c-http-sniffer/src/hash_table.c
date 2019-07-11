@@ -134,6 +134,7 @@ node* hash_delete(void *value, hash_t* ht) {
  * Update the element if the element already exists;
  * Otherwise, make a new record and add the value to it.
  */
+
 int hash_add(void *value, hash_t* ht) {
 	if(ht == NULL || value == NULL) return 1;
 		
@@ -141,6 +142,7 @@ int hash_add(void *value, hash_t* ht) {
 
 	e = hash_find(value, ht);
 	if(e != NULL) {
+		free(value);
 		ht->update_fn(e->value);
 	} else {
 		e = hash_new(value, ht);

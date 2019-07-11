@@ -39,7 +39,7 @@ void reset(Data* data) {
 	reset_metric(&(data->tp));
 
 	data->int_step = 0;
-	data->int_stamp++;
+	data->stamp++;
 
 	// TODO: clean on exit
 	//hash_clear(&(data->clients_ht)); 
@@ -176,13 +176,13 @@ void extract_data(const flow_t *flow){
 	//char *saddr = malloc(sizeof("aaa.bbb.ccc.ddd"));
 	//char *daddr = malloc(sizeof("aaa.bbb.ccc.ddd"));
 	
-	int n = sizeof("aaa.bbb.ccc.ddd") + 1;
+	/*int n = sizeof("aaa.bbb.ccc.ddd") + 1;
 	char *saddr[n];
 	char *daddr[n];
 	strncpy(saddr, ip_ntos(flow->socket.saddr), n);
 	strncpy(daddr, ip_ntos(flow->socket.daddr), n);
 	saddr[n] = '\0';
-	daddr[n] = '\0';
+	daddr[n] = '\0';*/
     
 	if (flow->http_f != NULL){        	
 		http_pair_t *h = flow->http_f;
@@ -195,29 +195,9 @@ void extract_data(const flow_t *flow){
               	parseURI(req->uri);
 
 				if(h->response_header != NULL) {
-					response_t *rsp = h->response_header;
-
-					// Compute response time
-					//double rst = (h->rsp_fb_sec + h->rsp_fb_usec * 0.000001) - (h->req_fb_sec + h->req_fb_usec * 0.000001);
-
-
-					double rst, rstu;
- 					rstu = h->rsp_fb_usec - h->req_fb_usec;
-                    if (rstu < 0) rstu = 1000000 - h->rsp_fb_usec + h->req_fb_usec;
-                    rst = h->rsp_fb_sec - h->req_fb_sec + rstu*0.000001; 
-                   
-			
-					inc_metric_total(&(data->rst), rst);
-					update_metric_min(&(data->rst), rst);
-					update_metric_max(&(data->rst), rst);
-					
-					// Extract first digit of status code
-					int i=rsp->status;
-					while (i>=10) i=i/10;  
-					if (i==4 || i==5) {
-						inc_metric_subtotal(&(data->err_rate), 1);
-						inc_metric_total(&(data->err_rate), 1);
-					}
+					compute_rst(h);
+					response_t *rsp = h->response_header;					
+					check_status(rsp);
 				}
 			}	   
 			h = h->next;
@@ -225,6 +205,48 @@ void extract_data(const flow_t *flow){
 	}
 }
 
+void compute_rst(http_pair_t *h) {
+	Data* data = {0};
+	get_data(&data);
+	
+	// Compute response time
+	double rst = (h->rsp_fb_sec + h->rsp_fb_usec * 0.000001) - (h->req_fb_sec + h->req_fb_usec * 0.000001);
+
+	response_t *rsp = h->response_header;
+	request_t *req = h->request_header;
+
+	printf("req_seq: %" PRIu32"\n", req->seq);
+	printf("req nxt seq: %" PRIu32 "\n", req->nxt_seq);
+	printf("aknowledgment: %ld \n", rsp->acknowledgement);
+
+	printf("req %lld %lld \n", (long long)h->req_fb_sec, (long long)h->req_fb_usec);
+	printf("rsp %lld %lld \n", (long long)h->rsp_fb_sec, (long long)h->rsp_fb_usec);
+
+	/*double rst, rstu;
+	rstu = h->rsp_fb_usec - h->req_fb_usec;
+	if (rstu < 0) rstu = (1000000 - h->rsp_fb_usec) + h->req_fb_usec;
+	rst = (h->rsp_fb_sec - h->req_fb_sec) + rstu*0.000001;*/
+
+	//int res = tcp_order_check(f->order);
+	//if(res == 0) printf("Unordered flow \n");
+	
+	inc_metric_total(&(data->rst), rst);
+	update_metric_min(&(data->rst), rst);
+	update_metric_max(&(data->rst), rst);
+}
+
+void check_status(response_t *rsp) {
+	Data* data = {0};
+	get_data(&data);
+
+	// Extract first digit of status code
+	int i = rsp->status;
+	while (i>=10) i=i/10;  
+	if (i==4 || i==5) {
+		inc_metric_subtotal(&(data->err_rate), 1);
+		inc_metric_total(&(data->err_rate), 1);
+	}
+}
 
 // TODO: check if status active
 Result* get_result(Result* result) {
@@ -284,10 +306,36 @@ void clear_tl() {
 
 }
 
+void flow_hash_process() {
+	Data* data = {0};
+	get_data(&data);
+	int i = 0;
+	flow_t	*flow, *flow_next = NULL;
+
+	for(i=0; i<HASH_SIZE; i++){
+		pthread_mutex_lock(&(data->flow_hash_table[i]->mutex));
+		flow = data->flow_hash_table[i]->first;
+
+		while(flow != NULL ){
+			flow_next = flow->next;
+			flow_hash_extract_http(flow);
+			flow = flow_next;
+		}
+		
+		pthread_mutex_unlock(&(data->flow_hash_table[i]->mutex));
+	}
+
+	return 0;
+}
+
 void process_data() {
 	Data* data = {0};
 	get_data(&data);
 	
+	// The completed flow are processed by extract_data
+	// We process the ones in the hash table using the following function 	
+	flow_hash_process();
+
 	data->int_step++;
 	process_rate(data);
 	if(data->int_step < data->interval) return;
@@ -356,13 +404,16 @@ void parseURI(const char *line) {
 	int totalp=0;
 	char *path;
 	char *query;
-	int len; 
+	u_int32_t len; 
 	const char *start_of_path;
 	const char *end_of_query;
 
-	start_of_path=strchr(line, '?');
-	len = start_of_path-line;
-	path = malloc(sizeof(char) * (len + 1));
+	// TODO : what to do if sop is NULL?
+	start_of_path = strchr(line, '?');
+	if(start_of_path == NULL) return;
+
+	len = start_of_path - line;
+	path = calloc(len + 1, sizeof(char));
 	
 	if ( NULL == path ){ 
         free(path);
@@ -372,12 +423,12 @@ void parseURI(const char *line) {
         path[len] = '\0';
 	}
     
-	printf("%s\n", path);
     start_of_path++;
-    end_of_query=strchr(start_of_path, '\0');
-    printf("%s\n",end_of_query);
-    len=end_of_query-start_of_path;
-	query=malloc(sizeof(char) * (len + 1));
+	
+    end_of_query = strchr(start_of_path, '\0');
+    //printf("%s\n",end_of_query);
+    len = end_of_query - start_of_path;
+	query = malloc(sizeof(char) * (len + 1));
 	
 	if ( NULL == query ) {
 		free(query);

@@ -179,8 +179,10 @@ struct _request_t
 	 *  and tcp length.
 	**/
 	char* 		time;
-	long		bytes;
+	//long		bytes;
 	int			hdlen;	// Header length
+    u_int32_t   seq;
+    u_int32_t   nxt_seq;
 };
 
 /*
@@ -253,7 +255,8 @@ void http_response_free(response_t *rsp);			    /* Free a response_t object */
 int http_add_request(http_pair_t *h, request_t *req);	/* Add a request_t object to http_pair_t request chain */
 int http_add_response(http_pair_t *h, response_t *rsp);	/* Add a response_t object to http_pair_t response chain */
 
-int http_parse_request(request_t *request, const char *data, const char *dataend,char* time, long bytes);		/* Parse the packet and store in a request_t object */
+//int http_parse_request(request_t *request, const char *data, const char *dataend,char* time, long bytes);		/* Parse the packet and store in a request_t object */
+int http_parse_request(request_t *request, const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq);   /* Parse the packet and store in a request_t object */
 int http_parse_response(response_t *response, const char *data, const char *dataend, long ack);	/* Parse the packet and store in a response_t object */
 
 #endif /* __HTTP_H__ */

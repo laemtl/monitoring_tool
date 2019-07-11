@@ -261,6 +261,8 @@ http_request_free(request_t *r)
 		free(r->content_encoding);
 	if(r->content_length != NULL)
         free(r->content_length);
+    if(r->time != NULL)
+        free(r->time);
 	free(r);
 }
 
@@ -307,7 +309,9 @@ http_free(http_pair_t *h)
 int	
 http_add_request(http_pair_t *h, request_t *req)
 {
-	if(h->request_header == NULL){
+	if(h == NULL) return 2;
+
+    if(h->request_header == NULL){
 		h->request_header = req;
 		return 0;
 	}else{
@@ -860,10 +864,13 @@ http_header_param(const char *header, int hlen, const char *param)
  * But only the header fields are extracted.
  */
 int 
-http_parse_request(request_t *request, const char *data, const char *dataend,char *time, long bytes)
+http_parse_request(request_t *request, const char *data, const char *dataend, char *time, u_int32_t seq, u_int32_t nxt_seq)
 {
 	char *eoh, *eol, *linesp, *lineep;
 	int line_cnt = 0, lnl = 0, hdl = 0;
+
+    request->seq = seq;
+    request->nxt_seq = nxt_seq;
 
 	eoh = find_header_end(data, dataend, &line_cnt);
 	hdl = eoh - data + 1;
@@ -873,7 +880,7 @@ http_parse_request(request_t *request, const char *data, const char *dataend,cha
 	 *  in request_header
 	**/
 	request->time=strdup(time);
-	request->bytes=bytes;
+	//request->bytes=bytes;
 	/* Parse first line of http request */
 	linesp = data;
 	lineep = find_line_end(linesp, eoh, &eol);
