@@ -44,6 +44,8 @@ struct _top_list {
 // memset to 0 on init
 typedef struct _data Data;
 struct _data {
+    int reqn;
+    int rspn;
     bool server_mode;
     int client_sock;
     

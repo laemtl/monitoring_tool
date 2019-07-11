@@ -85,6 +85,7 @@ struct _flow_t
 	time_t		last_action_sec;	/* latest modified time to the flow in seconds */
 	time_t		last_action_usec;	/* latest modified time to the flow in microseconds */
 	u_int8_t	close;
+	BOOL		init;			/* the flow has received its first packet */
 #define CLIENT_CLOSE	0x01
 #define SERVER_CLOSE	0x02
 #define FORCED_CLOSE	0x04

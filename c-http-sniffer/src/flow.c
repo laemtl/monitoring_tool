@@ -384,10 +384,10 @@ flow_add_packet(flow_t *f, packet_t *packet, register BOOL src){
 // order them
 // only if response
 
-int 
-flow_hash_extract_http(flow_t *f){
-	printf("In extract http \n");
-}
+//int 
+//flow_hash_extract_http(flow_t *f){
+	
+//}
 
 
 
@@ -815,10 +815,11 @@ flow_extract_http(flow_t *f){
 		/* Update flow's first byte time.
 		 * FBT of flow refers to the payload's FBT.
 		 */
-		if(seq->pkt != NULL && found == 0){
+		if(seq->pkt != NULL && found == 0 && f->init == FALSE){
 			found = 1;
 			f->fb_sec = seq->cap_sec;
 			f->fb_usec = seq->cap_usec;
+			f->init = TRUE;
 		}
 		
 		/*Search the FIN sequence in sequence queue.*/
@@ -890,7 +891,18 @@ flow_extract_http(flow_t *f){
 	if (fin_seq != NULL && seq != NULL){
 		/*A FIN packet exists.*/
 		while(compare_sequence_time(seq, fin_seq) < 0){
+			/*if(seq->processed) {
+				seq = seq->next;
+				if(seq != NULL)
+					seq_next = seq->next;
+				else
+					break;
+				continue;
+			}*/
+			
 			pkt = seq->pkt;
+			//seq->processed == TRUE;
+
 			if(pkt != NULL && pkt->http == HTTP_REQ){
 				//int res = tcp_order_check(f->order);
 				//if(res == 0) printf("Unordered flow \n");
@@ -942,9 +954,9 @@ flow_extract_http(flow_t *f){
 			}
 
 			if( new_http != NULL ){
+				// Last bit 
 				if( seq_next == NULL || seq_next == fin_seq || seq_next->pkt != NULL ||\
-						compare_sequence_time(seq_next, fin_seq) >= 0 ){
-					//assert(seq->nxt_seq != 0);
+				compare_sequence_time(seq_next, fin_seq) >= 0 ){
 					if( seq->nxt_seq != 0){
 						new_http->req_total_len = seq->nxt_seq - first_seq->seq;
 						new_http->req_body_len = 0;
@@ -954,8 +966,6 @@ flow_extract_http(flow_t *f){
 						f->lb_sec = seq->cap_sec;
 						f->lb_usec = seq->cap_usec;
 					}
-				}else{
-					//assert(seq->seq <= seq_next->seq);
 				}
 			}
 			

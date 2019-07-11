@@ -16,7 +16,7 @@ struct _seq_t{
 	time_t		cap_sec;
 	time_t		cap_usec;
 	seq_t		*next;		/* next in seq order */
-	BOOL		processed;
+	//BOOL		processed;
 	u_int32_t	size;
 };
 
@@ -29,7 +29,7 @@ struct _order_t {
 	seq_t		*last_dst;	/* last in dst queue inserted */
 	u_int32_t	num;		/* number of packet in queue */
 	BOOL		rst;		/* reset */
-	pthread_mutex_t mutex;
+	//pthread_mutex_t mutex;
 };
 
 seq_t *seq_new(void);

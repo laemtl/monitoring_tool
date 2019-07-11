@@ -152,12 +152,19 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 			char *head_end = NULL;
 			int hdl = 0;
 			head_end = IsRequest(cp, pkt->tcp_dl);
+			
+			Data* data = {0};
+			get_data(&data);
+
 			if( head_end != NULL ){
 				/* First packet of request. */
 				//total++;
+				// counter for rqst
 
-				Data* data = {0};
-				get_data(&data);
+			
+
+				data->reqn++;
+				printf("Request count is: %d", data->reqn);
 
 				inc_metric_subtotal(&(data->req_rate), 1);
 				inc_metric_total(&(data->req_rate), 1);
@@ -208,6 +215,12 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 				/* First packet of response. */
 				hdl = head_end - cp + 1;
 				pkt->http = HTTP_RSP;
+
+				// counter + 
+
+				data->rspn++;
+				printf("Rsp count is: %d", data->rspn);
+
 				/* Fake TCP data length with only HTTP header. */
 				//pkt->tcp_dl = hdl;
 				

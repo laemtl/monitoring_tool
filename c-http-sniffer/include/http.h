@@ -240,6 +240,7 @@ struct _http_pair_t
 	u_int32_t	rsp_body_len;
 
 	http_pair_t	*next;
+    BOOL processed;                                     /* if the http_pair has already been processed or not */
 };
 
 char* IsRequest(const char *p, const int datalen);	    /* If the packet carries HTTP request data */

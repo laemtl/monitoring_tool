@@ -54,6 +54,8 @@ void init_data(Data* data) {
 
 	reset(data);	
 	data->status = 0;
+	data->rspn = 0;
+	data->reqn = 0;
 
 	client_init(data);
 	path_init(data);
@@ -318,7 +320,7 @@ void flow_hash_process() {
 
 		while(flow != NULL ){
 			flow_next = flow->next;
-			flow_hash_extract_http(flow);
+			flow_extract_http(flow);
 			flow = flow_next;
 		}
 		
@@ -332,13 +334,13 @@ void process_data() {
 	Data* data = {0};
 	get_data(&data);
 	
-	// The completed flow are processed by extract_data
-	// We process the ones in the hash table using the following function 	
-	flow_hash_process();
-
 	data->int_step++;
 	process_rate(data);
 	if(data->int_step < data->interval) return;
+
+	// The completed flow are processed by extract_data
+	// We process the ones in the hash table using the following function 	
+	flow_hash_process();
 
 	Result* result = calloc(1, sizeof(Result));
 	get_result(result);
