@@ -5,6 +5,7 @@
  *      Author: chenxm
  */
 #include <stdlib.h>
+#include <stdbool.h>
 #include "packet.h"
 #include "util.h"
 #include "order.h"
@@ -13,6 +14,7 @@ seq_t *seq_new(void){
 	seq_t *seq;
 	seq = MALLOC(seq_t, 1);
 	memset(seq, 0, sizeof(seq_t));
+	seq->processed = false;
 	return seq;
 }
 

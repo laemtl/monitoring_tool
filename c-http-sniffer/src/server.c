@@ -195,9 +195,9 @@ void onExit(int signum) {
 	stop_server();
 
 	printf("pak: %d \n", pak);
-    printf("reqn: %d \n", pak_deq);
-    printf("rspn: %d \n", rsp_n);
-    printf("req_n: %d \n", req_n);
+    printf("dpak: %d \n", pak_deq);
+	printf("reqn: %d \n", req_n);
+	printf("rspn: %d \n", rsp_n);
 
 	exit(signum);
 }

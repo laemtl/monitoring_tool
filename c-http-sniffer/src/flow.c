@@ -12,6 +12,7 @@
 //#include <assert.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <inttypes.h>
 
 #include "util.h"
 #include "flow.h"
@@ -496,9 +497,14 @@ flow_extract_pairs(flow_t *f, seq_t *s){
 		* Similar to the request parsing, a new response is
 		* added to the first pair without response
 		*/
+		u_int32_t ack = pkt->tcp_ack;
+				
+		/* Try to find the first pair without response */
 		while(tmp != NULL){
-			if(tmp->response_header == NULL)
+			if(tmp->response_header == NULL && tmp->request_header->nxt_seq == ack) {
 				break;
+				printf("ns: %" PRIu32 " ack: %" PRIu32" \n", tmp->request_header->nxt_seq, ack);
+			}
 			tmp = tmp->next;
 		}
 		if(tmp == NULL)
@@ -520,7 +526,7 @@ flow_extract_pairs(flow_t *f, seq_t *s){
 			 *  response_header information.
 			**/
 
-			http_parse_response(rsp, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl, pkt->tcp_ack);
+			http_parse_response(rsp, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl, ack);
 		}
 		
 
@@ -889,7 +895,7 @@ flow_extract_http(flow_t *f, BOOL closed){
 				//int res = tcp_order_check(f->order);
 				//if(res == 0) printf("Unordered flow \n");
 				
-				seq->processed == TRUE;
+				seq->processed = TRUE;
 
 				/* When a new HTTP request is found,
 				 * create a HTTP pair object, then add the object to
@@ -941,7 +947,7 @@ flow_extract_http(flow_t *f, BOOL closed){
 			if( new_http != NULL ){
 				// Last bit 
 				// We check if the flow is closed to detect the last packet
-				if( ( seq_next == NULL && closed ) || seq_next == fin_seq || seq_next->pkt != NULL ||\
+				if( ( seq_next == NULL && closed ) || seq_next == fin_seq || ( seq_next != NULL && seq_next->pkt != NULL ) ||\
 				compare_sequence_time(seq_next, fin_seq) >= 0 ){
 					if( seq->nxt_seq != 0){
 						new_http->req_total_len = seq->nxt_seq - first_seq->seq;
@@ -966,9 +972,9 @@ flow_extract_http(flow_t *f, BOOL closed){
 		/* No FIN packet found.*/
 		while(seq != NULL){
 			pkt = seq->pkt;
-			if(pkt != NULL && pkt->http == HTTP_REQ && !seq->processed){
+			if(pkt != NULL && pkt->http == HTTP_REQ && !(seq->processed)){
 
-				seq->processed == TRUE;
+				seq->processed = TRUE;
 
 				/* When a new HTTP request is found,
 				 * create a HTTP pair object, then add the object to
@@ -1018,7 +1024,7 @@ flow_extract_http(flow_t *f, BOOL closed){
 			if( new_http != NULL ){
 				// Last bit
 				// We check if the flow is closed to detect the last packet
-				if( ( seq_next == NULL && closed ) || seq_next->pkt != NULL ){
+				if( ( seq_next == NULL && closed ) || ( seq_next != NULL && seq_next->pkt != NULL ) ){
 					if( seq->nxt_seq != 0){
 						new_http->req_total_len = seq->nxt_seq - first_seq->seq;
 						new_http->req_body_len = 0;
@@ -1058,16 +1064,19 @@ flow_extract_http(flow_t *f, BOOL closed){
 			pkt = seq->pkt;
 			if ( pkt != NULL && pkt->http == HTTP_RSP && !seq->processed){
 
-				seq->processed == TRUE;
+				seq->processed = TRUE;
 				
 				/*
 				 * Similar to the request parsing, a new response is
 				 * added to the first pair without response
 				 */
 				rspn++;
+
+				u_int32_t ack = pkt->tcp_ack;
+				
 				/* Try to find the first pair without response */
 				while(tmp != NULL){
-					if(tmp->response_header == NULL)
+					if(tmp->response_header == NULL && tmp->request_header->nxt_seq == ack)
 						break;
 					tmp = tmp->next;
 				}
@@ -1089,7 +1098,7 @@ flow_extract_http(flow_t *f, BOOL closed){
 					 *  acknowledgement number in 
 					 *  response_header information.
 					**/
-					http_parse_response(rsp, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,pkt->tcp_ack);
+					http_parse_response(rsp, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl, ack);
 				}
 			}else{
 				if(found_http == NULL || seq->processed){
@@ -1156,7 +1165,7 @@ flow_extract_http(flow_t *f, BOOL closed){
 			pkt = seq->pkt;
 			if ( pkt != NULL && pkt->http == HTTP_RSP && !seq->processed){
 
-				seq->processed == TRUE;
+				seq->processed = TRUE;
 
 				/*
 				 * Similar to the request parsing, a new response is

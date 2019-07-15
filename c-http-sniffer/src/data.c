@@ -188,15 +188,17 @@ void extract_data(const flow_t *flow){
 		http_pair_t *h = flow->http_f;
 		while(h != NULL) {
 
-			if(h->request_header != NULL && !h->req_processed) {
-				request_t *req = h->request_header;
-				h->req_processed == TRUE;
+			if(h->request_header != NULL) {
+				if(!h->req_processed) {
+					h->req_processed = TRUE;
+					request_t *req = h->request_header;
 
-				//if (parseURL)
-              	parseURI(req->uri);
+					//if (parseURL)
+              		parseURI(req->uri);
+				}
 				
 				if(h->response_header != NULL && !h->rsp_processed) {
-					h->rsp_processed == TRUE;
+					h->rsp_processed = TRUE;
 
 					compute_rst(h);
 					response_t *rsp = h->response_header;					
