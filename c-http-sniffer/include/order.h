@@ -16,7 +16,7 @@ struct _seq_t{
 	time_t		cap_sec;
 	time_t		cap_usec;
 	seq_t		*next;		/* next in seq order */
-	//BOOL		processed;
+	BOOL		processed;
 	u_int32_t	size;
 };
 

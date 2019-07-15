@@ -6,10 +6,16 @@
 #include <unistd.h> /* getopt() */
 #include <pcap.h>
 #include <errno.h>
+#include <signal.h> 
 
 #include "flow.h"
 #include "util.h"
 #include "server.h"
+
+int pak = 0;
+int req_n = 0;
+int rsp_n = 0;
+int pak_deq = 0;
 
 //int GP_CAP_FIN = 0; /* Flag for offline PCAP sniffing */
 
@@ -154,17 +160,14 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 			head_end = IsRequest(cp, pkt->tcp_dl);
 			
 			Data* data = {0};
-			get_data(&data);
-
+	        get_data(&data);
+			
 			if( head_end != NULL ){
 				/* First packet of request. */
 				//total++;
-				// counter for rqst
-
-			
-
-				data->reqn++;
-				printf("Request count is: %d", data->reqn);
+				
+				req_n++;
+				// printf("Request count is: %d \n", data->reqn);
 
 				inc_metric_subtotal(&(data->req_rate), 1);
 				inc_metric_total(&(data->req_rate), 1);
@@ -216,10 +219,9 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 				hdl = head_end - cp + 1;
 				pkt->http = HTTP_RSP;
 
-				// counter + 
-
-				data->rspn++;
-				printf("Rsp count is: %d", data->rspn);
+				rsp_n++;
+				//printf("Req/Rsp diff is: %d \n", data->reqn - data->rspn);
+                //printf("Rsp is: %d \n", data->rspn);
 
 				/* Fake TCP data length with only HTTP header. */
 				//pkt->tcp_dl = hdl;
@@ -255,13 +257,15 @@ int
 process_packet_queue(Data* data){
 	packet_t *pkt = NULL;
 	thread_init(data);
-	
+
 	while(1){
 		pkt = packet_queue_deq();
 		if ( data->status < 0 ) {
 			break;
 		} else if (pkt != NULL){
 			flow_hash_add_packet(pkt);
+			pak_deq++;
+			
 			continue;
 		} else {
 			nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
@@ -285,7 +289,7 @@ process_flow_queue(Data* data){
 		if (data->status < 0) {
 			break;
 		} else if(flow != NULL){
-			flow_extract_http(flow);
+			flow_extract_http(flow, true);
 			extract_data(flow);
 			flow_free(flow);
 
@@ -356,12 +360,9 @@ capture_main(void* p){
 		raw = pcap_next(cap, &pkthdr);
 		if( NULL != raw && data->status == 1){
 			packet = packet_preprocess(raw, &pkthdr);
-			if (NULL!= packet){
+			if (NULL != packet){
 				pkt_handler(packet);
-
-				// Check with this is commented! Memory leak.
-				// Is it to solve the seg Fault?
-				// packet_free(packet);
+				pak++;
 			}
 		} else if ( livemode==0 || data->status < 0) {
 			//GP_CAP_FIN = 1;
@@ -443,6 +444,16 @@ void start_analysis(char* ipaddress, Data* data) {
 	param = NULL;
 }
 
+void sigintHandler(int sig_num) { 
+      signal(SIGINT, sigintHandler); 
+      printf("pak: %d \n", pak);
+      printf("dpak: %d \n", pak_deq);
+	  printf("reqn: %d \n", req_n);
+      printf("rspn: %d \n", rsp_n);
+
+      exit(0);
+} 
+
 /**
  * Main portal of http-sniffer
  */
@@ -450,6 +461,7 @@ int main(int argc, char *argv[]){
 	char* interface = NULL;
 	char* ipaddress = NULL;
 	int opt;
+	signal(SIGINT, sigintHandler);
 
    	// Parse arguments
 	while((opt = getopt(argc, argv, ":i:f:o:p:h")) != -1){

@@ -2,6 +2,10 @@
 #include "data.h"
 
 int sfd = 0;
+extern int pak;
+extern int pak_deq;
+extern int rsp_n;
+extern int req_n;
 
 /*void set_server_mode(bool status) {
 	server_mode = status;
@@ -189,6 +193,12 @@ void* connection_handler(int *socket) {
 void onExit(int signum) {
 	printf("\nReady to exit\n");
 	stop_server();
+
+	printf("pak: %d \n", pak);
+    printf("reqn: %d \n", pak_deq);
+    printf("rspn: %d \n", rsp_n);
+    printf("req_n: %d \n", req_n);
+
 	exit(signum);
 }
 

@@ -54,8 +54,6 @@ void init_data(Data* data) {
 
 	reset(data);	
 	data->status = 0;
-	data->rspn = 0;
-	data->reqn = 0;
 
 	client_init(data);
 	path_init(data);
@@ -190,13 +188,16 @@ void extract_data(const flow_t *flow){
 		http_pair_t *h = flow->http_f;
 		while(h != NULL) {
 
-			if(h->request_header != NULL) {
+			if(h->request_header != NULL && !h->req_processed) {
 				request_t *req = h->request_header;
-				
+				h->req_processed == TRUE;
+
 				//if (parseURL)
               	parseURI(req->uri);
+				
+				if(h->response_header != NULL && !h->rsp_processed) {
+					h->rsp_processed == TRUE;
 
-				if(h->response_header != NULL) {
 					compute_rst(h);
 					response_t *rsp = h->response_header;					
 					check_status(rsp);
@@ -320,7 +321,8 @@ void flow_hash_process() {
 
 		while(flow != NULL ){
 			flow_next = flow->next;
-			flow_extract_http(flow);
+			flow_extract_http(flow, false);
+			extract_data(flow);
 			flow = flow_next;
 		}
 		

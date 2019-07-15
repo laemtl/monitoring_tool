@@ -100,7 +100,7 @@ flow_t* flow_new(void);		    /* Create a flow_t object */
 int flow_free(flow_t*);	        /* Free a flow_t object */
 int flow_add_packet(flow_t *f, packet_t *packet, BOOL src);	/* Add a packet_t object to flow's packet_t chain */
 int flow_socket_cmp(flow_s *a, flow_s *b);	                /* Compare flows' sockets */
-int flow_extract_http(flow_t *f);			                /* Extract http_pair_t objects from flow's packet_t chain */
+int flow_extract_http(flow_t *f, BOOL closed);			                /* Extract http_pair_t objects from flow's packet_t chain */
 int flow_add_http(flow_t *f, http_pair_t *h);	            /* Add a http_pair_t objects to flow's http_pair_t chain */
 
 /**

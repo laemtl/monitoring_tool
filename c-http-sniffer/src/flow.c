@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
-#include <assert.h>
+//#include <assert.h>
 #include <sys/time.h>
 #include <unistd.h>
 
@@ -18,7 +18,6 @@
 #include "packet.h"
 #include "tcp.h"
 #include "http.h"
-
 
 /***********************
  * Static functions      *
@@ -383,12 +382,6 @@ flow_add_packet(flow_t *f, packet_t *packet, register BOOL src){
 // add a flag + pointer to point to the last incompleted pair
 // order them
 // only if response
-
-//int 
-//flow_hash_extract_http(flow_t *f){
-	
-//}
-
 
 
 /* Extract http_pair_t objects from flow's packet_t chain */
@@ -798,7 +791,7 @@ flow_extract_pairs(flow_t *f, seq_t *s){
 
 /* Extract http_pair_t objects from flow's packet_t chain */
 int 
-flow_extract_http(flow_t *f){
+flow_extract_http(flow_t *f, BOOL closed){
 	/* check if the flow is carrying HTTP again */
 	if( f->http == FALSE)
 		return 1;
@@ -891,21 +884,12 @@ flow_extract_http(flow_t *f){
 	if (fin_seq != NULL && seq != NULL){
 		/*A FIN packet exists.*/
 		while(compare_sequence_time(seq, fin_seq) < 0){
-			/*if(seq->processed) {
-				seq = seq->next;
-				if(seq != NULL)
-					seq_next = seq->next;
-				else
-					break;
-				continue;
-			}*/
-			
 			pkt = seq->pkt;
-			//seq->processed == TRUE;
-
-			if(pkt != NULL && pkt->http == HTTP_REQ){
+			if(pkt != NULL && pkt->http == HTTP_REQ && !seq->processed){
 				//int res = tcp_order_check(f->order);
 				//if(res == 0) printf("Unordered flow \n");
+				
+				seq->processed == TRUE;
 
 				/* When a new HTTP request is found,
 				 * create a HTTP pair object, then add the object to
@@ -942,8 +926,9 @@ flow_extract_http(flow_t *f){
 				http_parse_request(req, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,time,pkt->tcp_seq,pkt->tcp_seq+pkt->tcp_dl);
 
 			}else{
-				/*Omit the TCP handshake sequences.*/
-				if(new_http == NULL){
+				/* Omit the TCP handshake sequences.*/
+				/* or already processed sequence */
+				if(new_http == NULL || seq->processed){
 					seq = seq->next;
 					if(seq != NULL)
 						seq_next = seq->next;
@@ -955,7 +940,8 @@ flow_extract_http(flow_t *f){
 
 			if( new_http != NULL ){
 				// Last bit 
-				if( seq_next == NULL || seq_next == fin_seq || seq_next->pkt != NULL ||\
+				// We check if the flow is closed to detect the last packet
+				if( ( seq_next == NULL && closed ) || seq_next == fin_seq || seq_next->pkt != NULL ||\
 				compare_sequence_time(seq_next, fin_seq) >= 0 ){
 					if( seq->nxt_seq != 0){
 						new_http->req_total_len = seq->nxt_seq - first_seq->seq;
@@ -980,7 +966,10 @@ flow_extract_http(flow_t *f){
 		/* No FIN packet found.*/
 		while(seq != NULL){
 			pkt = seq->pkt;
-			if(pkt != NULL && pkt->http == HTTP_REQ){
+			if(pkt != NULL && pkt->http == HTTP_REQ && !seq->processed){
+
+				seq->processed == TRUE;
+
 				/* When a new HTTP request is found,
 				 * create a HTTP pair object, then add the object to
 				 * flow's HTTP chain.
@@ -1016,7 +1005,7 @@ flow_extract_http(flow_t *f){
 				//http_parse_request(req, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,time,pkt->tcp_seq + pkt->tcp_dl);
 				http_parse_request(req, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,time,pkt->tcp_seq,pkt->tcp_seq+pkt->tcp_dl);
 			}else{
-				if(new_http == NULL){
+				if(new_http == NULL || seq->processed){
 					/*Omit the TCP handshake sequences.*/
 					seq = seq->next;
 					if(seq != NULL)
@@ -1027,8 +1016,9 @@ flow_extract_http(flow_t *f){
 				}
 			}
 			if( new_http != NULL ){
-				if( seq_next == NULL || seq_next->pkt != NULL ){
-					//assert(seq->nxt_seq != 0);
+				// Last bit
+				// We check if the flow is closed to detect the last packet
+				if( ( seq_next == NULL && closed ) || seq_next->pkt != NULL ){
 					if( seq->nxt_seq != 0){
 						new_http->req_total_len = seq->nxt_seq - first_seq->seq;
 						new_http->req_body_len = 0;
@@ -1038,8 +1028,6 @@ flow_extract_http(flow_t *f){
 						f->lb_sec = seq->cap_sec;
 						f->lb_usec = seq->cap_usec;
 					}
-				}else{
-					//assert(seq->seq <= seq_next->seq);
 				}
 			}
 			/*Continue to next sequence.*/
@@ -1050,8 +1038,6 @@ flow_extract_http(flow_t *f){
 				break;
 		}
 	}
-
-	printf("total req: %d \n", reqn);
 
 	/* If no responses found, we treat the flow as invalid and stop parsing */
 	if(reqn == 0)
@@ -1070,7 +1056,10 @@ flow_extract_http(flow_t *f){
 		int first_packet = 0;
 		while(compare_sequence_time(seq, fin_seq) < 0){
 			pkt = seq->pkt;
-			if ( pkt != NULL && pkt->http == HTTP_RSP){
+			if ( pkt != NULL && pkt->http == HTTP_RSP && !seq->processed){
+
+				seq->processed == TRUE;
+				
 				/*
 				 * Similar to the request parsing, a new response is
 				 * added to the first pair without response
@@ -1103,7 +1092,7 @@ flow_extract_http(flow_t *f){
 					http_parse_response(rsp, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,pkt->tcp_ack);
 				}
 			}else{
-				if(found_http == NULL){
+				if(found_http == NULL || seq->processed){
 					seq = seq->next;
 					if(seq != NULL)
 						seq_next = seq->next;
@@ -1137,9 +1126,8 @@ flow_extract_http(flow_t *f){
 						compare_sequence_time(seq_next, fin_seq) >= 0 ){
 					found_http->rsp_lb_sec = seq->cap_sec;
 					found_http->rsp_lb_usec = seq->cap_usec;
-					//assert( seq->nxt_seq != 0 );
+					
 					if(seq->nxt_seq != 0){
-						
 						found_http->rsp_total_len = seq->nxt_seq - first_seq->seq;
 						found_http->rsp_body_len = found_http->rsp_total_len - found_http->response_header->hdlen;
 						if (found_http->rsp_body_len < 0)
@@ -1152,8 +1140,6 @@ flow_extract_http(flow_t *f){
 						f->lb_sec = seq->cap_sec;
 						f->lb_usec = seq->cap_usec;
 					}
-				}else{
-					//assert(seq->seq <= seq_next->seq);
 				}
 			}
 
@@ -1168,7 +1154,9 @@ flow_extract_http(flow_t *f){
 		while(seq != NULL){
 			int first_packet = 0;
 			pkt = seq->pkt;
-			if ( pkt != NULL && pkt->http == HTTP_RSP ){
+			if ( pkt != NULL && pkt->http == HTTP_RSP && !seq->processed){
+
+				seq->processed == TRUE;
 
 				/*
 				 * Similar to the request parsing, a new response is
@@ -1203,7 +1191,7 @@ flow_extract_http(flow_t *f){
 					http_parse_response(rsp, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl, pkt->tcp_ack);
 				}
 			}else{
-				if(found_http == NULL){
+				if(found_http == NULL || seq->processed){
 					seq = seq->next;
 					if(seq != NULL)
 						seq_next = seq->next;
@@ -1217,27 +1205,26 @@ flow_extract_http(flow_t *f){
 				/*first_seq != null*/                      
 
 				/** Added functionality: Concatenate capture
-                                 *  times of all response packets to string
-                                 *  stored in http_pair, separated by commas.
-                                **/
+				 *  times of all response packets to string
+				 *  stored in http_pair, separated by commas.
+				**/
 
 				char temp[20];
-                                sprintf(temp,",%ld",seq->cap_usec);
-                                strcat(found_http->response_header->time,temp);
+				sprintf(temp,",%ld",seq->cap_usec);
+				strcat(found_http->response_header->time,temp);
 				if (!first_packet){
-                                        sprintf(temp,",%d",seq->size);
-                                }
-                                else{
-                                        sprintf(temp,"%d",seq->size);
-                                }
-                                strcat(found_http->response_header->size,temp);
+					sprintf(temp,",%d",seq->size);
+				}else{
+					sprintf(temp,"%d",seq->size);
+				}
+				strcat(found_http->response_header->size,temp);
 
-                                first_packet=0;
+				first_packet=0;
 
 				if( seq_next == NULL || seq_next->pkt != NULL ){
 					found_http->rsp_lb_sec = seq->cap_sec;
 					found_http->rsp_lb_usec = seq->cap_usec;
-					//assert( seq->nxt_seq != 0 );
+					
 					if(seq->nxt_seq != 0){
 						found_http->rsp_total_len = seq->nxt_seq - first_seq->seq;	
 						found_http->rsp_body_len = found_http->rsp_total_len - found_http->response_header->hdlen;
@@ -1252,8 +1239,6 @@ flow_extract_http(flow_t *f){
 						f->lb_sec = seq->cap_sec;
 						f->lb_usec = seq->cap_usec;
 					}
-				}else{
-					//assert(seq->seq <= seq_next->seq);
 				}
 			}
 
@@ -1265,6 +1250,6 @@ flow_extract_http(flow_t *f){
 		}
 	}
 
-	printf("total rsp: %d \n", rspn);
+	//printf("total rsp: %d \n", rspn);
 	return 0;
 }
