@@ -96,12 +96,12 @@ double get_metric_min(Metric metric) {
 	return metric.min.value;
 }
 
-double get_rst_avg(Metric metric) {
+double get_rst_avg(Metric rst) {
 	Data* data = {0};
 	get_data(&data);
 
 	double req_total = data->req_rate.total.value; 
-	if (!CLOSE(req_total, 0)) return metric.total.value/req_total;
+	if (!CLOSE(req_total, 0)) return rst.total.value/req_total;
 	return 0;
 }
 
@@ -132,15 +132,21 @@ double get_req_rate() {
 	return (double)req_total/data->interval;
 }
 
-void inc_metric_total(Metric* metric, double amt) {
+void add_metric_sum(Metric* metric, double amt) {
     pthread_mutex_lock(&(metric->total.mutex));
 	metric->total.value += amt;
 	pthread_mutex_unlock(&(metric->total.mutex));
 }
 
-void inc_metric_subtotal(Metric* metric, double amt) {
+void inc_metric_total(Metric* metric) {
+    pthread_mutex_lock(&(metric->total.mutex));
+	metric->total.value ++;
+	pthread_mutex_unlock(&(metric->total.mutex));
+}
+
+void inc_metric_subtotal(Metric* metric) {
 	pthread_mutex_lock(&(metric->subtotal.mutex));
-	metric->subtotal.value += amt;
+	metric->subtotal.value++;
 	pthread_mutex_unlock(&(metric->subtotal.mutex)); 
 }
 
@@ -195,6 +201,9 @@ void extract_data(const flow_t *flow){
 
 					//if (parseURL)
               		parseURI(req->uri);
+
+					inc_metric_subtotal(&(data->req_rate));
+					inc_metric_total(&(data->req_rate));
 				}
 				
 				if(h->response_header != NULL && !h->rsp_processed) {
@@ -220,12 +229,14 @@ void compute_rst(http_pair_t *h) {
 	response_t *rsp = h->response_header;
 	request_t *req = h->request_header;
 
-	printf("req_seq: %" PRIu32"\n", req->seq);
-	printf("req nxt seq: %" PRIu32 "\n", req->nxt_seq);
-	printf("aknowledgment: %ld \n", rsp->acknowledgement);
+	if(rst < 0 ) {
+		//printf("req_seq: %" PRIu32"\n", req->seq);
+		printf("req nxt seq: %" PRIu32 "\n", req->nxt_seq);
+		printf("aknowledgment: %ld \n", rsp->acknowledgement);
 
-	printf("req %lld %lld \n", (long long)h->req_fb_sec, (long long)h->req_fb_usec);
-	printf("rsp %lld %lld \n", (long long)h->rsp_fb_sec, (long long)h->rsp_fb_usec);
+		//printf("req %lld %lld \n", (long long)h->req_fb_sec, (long long)h->req_fb_usec);
+		//printf("rsp %lld %lld \n", (long long)h->rsp_fb_sec, (long long)h->rsp_fb_usec);
+	}
 
 	/*double rst, rstu;
 	rstu = h->rsp_fb_usec - h->req_fb_usec;
@@ -235,7 +246,8 @@ void compute_rst(http_pair_t *h) {
 	//int res = tcp_order_check(f->order);
 	//if(res == 0) printf("Unordered flow \n");
 	
-	inc_metric_total(&(data->rst), rst);
+	inc_metric_total(&(data->rst));
+	add_metric_sum(&(data->rst), rst);
 	update_metric_min(&(data->rst), rst);
 	update_metric_max(&(data->rst), rst);
 }
@@ -248,8 +260,8 @@ void check_status(response_t *rsp) {
 	int i = rsp->status;
 	while (i>=10) i=i/10;  
 	if (i==4 || i==5) {
-		inc_metric_subtotal(&(data->err_rate), 1);
-		inc_metric_total(&(data->err_rate), 1);
+		inc_metric_subtotal(&(data->err_rate));
+		inc_metric_total(&(data->err_rate));
 	}
 }
 

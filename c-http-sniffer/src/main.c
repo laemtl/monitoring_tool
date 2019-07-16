@@ -169,9 +169,7 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 				req_n++;
 				// printf("Request count is: %d \n", data->reqn);
 
-				inc_metric_subtotal(&(data->req_rate), 1);
-				inc_metric_total(&(data->req_rate), 1);
-
+				
 				//printf("source infos: %s %" PRIu16 "\n", saddr, pkt->sport);
 
 				Client* c = CALLOC(Client, 1);
@@ -353,7 +351,8 @@ capture_main(void* p){
 
 	if( cap == NULL) {
 		printf("errbuf %s\n", errbuf); 
-		exit(1);
+		data->status = -1;
+		pthread_exit(NULL);
 	}
 
 	while(1){
