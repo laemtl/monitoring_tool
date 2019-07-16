@@ -100,8 +100,8 @@ double get_rst_avg(Metric rst) {
 	Data* data = {0};
 	get_data(&data);
 
-	double req_total = data->req_rate.total.value; 
-	if (!CLOSE(req_total, 0)) return rst.total.value/req_total;
+	double req_total = rst.total.value; 
+	if (!CLOSE(req_total, 0)) return rst.sum.value/req_total;
 	return 0;
 }
 
@@ -134,19 +134,19 @@ double get_req_rate() {
 
 void add_metric_sum(Metric* metric, double amt) {
     pthread_mutex_lock(&(metric->total.mutex));
-	metric->total.value += amt;
+	metric->sum.value += amt;
 	pthread_mutex_unlock(&(metric->total.mutex));
 }
 
 void inc_metric_total(Metric* metric) {
     pthread_mutex_lock(&(metric->total.mutex));
-	metric->total.value ++;
+	metric->total.value += 1;
 	pthread_mutex_unlock(&(metric->total.mutex));
 }
 
 void inc_metric_subtotal(Metric* metric) {
 	pthread_mutex_lock(&(metric->subtotal.mutex));
-	metric->subtotal.value++;
+	metric->subtotal.value += 1;
 	pthread_mutex_unlock(&(metric->subtotal.mutex)); 
 }
 

@@ -18,20 +18,26 @@
 #define EPSILON	1e-7
 #define CLOSE(a,b) (fabs(a - b)<EPSILON)
 
-typedef struct _metric_el Metric_el;
-struct _metric_el {
-    double value;
+typedef struct _int_metric int_metric;
+struct _int_metric {
+    int value;
 	pthread_mutex_t mutex;
+};
+
+typedef struct _dbl_metric dbl_metric;
+struct _dbl_metric {
+    double value;
+    pthread_mutex_t mutex;
 };
 
 typedef struct _metric Metric;
 struct _metric {
     int status;
-    Metric_el subtotal;
-    Metric_el total;
-    Metric_el sum;
-    Metric_el min;
-    Metric_el max;
+    int_metric subtotal;
+    int_metric total;
+    dbl_metric sum;
+    dbl_metric min;
+    dbl_metric max;
 };
 
 typedef struct _top_list Top_list;
@@ -134,6 +140,7 @@ double get_rst_avg(Metric metric);
 double get_err_rate();
 double get_err_rate_subtotals();
 double get_req_rate();
+void add_metric_sum(Metric* metric, double amt);
 void inc_metric_total(Metric* metric);
 void inc_metric_subtotal(Metric* metric);
 void reset_metric_subtotal(Metric* metric);
