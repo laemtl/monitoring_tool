@@ -22,12 +22,14 @@ void destr_fn(void *param) {
 void init_once_metric(Metric* metric) {
 	pthread_mutex_init(&(metric->total.mutex), NULL);
 	pthread_mutex_init(&(metric->subtotal.mutex), NULL);
+	pthread_mutex_init(&(metric->sum.mutex), NULL);
 	pthread_mutex_init(&(metric->min.mutex), NULL);
 	pthread_mutex_init(&(metric->max.mutex), NULL);
 }
 
 void reset_metric(Metric* metric) {
 	metric->total.value = 0;
+	metric->sum.value = 0;
 	metric->min.value = DBL_MAX;
 	metric->max.value = 0;
 }
@@ -91,7 +93,7 @@ void get_data(Data** d) {
 
 double get_metric_min(Metric metric) {
 	if(CLOSE(metric.min.value, DBL_MAX)) {
-	    return -1;
+	    return 0;
     }
 	return metric.min.value;
 }
@@ -100,8 +102,8 @@ double get_rst_avg(Metric rst) {
 	Data* data = {0};
 	get_data(&data);
 
-	double req_total = rst.total.value; 
-	if (!CLOSE(req_total, 0)) return rst.sum.value/req_total;
+	int req_total = rst.total.value; 
+	if (req_total != 0) return rst.sum.value/req_total;
 	return 0;
 }
 
@@ -109,7 +111,7 @@ double get_err_rate() {
 	Data* data = {0};
 	get_data(&data);
 
-	double req_total = data->req_rate.total.value; 
+	int req_total = data->req_rate.total.value; 
 	if (req_total > 0) return data->err_rate.total.value/req_total;
 	return 0;
 }
@@ -119,7 +121,7 @@ double get_err_rate_subtotals() {
 	Data* data = {0};
 	get_data(&data);
 
-	double req_subtotal = data->req_rate.subtotal.value; 
+	int req_subtotal = data->req_rate.subtotal.value; 
 	if (req_subtotal > 0) return data->err_rate.subtotal.value/req_subtotal;
 	return 0;
 }
@@ -128,25 +130,25 @@ double get_req_rate() {
 	Data* data = {0};
 	get_data(&data);
 
-	double req_total = data->req_rate.total.value;
+	int req_total = data->req_rate.total.value;
 	return (double)req_total/data->interval;
 }
 
 void add_metric_sum(Metric* metric, double amt) {
-    pthread_mutex_lock(&(metric->total.mutex));
+    pthread_mutex_lock(&(metric->sum.mutex));
 	metric->sum.value += amt;
-	pthread_mutex_unlock(&(metric->total.mutex));
+	pthread_mutex_unlock(&(metric->sum.mutex));
 }
 
 void inc_metric_total(Metric* metric) {
     pthread_mutex_lock(&(metric->total.mutex));
-	metric->total.value += 1;
+	metric->total.value++;
 	pthread_mutex_unlock(&(metric->total.mutex));
 }
 
 void inc_metric_subtotal(Metric* metric) {
 	pthread_mutex_lock(&(metric->subtotal.mutex));
-	metric->subtotal.value += 1;
+	metric->subtotal.value++;
 	pthread_mutex_unlock(&(metric->subtotal.mutex)); 
 }
 
@@ -293,7 +295,7 @@ Result* get_result(Result* result) {
 
 // TODO: check if status active
 void process_rate(Data* data) {
-	double req_subtotal = data->req_rate.subtotal.value;
+	int req_subtotal = data->req_rate.subtotal.value;
 	update_metric_min(&(data->req_rate), req_subtotal);
 	update_metric_max(&(data->req_rate), req_subtotal);
 	
@@ -349,14 +351,15 @@ void flow_hash_process() {
 void process_data() {
 	Data* data = {0};
 	get_data(&data);
-	
+
 	data->int_step++;
-	process_rate(data);
-	if(data->int_step < data->interval) return;
 
 	// The completed flow are processed by extract_data
 	// We process the ones in the hash table using the following function 	
 	flow_hash_process();
+	
+	process_rate(data);
+	if(data->int_step < data->interval) return;
 
 	Result* result = calloc(1, sizeof(Result));
 	get_result(result);

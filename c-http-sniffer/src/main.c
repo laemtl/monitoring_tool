@@ -344,6 +344,7 @@ capture_main(void* p){
 	thread_init(data);
 
 	if ( livemode==1 ) {
+
 		cap = pcap_open_live(interface, 65535, 0, 1000, errbuf);
 	} else {
 		cap = pcap_open_offline(interface, errbuf);
@@ -489,7 +490,7 @@ int main(int argc, char *argv[]){
 		data->client_tl.size = 5;
 		init_data(data);
 		data->interface = interface;
-        data->interval = 1;
+        data->interval = 5;
 		start_analysis(ipaddress, data);
 	}
 
