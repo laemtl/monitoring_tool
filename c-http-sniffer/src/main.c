@@ -359,10 +359,10 @@ capture_main(void* p){
 	while(1){
 		raw = pcap_next(cap, &pkthdr);
 		if( NULL != raw && data->status == 1){
+			pak++;
 			packet = packet_preprocess(raw, &pkthdr);
 			if (NULL != packet){
 				pkt_handler(packet);
-				pak++;
 			}
 		} else if ( livemode==0 || data->status < 0) {
 			//GP_CAP_FIN = 1;
