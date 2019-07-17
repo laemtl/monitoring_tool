@@ -476,14 +476,14 @@ int main(int argc, char *argv[]){
 	}
     
     // Interface is NULL - RUN in server mode	
-	if (interface == NULL){
-		/* Start server thread */
+	/*if (interface == NULL){
+		// Start server thread
 		pthread_t job_server;
 		pthread_create(&job_server, NULL, (void*)start_server, NULL);
 		pthread_join(job_server, NULL);
 	
 	// Interface is provided - RUN in app mode
-	} else {		
+	} else {*/		
 		Data* data = (Data*)calloc(1, sizeof(Data));
 		if(data == NULL) return EXIT_FAILURE;	
 		
@@ -492,7 +492,7 @@ int main(int argc, char *argv[]){
 		data->interface = interface;
         data->interval = 5;
 		start_analysis(ipaddress, data);
-	}
+	//}
 
 	return 0;
 }

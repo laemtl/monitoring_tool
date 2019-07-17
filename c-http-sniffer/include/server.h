@@ -13,7 +13,7 @@
 #include <stdbool.h>
 
 #include "packet.h"
-#include "analysis.pb-c.h"
+//#include "analysis.pb-c.h"
 #include "data.h"
 #include "timer.h"
 

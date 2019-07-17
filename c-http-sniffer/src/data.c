@@ -378,7 +378,7 @@ void process_data() {
 
 	// Struct are passed by value so the code below will execute correctly in an MT env
 	if(is_server_mode()) {
-		send_data(result);
+		//send_data(result);
 	} 
 
 	free(result);
