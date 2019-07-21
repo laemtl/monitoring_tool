@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <signal.h> 
 
+#include "packet_raw.h"
 #include "flow.h"
 #include "util.h"
 #include "server.h"
@@ -16,6 +17,11 @@ int pak = 0;
 int req_n = 0;
 int rsp_n = 0;
 int pak_deq = 0;
+
+int raw_req = 0;
+int raw_rsp = 0;
+int flow_req = 0;
+int flow_rsp = 0;
 
 //int GP_CAP_FIN = 0; /* Flag for offline PCAP sniffing */
 
@@ -310,12 +316,12 @@ scrubbing_flow_htbl(Data* data){
 
 	while(1){
 		sleep(10);
-		if (data->status == 1){
-			num = flow_scrubber(60*10);	/* flow timeout in seconds */
-		} else if (data->status == -1){
-			num = flow_scrubber(-1); /* cleanse all flows */
+		/*if (data->status == 1){*/
+			num = flow_scrubber(60*10);	// flow timeout in seconds
+		/*} else if (data->status == -1){
+			num = flow_scrubber(-1); // cleanse all flows
 			break;
-		}
+		}*/
 	}
 	pthread_exit(NULL);
 }
@@ -325,13 +331,20 @@ scrubbing_flow_htbl(Data* data){
  */
 int
 capture_main(void* p){
-
+	int ret, i;
 	char errbuf[PCAP_ERRBUF_SIZE];
 	memset(errbuf, 0, PCAP_ERRBUF_SIZE);
-	char *raw = NULL;
 	pcap_t *cap = NULL;
-	struct pcap_pkthdr pkthdr;
-	packet_t *packet = NULL;
+	
+	raw_pkt raw_pkts[RAW_PKT_SIZE];
+	for(i=0; i<RAW_PKT_SIZE; i++){
+		ret = pthread_mutex_init(&(raw_pkts[i].mutex), NULL);
+		if (ret != 0) return -1;
+	}
+	
+	//char *raw = NULL;
+	//struct pcap_pkthdr pkthdr;
+	//packet_t *packet = NULL;
 	//extern int GP_CAP_FIN;
 
 	Capture* param = (Capture*) p;
@@ -344,7 +357,6 @@ capture_main(void* p){
 	thread_init(data);
 
 	if ( livemode==1 ) {
-
 		cap = pcap_open_live(interface, 65535, 0, 1000, errbuf);
 	} else {
 		cap = pcap_open_offline(interface, errbuf);
@@ -357,19 +369,26 @@ capture_main(void* p){
 	}
 
 	while(1){
-		raw = pcap_next(cap, &pkthdr);
-		if( NULL != raw && data->status == 1){
-			pak++;
-			packet = packet_preprocess(raw, &pkthdr);
-			if (NULL != packet){
-				pkt_handler(packet);
+		//if(raw_pkts[i].raw == NULL) {
+    		pthread_mutex_lock(&(raw_pkts[i].mutex));
+			raw_pkts[i].raw = pcap_next(cap, &(raw_pkts[i].pkthdr));
+			pthread_mutex_unlock(&(raw_pkts[i].mutex));
+
+			if( NULL != raw_pkts[i].raw && data->status == 1){
+				pak++;
+				i = ++i % RAW_PKT_SIZE;
+
+				/*packet = packet_preprocess(raw, &pkthdr);
+				if (NULL != packet){
+					pkt_handler(packet);
+				}*/
+			} else if ( livemode==0 || data->status < 0) {
+				//GP_CAP_FIN = 1;
+				break;
+			} else {
+				nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
 			}
-		} else if ( livemode==0 || data->status < 0) {
-			//GP_CAP_FIN = 1;
-			break;
-		} else {
-			nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
-		}
+		//}
 	}
 
 	if( cap != NULL)
@@ -450,6 +469,11 @@ void sigintHandler(int sig_num) {
       printf("dpak: %d \n", pak_deq);
 	  printf("reqn: %d \n", req_n);
       printf("rspn: %d \n", rsp_n);
+
+	  printf("raw_req: %d \n", raw_req);
+	  printf("raw_rsp: %d \n", raw_rsp);
+      printf("flow_req: %d \n", flow_req);
+      printf("flow_rsp: %d \n", flow_rsp);
 
       exit(0);
 } 

@@ -20,6 +20,9 @@
 #include "tcp.h"
 #include "http.h"
 
+extern int raw_req;
+extern int raw_rsp;
+
 /***********************
  * Static functions      *
  ***********************/
@@ -662,10 +665,12 @@ flow_extract_http(flow_t *f, BOOL closed){
 				rspn++;
 
 				u_int32_t ack = pkt->tcp_ack;
-				
+				raw_rsp++;
+
 				/* Try to find the first pair without response */
 				while(tmp != NULL){
 					if(tmp->request_header->nxt_seq > ack) {
+						printf("ns: %" PRIu32 " ack: %" PRIu32" \n", tmp->request_header->nxt_seq, ack);
 						tmp = NULL;
 						break;
 					}
@@ -676,10 +681,11 @@ flow_extract_http(flow_t *f, BOOL closed){
 					}
 					tmp = tmp->next;
 				}
-				if(tmp == NULL)
+				if(tmp == NULL) {
 					/* no response empty, then return */
+					//d3++;
 					return 1;
-				else{
+				}else{
 					/*Found!*/
 					found_http = tmp;
 					first_seq = seq;
@@ -770,6 +776,7 @@ flow_extract_http(flow_t *f, BOOL closed){
 				rspn++;
 
 				u_int32_t ack = pkt->tcp_ack;
+				raw_rsp++;
 				
 				/* Try to find the first pair without response */
 				while(tmp != NULL){

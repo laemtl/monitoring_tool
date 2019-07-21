@@ -21,7 +21,6 @@ seq_t *seq_new(void){
 void seq_free(seq_t *seq){
 	/* packet is freed by packet_free to avoid double free */
 	free(seq);
-	seq = NULL;
 }
 
 order_t *order_new(void){

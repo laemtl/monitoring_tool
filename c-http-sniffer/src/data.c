@@ -5,6 +5,11 @@
 #include <float.h>
 #include "data.h"
 
+extern int flow_req;
+extern int flow_rsp;
+
+int d = 0;
+
 /* Output flow's brief to stdout */
 /** Added Functionality: Function now takes file descriptor as arguement
  *  file descriptor should point to sockt in remote node where
@@ -200,6 +205,8 @@ void extract_data(const flow_t *flow){
 				if(!h->req_processed) {
 					h->req_processed = TRUE;
 					request_t *req = h->request_header;
+					flow_req++;
+
 
 					//if (parseURL)
               		parseURI(req->uri);
@@ -210,11 +217,14 @@ void extract_data(const flow_t *flow){
 				
 				if(h->response_header != NULL && !h->rsp_processed) {
 					h->rsp_processed = TRUE;
+					flow_rsp++;
 
 					compute_rst(h);
 					response_t *rsp = h->response_header;					
 					check_status(rsp);
 				}
+				
+				if(h->response_header == NULL) d++;
 			}	   
 			h = h->next;
 		}
