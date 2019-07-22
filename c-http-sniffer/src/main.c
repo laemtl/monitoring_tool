@@ -261,7 +261,7 @@ void process_packet(Data* data) {
 	raw_pkt *rpkt = NULL;
 	
 	while(1){
-		rpkt = (raw_pkt*)queue_deq(data->raw_pkt_queue);
+		rpkt = (raw_pkt*)queue_deq(&(data->raw_pkt_queue));
 		if (data->status < 0 && rpkt == NULL) {
 			break;
 		} else if (rpkt != NULL){
@@ -400,7 +400,7 @@ capture_main(void* p){
 			raw_pkt* p = MALLOC(raw_pkt, 1);
 			*p = pkt;
 			
-			queue_enq(data->raw_pkt_queue, p);
+			queue_enq(&(data->raw_pkt_queue), p);
 			pak++;
 		} else {
 			nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);

@@ -10,5 +10,5 @@ void raw_pkt_queue_init() {
 	get_data(&data);
 
     data->raw_pkt_queue.free = raw_packet_free;
-    queue_init(data->raw_pkt_queue);
+    queue_init(&(data->raw_pkt_queue));
 }

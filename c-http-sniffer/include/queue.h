@@ -19,11 +19,11 @@ struct _queue {
     void (*free)(void*);
 };
 
-BOOL queue_init(Queue q);
-BOOL queue_enq(Queue q, void* elem);
-void* queue_deq(Queue q);
-BOOL queue_clr(Queue q);
-unsigned int queue_len(Queue q);
-void queue_print(Queue q);
+BOOL queue_init(Queue* q);
+BOOL queue_enq(Queue* q, void* elem);
+void* queue_deq(Queue* q);
+BOOL queue_clr(Queue* q);
+unsigned int queue_len(Queue* q);
+void queue_print(Queue* q);
 
 #endif
