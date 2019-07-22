@@ -494,6 +494,8 @@ flow_extract_http(flow_t *f, BOOL closed){
 				 * flow's HTTP chain.
 				 */
 				reqn++;
+				raw_req++;
+
 				/* new HTTP pair object*/
 				new_http = http_new();
 				first_seq = seq;
@@ -573,6 +575,8 @@ flow_extract_http(flow_t *f, BOOL closed){
 				 * flow's HTTP chain.
 				 */
 				reqn++;
+				raw_req++;
+
 				/* new HTTP pair object*/
 				new_http = http_new();
 				first_seq = seq;

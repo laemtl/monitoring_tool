@@ -7,7 +7,7 @@ extern int pak_deq;
 extern int rsp_n;
 extern int req_n;
 
-/*void set_server_mode(bool status) {
+/*void set_server_mode(BOOL status) {
 	server_mode = status;
 }*/
 

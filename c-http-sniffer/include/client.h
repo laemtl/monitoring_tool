@@ -1,5 +1,4 @@
 #include <sys/types.h>
-#include <stdbool.h>
 #include "hash_table.h"
 
 #ifndef CLIENTS_H

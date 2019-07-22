@@ -23,7 +23,7 @@ packet_queue_init(void* d)
 	data->pkt_first = NULL;
 	data->pkt_last = NULL;
 	data->que_len = 0;
-	ret = pthread_mutex_init(&data->mutex, NULL);
+	ret = pthread_mutex_init(&data->pkt_queue_mutex, NULL);
 	if(ret != 0)
 	{
 		return FALSE;
@@ -36,21 +36,21 @@ packet_queue_enq(packet_t *pkt)
 {
 	Data* data = {0};
 	get_data(&data);
-	pthread_mutex_lock(&data->mutex);
+	pthread_mutex_lock(&data->pkt_queue_mutex);
 	if(data->que_len == 0)
 	{
 		data->pkt_first = pkt;
 		data->pkt_last = pkt;
 		data->pkt_last->next = NULL;
 		data->que_len++;
-		pthread_mutex_unlock(&data->mutex);
+		pthread_mutex_unlock(&data->pkt_queue_mutex);
 		return TRUE;
 	}
 	data->pkt_last->next = pkt;
 	data->pkt_last = pkt;
 	data->pkt_last->next = NULL;
 	data->que_len++;
-	pthread_mutex_unlock(&data->mutex);
+	pthread_mutex_unlock(&data->pkt_queue_mutex);
 	return TRUE;
 }
 
@@ -59,11 +59,11 @@ packet_queue_deq(void)
 {
 	Data* data = {0};
 	get_data(&data);
-	pthread_mutex_lock(&data->mutex);
+	pthread_mutex_lock(&data->pkt_queue_mutex);
 	packet_t *pkt;
 	if(data->que_len == 0)
 	{
-		pthread_mutex_unlock(&data->mutex);
+		pthread_mutex_unlock(&data->pkt_queue_mutex);
 		return NULL;
 	}
 	else if (data->que_len == 1 )
@@ -73,7 +73,7 @@ packet_queue_deq(void)
 	pkt = data->pkt_first;
 	data->pkt_first = data->pkt_first->next;
 	data->que_len--;
-	pthread_mutex_unlock(&data->mutex);
+	pthread_mutex_unlock(&data->pkt_queue_mutex);
 	return pkt;
 }
 
@@ -82,7 +82,7 @@ packet_queue_clr(void)
 {
 Data* data = {0};
 	get_data(&data);
-	pthread_mutex_lock(&data->mutex);
+	pthread_mutex_lock(&data->pkt_queue_mutex);
 	packet_t *pkt;
 	while(data->que_len > 0)
 	{
@@ -94,7 +94,7 @@ Data* data = {0};
 	data->pkt_first =  NULL;
 	data->pkt_last = NULL;
 	data->que_len = 0;
-	pthread_mutex_unlock(&data->mutex);
+	pthread_mutex_unlock(&data->pkt_queue_mutex);
 	return TRUE;
 }
 

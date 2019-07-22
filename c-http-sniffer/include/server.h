@@ -10,7 +10,6 @@
 #include <errno.h>
 #include <syslog.h>
 #include <pthread.h>
-#include <stdbool.h>
 
 #include "packet.h"
 #include "analysis.pb-c.h"

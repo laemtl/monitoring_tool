@@ -4,11 +4,11 @@
 #include <stdint.h>
 #include <errno.h>
 #include <pthread.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include "flow.h"
 #include "hash_table.h"
 #include "client.h"
+#include "queue.h"
 
 #ifndef DEBUGGING
 #define DEBUGGING 2 
@@ -51,7 +51,7 @@ struct _top_list {
 // memset to 0 on init
 typedef struct _data Data;
 struct _data {
-    bool server_mode;
+    BOOL server_mode;
     int client_sock;
     
     // 0: started, 1: running, -1: stopped
@@ -69,6 +69,8 @@ struct _data {
     Metric req_rate;
     Metric tp;
     
+    Queue raw_pkt_queue;
+
     // flow_queue.c
     /* Queue vars */
     pthread_mutex_t mutex_queue;
@@ -81,7 +83,7 @@ struct _data {
     unsigned int que_len;
     packet_t *pkt_first;
     packet_t *pkt_last;
-    pthread_mutex_t mutex;
+    pthread_mutex_t pkt_queue_mutex;
  
     // flow_hash_table.c
     hash_mb_t *flow_hash_table[HASH_SIZE];
@@ -146,7 +148,7 @@ void inc_metric_subtotal(Metric* metric);
 void reset_metric_subtotal(Metric* metric);
 void update_metric_min(Metric* metric, double value);
 void update_metric_max(Metric* metric, double value);
-bool is_server_mode();
+BOOL is_server_mode();
 void extract_data(const flow_t *flow);
 Result* get_result(Result* result);
 void process_rate(Data* data);

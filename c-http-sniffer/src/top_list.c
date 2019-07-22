@@ -1,13 +1,13 @@
-#include <stdbool.h>
+#include "util.h"
 #include <stdlib.h>
 
-bool is_top(void** tl, int count, void* c, int (*compare_fn)(void*, void*)) {
+BOOL is_top(void** tl, int count, void* c, int (*compare_fn)(void*, void*)) {
     int i = 0;
     while (i < count) {
-        if (compare_fn(c, tl[i]) == 0) return true;
+        if (compare_fn(c, tl[i]) == 0) return TRUE;
         i++;
     }
-    return false;
+    return FALSE;
 }
 
 int sort_tl(void** tl, int n_index, int (*compare_fn)(void*, void*)) {

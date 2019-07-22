@@ -8,7 +8,7 @@
 #include <errno.h>
 #include <signal.h> 
 
-#include "packet_raw.h"
+#include "raw_packet.h"
 #include "flow.h"
 #include "util.h"
 #include "server.h"
@@ -254,6 +254,32 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 	return pkt;
 }
 
+void process_packet(Data* data) {
+	thread_init(data);
+
+	packet_t *packet = NULL;
+	raw_pkt *rpkt = NULL;
+	
+	while(1){
+		rpkt = (raw_pkt*)queue_deq(data->raw_pkt_queue);
+		if (data->status < 0 && rpkt == NULL) {
+			break;
+		} else if (rpkt != NULL){
+			packet = packet_preprocess(rpkt->raw, &(rpkt->pkthdr));
+			raw_packet_free(rpkt);
+
+			if (NULL != packet){
+				packet_queue_enq(packet);
+			}
+			continue;
+		} else {
+			nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
+		}
+	}
+	pthread_exit("Packet raw processing finished.\n");
+	return 0;
+}
+
 /**
  * Fetch a packet from packet queue and add it to any flow.
  */
@@ -293,7 +319,7 @@ process_flow_queue(Data* data){
 		if (data->status < 0) {
 			break;
 		} else if(flow != NULL){
-			flow_extract_http(flow, true);
+			flow_extract_http(flow, TRUE);
 			extract_data(flow);
 			flow_free(flow);
 
@@ -331,30 +357,26 @@ scrubbing_flow_htbl(Data* data){
  */
 int
 capture_main(void* p){
-	int ret, i;
 	char errbuf[PCAP_ERRBUF_SIZE];
 	memset(errbuf, 0, PCAP_ERRBUF_SIZE);
 	pcap_t *cap = NULL;
 	
-	raw_pkt raw_pkts[RAW_PKT_SIZE];
-	for(i=0; i<RAW_PKT_SIZE; i++){
-		ret = pthread_mutex_init(&(raw_pkts[i].mutex), NULL);
-		if (ret != 0) return -1;
-	}
+	Capture* param = (Capture*) p;
+	Data* data = param->data;
+	const char* interface = data->interface;
+	int fd = param->fd;
+	//void (*pkt_handler)(void*) = param->pkt_handler;
+	int livemode = param->livemode;
+	
+	thread_init(data);
+	raw_pkt_queue_init();
+
 	
 	//char *raw = NULL;
 	//struct pcap_pkthdr pkthdr;
 	//packet_t *packet = NULL;
 	//extern int GP_CAP_FIN;
-
-	Capture* param = (Capture*) p;
-	Data* data = param->data;
-	const char* interface = data->interface;
-	int fd = param->fd;
-	void (*pkt_handler)(void*) = param->pkt_handler;
-	int livemode = param->livemode;
-	
-	thread_init(data);
+	raw_pkt pkt = {0};
 
 	if ( livemode==1 ) {
 		cap = pcap_open_live(interface, 65535, 0, 1000, errbuf);
@@ -369,26 +391,20 @@ capture_main(void* p){
 	}
 
 	while(1){
-		//if(raw_pkts[i].raw == NULL) {
-    		pthread_mutex_lock(&(raw_pkts[i].mutex));
-			raw_pkts[i].raw = pcap_next(cap, &(raw_pkts[i].pkthdr));
-			pthread_mutex_unlock(&(raw_pkts[i].mutex));
-
-			if( NULL != raw_pkts[i].raw && data->status == 1){
-				pak++;
-				i = ++i % RAW_PKT_SIZE;
-
-				/*packet = packet_preprocess(raw, &pkthdr);
-				if (NULL != packet){
-					pkt_handler(packet);
-				}*/
-			} else if ( livemode==0 || data->status < 0) {
-				//GP_CAP_FIN = 1;
-				break;
-			} else {
-				nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
-			}
-		//}
+		pkt.raw = pcap_next(cap, &(pkt.pkthdr));
+		
+		if ( livemode == 0 || data->status < 0) {
+			//GP_CAP_FIN = 1;
+			break;
+		} else if( NULL != pkt.raw){
+			raw_pkt* p = MALLOC(raw_pkt, 1);
+			*p = pkt;
+			
+			queue_enq(data->raw_pkt_queue, p);
+			pak++;
+		} else {
+			nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
+		}
 	}
 
 	if( cap != NULL)
@@ -402,6 +418,7 @@ void start_analysis(char* ipaddress, Data* data) {
 	time_t start, end;
 	time(&start);
 
+	pthread_t job_pkt;
 	pthread_t job_pkt_q;
 	pthread_t job_flow_q;
 	pthread_t job_scrb_htbl;
@@ -413,7 +430,7 @@ void start_analysis(char* ipaddress, Data* data) {
 
 	Capture* param = CALLOC(Capture, 1);
 	param->fd = ipaddress;
-	param->pkt_handler = packet_queue_enq;
+	//param->pkt_handler = packet_queue_enq;
 	param->livemode = 1;
 	param->data = data;
 
@@ -421,10 +438,13 @@ void start_analysis(char* ipaddress, Data* data) {
 
 	/* Initialization of packet and flow data structures */
 	
-	packet_queue_init((void*) data);
+	packet_queue_init((void*)data);
 	flow_init((void*) data);
 	data->status = 1;
 
+	/* Start packet receiving thread */
+	pthread_create(&job_pkt, NULL, (void*)process_packet, data);
+	
 	/* Start packet receiving thread */
 	pthread_create(&job_pkt_q, NULL, (void*)process_packet_queue, data);
 	
@@ -445,10 +465,11 @@ void start_analysis(char* ipaddress, Data* data) {
 
 	// Wait for all threads to finish
 	pthread_join(timer, NULL);
+	pthread_join(capture, &thread_result);
 	pthread_join(job_pkt_q, &thread_result);
 	pthread_join(job_flow_q, &thread_result);
 	pthread_join(job_scrb_htbl, &thread_result);
-	pthread_join(capture, &thread_result);
+	pthread_join(job_pkt, &thread_result);
 #if DEBUGGING == 1
 	pthread_join(job_debug_p, &thread_result);
 #endif

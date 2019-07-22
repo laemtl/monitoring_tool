@@ -175,7 +175,7 @@ void update_metric_max(Metric* metric, double value) {
 	pthread_mutex_unlock(&(metric->max.mutex)); 
 }
 
-bool is_server_mode() {
+BOOL is_server_mode() {
     Data* data = {0};
 	get_data(&data);
 	return data->server_mode;
@@ -347,7 +347,7 @@ void flow_hash_process() {
 
 		while(flow != NULL ){
 			flow_next = flow->next;
-			flow_extract_http(flow, false);
+			flow_extract_http(flow, FALSE);
 			extract_data(flow);
 			flow = flow_next;
 		}
@@ -426,7 +426,7 @@ void print_data(Result* result) {
 
 
 
-//bool parseURL=false;
+//BOOL parseURL=FALSE;
 
 //obj_total / req_total 
 
