@@ -13,55 +13,59 @@ BOOL queue_init(Queue* q) {
 }
 
 BOOL queue_enq(Queue* q, void* elem) {
+    Q_Node* node = MALLOC(Q_Node, 1);
+    node->elem = elem;
+    node->next = NULL;
+
 	pthread_mutex_lock(&q->mutex);
-	if(q->len == 0)
-	{
-		q->first = elem;
-		q->last = elem;
-		q->last->next = NULL;
+	if(q->len == 0) {
+		q->first = node;
+		q->last = node;
 		q->len++;
 		pthread_mutex_unlock(&q->mutex);
 		return TRUE;
 	}
-	q->last->next = elem;
-	q->last = elem;
-	q->last->next = NULL;
+	q->last->next = node;
+	q->last = node;
 	q->len++;
 	pthread_mutex_unlock(&q->mutex);
+
 	return TRUE;
 }
 
 void* queue_deq(Queue* q) {
+    void* elem;
+    Q_Node* node;
 
     pthread_mutex_lock(&q->mutex);
-	void* elem;
-	if(q->len == 0)
-	{
+	if(q->len == 0) {
 		pthread_mutex_unlock(&q->mutex);
 		return NULL;
-	}
-	else if (q->len == 1)
-	{
+	} else if (q->len == 1) {
 		q->last = NULL;
 	}
-	elem = q->first;
+
+	elem = q->first->elem;
+    node = q->first;
+
 	q->first = q->first->next;
 	q->len--;
 	pthread_mutex_unlock(&q->mutex);
+
+    free(node);
 	return elem;
 }
 
 BOOL queue_clr(Queue* q) {
 	pthread_mutex_lock(&(q->mutex));
-	void *elem;
-	while(q->len > 0)
-	{
-		elem = q->first;
-		q->first = q->first->next;
-		q->free(elem);
+	while(q->len > 0) {        
+        q->free(q->first->elem);
+        free(q->first);
+        q->first = q->first->next;
 		q->len--;
 	}
-	q->first =  NULL;
+
+	q->first = NULL;
 	q->last = NULL;
 	q->len = 0;
 	pthread_mutex_unlock(&q->mutex);

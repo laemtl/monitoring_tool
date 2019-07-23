@@ -7,6 +7,7 @@
 #include <pcap.h>
 #include <errno.h>
 #include <signal.h> 
+#include <inttypes.h>
 
 #include "raw_packet.h"
 #include "flow.h"
@@ -83,6 +84,7 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 	ip_hdr = packet_parse_iphdr(cp);
 	pkt->saddr = ip_hdr->saddr;
 	pkt->daddr = ip_hdr->daddr;
+
 	/*char *saddr = malloc(sizeof("aaa.bbb.ccc.ddd"));
 	char *daddr = malloc(sizeof("aaa.bbb.ccc.ddd"));
 	strncpy(saddr, ip_ntos(pkt->saddr), sizeof("aaa.bbb.ccc.ddd"));
@@ -90,9 +92,11 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 	printf("%s||%s\n",saddr,daddr);
 	free(saddr);
 	free(daddr);*/
+	
 	pkt->ip_hl = (ip_hdr->ihl) << 2;	/* bytes */
 	pkt->ip_tol = ip_hdr->tot_len;
 	pkt->ip_pro = ip_hdr->protocol;
+
 	if(pkt->ip_pro != 0x06){
 		free_ethhdr(eth_hdr);
 		free_iphdr(ip_hdr);
@@ -262,6 +266,7 @@ void process_packet(Data* data) {
 	
 	while(1){
 		rpkt = (raw_pkt*)queue_deq(&(data->raw_pkt_queue));
+		
 		if (data->status < 0 && rpkt == NULL) {
 			break;
 		} else if (rpkt != NULL){
@@ -371,13 +376,11 @@ capture_main(void* p){
 	thread_init(data);
 	raw_pkt_queue_init();
 
-	
-	//char *raw = NULL;
-	//struct pcap_pkthdr pkthdr;
+	const char *raw = NULL;
+	struct pcap_pkthdr pkthdr;
 	//packet_t *packet = NULL;
 	//extern int GP_CAP_FIN;
-	raw_pkt pkt = {0};
-
+	
 	if ( livemode==1 ) {
 		cap = pcap_open_live(interface, 65535, 0, 1000, errbuf);
 	} else {
@@ -390,17 +393,24 @@ capture_main(void* p){
 		pthread_exit(NULL);
 	}
 
+	raw_pkt* pkt2 = NULL;
+
 	while(1){
-		pkt.raw = pcap_next(cap, &(pkt.pkthdr));
+		raw = pcap_next(cap, &(pkthdr));
 		
 		if ( livemode == 0 || data->status < 0) {
 			//GP_CAP_FIN = 1;
 			break;
-		} else if( NULL != pkt.raw){
-			raw_pkt* p = MALLOC(raw_pkt, 1);
-			*p = pkt;
+		} else if( NULL != raw){
+			pkt2 = MALLOC(raw_pkt, 1);
+			pkt2->pkthdr = pkthdr;
+			size_t len = pkthdr.len;
+
+			char* r = MALLOC(char, len+1);
+        	memcpy(r, raw, len+1);
+			pkt2->raw = r;
 			
-			queue_enq(&(data->raw_pkt_queue), p);
+			queue_enq(&(data->raw_pkt_queue), pkt2);
 			pak++;
 		} else {
 			nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);

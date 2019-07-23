@@ -7,7 +7,7 @@
 typedef struct _q_node Q_Node;
 struct _q_node {
     void* elem;
-    void* next;
+    Q_Node* next;
 };
 
 typedef struct _queue Queue;
