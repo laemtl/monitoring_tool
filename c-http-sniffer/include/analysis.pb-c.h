@@ -68,10 +68,22 @@ struct  _Analysis__Data
   double reqratemax;
   protobuf_c_boolean has_reqrateclient;
   double reqrateclient;
+  protobuf_c_boolean has_clientavg;
+  double clientavg;
+  protobuf_c_boolean has_clientmin;
+  double clientmin;
+  protobuf_c_boolean has_clientmax;
+  double clientmax;
+  protobuf_c_boolean has_pathavg;
+  double pathavg;
+  protobuf_c_boolean has_pathmin;
+  double pathmin;
+  protobuf_c_boolean has_pathmax;
+  double pathmax;
 };
 #define ANALYSIS__DATA__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&analysis__data__descriptor) \
-    , 0, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+    , 0, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 
 
 /* Analysis__Init methods */

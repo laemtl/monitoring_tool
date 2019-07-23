@@ -43,12 +43,12 @@ export default {
         stats["rst"] = { 
           label: "Request service time",
           active: true,
-          max: 0.10
+          max: 0.01
         };
         stats["reqRate"] = { 
           label: "Request rate",
           active: true,
-          max: 3000,
+          max: 4,
           from: { ip: null, port: null } 
         };
         stats["errRate"] = { 
@@ -62,6 +62,16 @@ export default {
           max: 5,
           from: { ip: null, port: null },
           to: { ip: null, port: null }
+        };
+        stats["client"] = { 
+          label: "Clients",
+          active: true,
+          max: 10
+        };
+        stats["path"] = { 
+          label: "Paths",
+          active: true,
+          max: 10
         };
         return stats;
       }

@@ -161,7 +161,7 @@ const ProtobufCMessageDescriptor analysis__init__descriptor =
   (ProtobufCMessageInit) analysis__init__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor analysis__data__field_descriptors[15] =
+static const ProtobufCFieldDescriptor analysis__data__field_descriptors[21] =
 {
   {
     "time",
@@ -343,13 +343,91 @@ static const ProtobufCFieldDescriptor analysis__data__field_descriptors[15] =
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
+  {
+    "clientAvg",
+    16,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_DOUBLE,
+    offsetof(Analysis__Data, has_clientavg),
+    offsetof(Analysis__Data, clientavg),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "clientMin",
+    17,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_DOUBLE,
+    offsetof(Analysis__Data, has_clientmin),
+    offsetof(Analysis__Data, clientmin),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "clientMax",
+    18,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_DOUBLE,
+    offsetof(Analysis__Data, has_clientmax),
+    offsetof(Analysis__Data, clientmax),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "pathAvg",
+    19,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_DOUBLE,
+    offsetof(Analysis__Data, has_pathavg),
+    offsetof(Analysis__Data, pathavg),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "pathMin",
+    20,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_DOUBLE,
+    offsetof(Analysis__Data, has_pathmin),
+    offsetof(Analysis__Data, pathmin),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "pathMax",
+    21,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_DOUBLE,
+    offsetof(Analysis__Data, has_pathmax),
+    offsetof(Analysis__Data, pathmax),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
 };
 static const unsigned analysis__data__field_indices_by_name[] = {
+  15,   /* field[15] = clientAvg */
+  17,   /* field[17] = clientMax */
+  16,   /* field[16] = clientMin */
   7,   /* field[7] = errRate */
   10,   /* field[10] = errRateClient */
   9,   /* field[9] = errRateMax */
   8,   /* field[8] = errRateMin */
   1,   /* field[1] = netInt */
+  18,   /* field[18] = pathAvg */
+  20,   /* field[20] = pathMax */
+  19,   /* field[19] = pathMin */
   11,   /* field[11] = reqRate */
   14,   /* field[14] = reqRateClient */
   13,   /* field[13] = reqRateMax */
@@ -364,7 +442,7 @@ static const unsigned analysis__data__field_indices_by_name[] = {
 static const ProtobufCIntRange analysis__data__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 0, 15 }
+  { 0, 21 }
 };
 const ProtobufCMessageDescriptor analysis__data__descriptor =
 {
@@ -374,7 +452,7 @@ const ProtobufCMessageDescriptor analysis__data__descriptor =
   "Analysis__Data",
   "analysis",
   sizeof(Analysis__Data),
-  15,
+  21,
   analysis__data__field_descriptors,
   analysis__data__field_indices_by_name,
   1,  analysis__data__number_ranges,

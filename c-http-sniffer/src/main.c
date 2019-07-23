@@ -24,6 +24,7 @@ int raw_rsp = 0;
 int flow_req = 0;
 int flow_rsp = 0;
 
+Data* data = NULL;
 //int GP_CAP_FIN = 0; /* Flag for offline PCAP sniffing */
 
 void
@@ -175,40 +176,9 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 			if( head_end != NULL ){
 				/* First packet of request. */
 				//total++;
-				
 				req_n++;
 				// printf("Request count is: %d \n", data->reqn);
-
-				
 				//printf("source infos: %s %" PRIu16 "\n", saddr, pkt->sport);
-
-				/*Client* c = CALLOC(Client, 1);
-				c->addr.ip = pkt->saddr;
-				c->addr.port = pkt->sport;
-				c->stamp = data->stamp;
-				
-				pthread_mutex_init(&(c->mutex), NULL);
-				hash_add(c, &(data->client_ht));*/
-
-				//node* nd = hash_find(c, data->clients_ht);
-
-				/*if(nd != NULL) {
-					Addr* value = nd->value;
-
-					int n = sizeof("aaa.bbb.ccc.ddd") + 1;
-					char *saddr[n];
-					strncpy(saddr, ip_ntos(value->ip), n);
-					saddr[n] = '\0';
-
-					printf("source infos: %s %" PRIu16 "\n", saddr, value->port);
-				} else {
-					printf("nd is NULL \n");
-				}*/
-
-				//Addr* popular_clients;
-
-
-
 				//printf("%d\n",total);
 				hdl = head_end - cp + 1;
 				pkt->http = HTTP_REQ;
@@ -506,6 +476,7 @@ void sigintHandler(int sig_num) {
       printf("flow_req: %d \n", flow_req);
       printf("flow_rsp: %d \n", flow_rsp);
 
+	  print_tl(data->client_tl);
       exit(0);
 } 
 
@@ -539,7 +510,7 @@ int main(int argc, char *argv[]){
 	
 	// Interface is provided - RUN in app mode
 	} else {		
-		Data* data = (Data*)calloc(1, sizeof(Data));
+		data = (Data*)calloc(1, sizeof(Data));
 		if(data == NULL) return EXIT_FAILURE;	
 		
 		data->client_tl.size = 5;

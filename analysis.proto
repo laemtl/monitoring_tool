@@ -28,4 +28,12 @@ message Data {
     optional double reqRateMin = 13;
     optional double reqRateMax = 14;
     optional double reqRateClient = 15;
-};
+
+    optional double clientAvg = 16;
+    optional double clientMin = 17;
+    optional double clientMax = 18;
+    
+    optional double pathAvg = 19;
+    optional double pathMin = 20;
+    optional double pathMax = 21;
+ };

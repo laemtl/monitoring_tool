@@ -116,14 +116,19 @@ struct _result {
     
     double tp;
 
-    int client_tot;
-    int path_tot;
+    double client_avg;
+    int client_min;
+    int client_max;
+
+    double path_avg;
+    int path_min;
+    int path_max;
 };
 
 typedef struct _capt Capture;
 struct _capt {
     int fd;
-	void (*pkt_handler)(void*); 
+	//void (*pkt_handler)(void*); 
 	int livemode;
     Data* data;
 };

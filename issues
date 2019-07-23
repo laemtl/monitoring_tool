@@ -1,0 +1,8 @@
+Issues:
+
+- client count
+- flow delay: no metrics produce untilthe connection is closed
+- negative rst
+- acknowledgment mismatch
+- packet loss
+- packet processing speedup

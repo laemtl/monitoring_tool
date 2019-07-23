@@ -78,7 +78,11 @@ enum Msg {
         #[serde(skip_serializing_if = "Option::is_none")]
         errRate: ::std::option::Option<Params>,
         #[serde(skip_serializing_if = "Option::is_none")]
-        reqRate: ::std::option::Option<Params>
+        reqRate: ::std::option::Option<Params>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        client: ::std::option::Option<Params>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        path: ::std::option::Option<Params>
     }
 }
 
@@ -171,7 +175,7 @@ impl StreamHandler<ws::Message, ws::ProtocolError> for Ws {
                         //let ip = resolve("bmj-cluster.cs.mcgill.ca:15430");
                         SnifferServer::connect("127.0.0.1:3000", init, ws_addr);
                     }
-                    Msg::Data { time, netInt, rst, tp, errRate, reqRate } => println!("Got Data")
+                    Msg::Data { time, netInt, rst, tp, errRate, reqRate, client, path } => println!("Got Data")
                 }
             }
 
@@ -218,6 +222,24 @@ impl Handler<Data> for Ws {
                     avg: Some(data.get_reqRate()),
                     min: Some(data.get_reqRateMin()),
                     max: Some(data.get_reqRateMax()),
+                    client: None
+                }),
+                _ => None
+            },
+            client: match data.has_clientAvg() {
+                true => Some(Params { 
+                    avg: Some(data.get_clientAvg()),
+                    min: Some(data.get_clientMin()),
+                    max: Some(data.get_clientMax()),
+                    client: None
+                }),
+                _ => None
+            },
+            path: match data.has_pathAvg() {
+                true => Some(Params { 
+                    avg: Some(data.get_pathAvg()),
+                    min: Some(data.get_pathMin()),
+                    max: Some(data.get_pathMax()),
                     client: None
                 }),
                 _ => None

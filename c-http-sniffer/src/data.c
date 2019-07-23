@@ -197,6 +197,31 @@ void extract_data(const flow_t *flow){
 	saddr[n] = '\0';
 	daddr[n] = '\0';*/
     
+	Client* c = CALLOC(Client, 1);
+	c->addr.ip = flow->socket.saddr;
+	c->addr.port = flow->socket.sport;
+	c->stamp = data->stamp;
+	pthread_mutex_init(&(c->mutex), NULL);
+
+	hash_add(c, &(data->client_ht));
+
+	/*node* nd = hash_find(c, &(data->client_ht));
+
+	if(nd != NULL) {
+		Addr* value = nd->value;
+
+		int n = sizeof("aaa.bbb.ccc.ddd") + 1;
+		char *saddr[n];
+		strncpy(saddr, ip_ntos(value->ip), n);
+		saddr[n] = '\0';
+
+		//printf("source infos: %s %" PRIu16 "\n", saddr, value->port);
+	} else {
+		//printf("nd is NULL \n");
+	}*/
+
+	//Addr* popular_clients;
+
 	if (flow->http_f != NULL){        	
 		http_pair_t *h = flow->http_f;
 		while(h != NULL) {
@@ -206,7 +231,6 @@ void extract_data(const flow_t *flow){
 					h->req_processed = TRUE;
 					request_t *req = h->request_header;
 					flow_req++;
-
 
 					//if (parseURL)
               		parseURI(req->uri);
@@ -297,8 +321,8 @@ Result* get_result(Result* result) {
 	result->req_rate_min = get_metric_min(data->req_rate);
 	result->req_rate_max = data->req_rate.max.value;
 
-	result->client_tot = data->client_ht.sub_cnt;
-	result->path_tot = data->path_ht.sub_cnt;
+	result->client_avg = data->client_ht.sub_cnt;
+	result->path_avg = data->path_ht.sub_cnt;
 	
 	return result;
 }
@@ -406,13 +430,13 @@ void print_data(Result* result) {
 	memset(time_buf, 0, sizeof(time_buf));
 	strftime(time_buf, sizeof(time_buf), "%Y%m%d %H:%M:%S", timeinfo);
 
-	printf("%s - %f %f %f %f %f %f %f %f %f %d %d \n", 
+	printf("%s - %f %f %f %f %f %f %f %f %f %f %f \n", 
 		time_buf, 
 		result->rst_avg, result->rst_min, result->rst_max, 
     	result->req_rate, result->req_rate_min, result->req_rate_max,
         result->err_rate, result->err_rate_min, result->err_rate_max,
-		result->client_tot,
-		result->path_tot
+		result->client_avg,
+		result->path_avg
     );
 }
 
@@ -439,12 +463,13 @@ void parseURI(const char *line) {
 	const char *start_of_path;
 	const char *end_of_query;
 
-	// TODO : what to do if sop is NULL?
 	start_of_path = strchr(line, '?');
-	if(start_of_path == NULL) return;
+	if(start_of_path == NULL) {
+		start_of_path = line + strlen(line);
+	}
 
-	len = start_of_path - line;
-	path = calloc(len + 1, sizeof(char));
+	len = start_of_path - line;	
+	path = calloc(len+1, sizeof(char));
 	
 	if ( NULL == path ){ 
         free(path);
@@ -457,7 +482,7 @@ void parseURI(const char *line) {
     start_of_path++;
 	
     end_of_query = strchr(start_of_path, '\0');
-    //printf("%s\n",end_of_query);
+    printf("%s\n",end_of_query);
     len = end_of_query - start_of_path;
 	query = malloc(sizeof(char) * (len + 1));
 	

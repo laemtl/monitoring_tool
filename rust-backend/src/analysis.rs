@@ -291,6 +291,12 @@ pub struct Data {
     reqRateMin: ::std::option::Option<f64>,
     reqRateMax: ::std::option::Option<f64>,
     reqRateClient: ::std::option::Option<f64>,
+    clientAvg: ::std::option::Option<f64>,
+    clientMin: ::std::option::Option<f64>,
+    clientMax: ::std::option::Option<f64>,
+    pathAvg: ::std::option::Option<f64>,
+    pathMin: ::std::option::Option<f64>,
+    pathMax: ::std::option::Option<f64>,
     // special fields
     pub unknown_fields: ::protobuf::UnknownFields,
     pub cached_size: ::protobuf::CachedSize,
@@ -608,6 +614,120 @@ impl Data {
     pub fn set_reqRateClient(&mut self, v: f64) {
         self.reqRateClient = ::std::option::Option::Some(v);
     }
+
+    // optional double clientAvg = 16;
+
+
+    pub fn get_clientAvg(&self) -> f64 {
+        self.clientAvg.unwrap_or(0.)
+    }
+    pub fn clear_clientAvg(&mut self) {
+        self.clientAvg = ::std::option::Option::None;
+    }
+
+    pub fn has_clientAvg(&self) -> bool {
+        self.clientAvg.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_clientAvg(&mut self, v: f64) {
+        self.clientAvg = ::std::option::Option::Some(v);
+    }
+
+    // optional double clientMin = 17;
+
+
+    pub fn get_clientMin(&self) -> f64 {
+        self.clientMin.unwrap_or(0.)
+    }
+    pub fn clear_clientMin(&mut self) {
+        self.clientMin = ::std::option::Option::None;
+    }
+
+    pub fn has_clientMin(&self) -> bool {
+        self.clientMin.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_clientMin(&mut self, v: f64) {
+        self.clientMin = ::std::option::Option::Some(v);
+    }
+
+    // optional double clientMax = 18;
+
+
+    pub fn get_clientMax(&self) -> f64 {
+        self.clientMax.unwrap_or(0.)
+    }
+    pub fn clear_clientMax(&mut self) {
+        self.clientMax = ::std::option::Option::None;
+    }
+
+    pub fn has_clientMax(&self) -> bool {
+        self.clientMax.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_clientMax(&mut self, v: f64) {
+        self.clientMax = ::std::option::Option::Some(v);
+    }
+
+    // optional double pathAvg = 19;
+
+
+    pub fn get_pathAvg(&self) -> f64 {
+        self.pathAvg.unwrap_or(0.)
+    }
+    pub fn clear_pathAvg(&mut self) {
+        self.pathAvg = ::std::option::Option::None;
+    }
+
+    pub fn has_pathAvg(&self) -> bool {
+        self.pathAvg.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_pathAvg(&mut self, v: f64) {
+        self.pathAvg = ::std::option::Option::Some(v);
+    }
+
+    // optional double pathMin = 20;
+
+
+    pub fn get_pathMin(&self) -> f64 {
+        self.pathMin.unwrap_or(0.)
+    }
+    pub fn clear_pathMin(&mut self) {
+        self.pathMin = ::std::option::Option::None;
+    }
+
+    pub fn has_pathMin(&self) -> bool {
+        self.pathMin.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_pathMin(&mut self, v: f64) {
+        self.pathMin = ::std::option::Option::Some(v);
+    }
+
+    // optional double pathMax = 21;
+
+
+    pub fn get_pathMax(&self) -> f64 {
+        self.pathMax.unwrap_or(0.)
+    }
+    pub fn clear_pathMax(&mut self) {
+        self.pathMax = ::std::option::Option::None;
+    }
+
+    pub fn has_pathMax(&self) -> bool {
+        self.pathMax.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_pathMax(&mut self, v: f64) {
+        self.pathMax = ::std::option::Option::Some(v);
+    }
 }
 
 impl ::protobuf::Message for Data {
@@ -726,6 +846,48 @@ impl ::protobuf::Message for Data {
                     let tmp = is.read_double()?;
                     self.reqRateClient = ::std::option::Option::Some(tmp);
                 },
+                16 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_double()?;
+                    self.clientAvg = ::std::option::Option::Some(tmp);
+                },
+                17 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_double()?;
+                    self.clientMin = ::std::option::Option::Some(tmp);
+                },
+                18 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_double()?;
+                    self.clientMax = ::std::option::Option::Some(tmp);
+                },
+                19 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_double()?;
+                    self.pathAvg = ::std::option::Option::Some(tmp);
+                },
+                20 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_double()?;
+                    self.pathMin = ::std::option::Option::Some(tmp);
+                },
+                21 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_double()?;
+                    self.pathMax = ::std::option::Option::Some(tmp);
+                },
                 _ => {
                     ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
                 },
@@ -783,6 +945,24 @@ impl ::protobuf::Message for Data {
         if let Some(v) = self.reqRateClient {
             my_size += 9;
         }
+        if let Some(v) = self.clientAvg {
+            my_size += 10;
+        }
+        if let Some(v) = self.clientMin {
+            my_size += 10;
+        }
+        if let Some(v) = self.clientMax {
+            my_size += 10;
+        }
+        if let Some(v) = self.pathAvg {
+            my_size += 10;
+        }
+        if let Some(v) = self.pathMin {
+            my_size += 10;
+        }
+        if let Some(v) = self.pathMax {
+            my_size += 10;
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
         self.cached_size.set(my_size);
         my_size
@@ -833,6 +1013,24 @@ impl ::protobuf::Message for Data {
         }
         if let Some(v) = self.reqRateClient {
             os.write_double(15, v)?;
+        }
+        if let Some(v) = self.clientAvg {
+            os.write_double(16, v)?;
+        }
+        if let Some(v) = self.clientMin {
+            os.write_double(17, v)?;
+        }
+        if let Some(v) = self.clientMax {
+            os.write_double(18, v)?;
+        }
+        if let Some(v) = self.pathAvg {
+            os.write_double(19, v)?;
+        }
+        if let Some(v) = self.pathMin {
+            os.write_double(20, v)?;
+        }
+        if let Some(v) = self.pathMax {
+            os.write_double(21, v)?;
         }
         os.write_unknown_fields(self.get_unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -951,6 +1149,36 @@ impl ::protobuf::Message for Data {
                     |m: &Data| { &m.reqRateClient },
                     |m: &mut Data| { &mut m.reqRateClient },
                 ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
+                    "clientAvg",
+                    |m: &Data| { &m.clientAvg },
+                    |m: &mut Data| { &mut m.clientAvg },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
+                    "clientMin",
+                    |m: &Data| { &m.clientMin },
+                    |m: &mut Data| { &mut m.clientMin },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
+                    "clientMax",
+                    |m: &Data| { &m.clientMax },
+                    |m: &mut Data| { &mut m.clientMax },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
+                    "pathAvg",
+                    |m: &Data| { &m.pathAvg },
+                    |m: &mut Data| { &mut m.pathAvg },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
+                    "pathMin",
+                    |m: &Data| { &m.pathMin },
+                    |m: &mut Data| { &mut m.pathMin },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
+                    "pathMax",
+                    |m: &Data| { &m.pathMax },
+                    |m: &mut Data| { &mut m.pathMax },
+                ));
                 ::protobuf::reflect::MessageDescriptor::new::<Data>(
                     "Data",
                     fields,
@@ -988,6 +1216,12 @@ impl ::protobuf::Clear for Data {
         self.reqRateMin = ::std::option::Option::None;
         self.reqRateMax = ::std::option::Option::None;
         self.reqRateClient = ::std::option::Option::None;
+        self.clientAvg = ::std::option::Option::None;
+        self.clientMin = ::std::option::Option::None;
+        self.clientMax = ::std::option::Option::None;
+        self.pathAvg = ::std::option::Option::None;
+        self.pathMin = ::std::option::Option::None;
+        self.pathMax = ::std::option::Option::None;
         self.unknown_fields.clear();
     }
 }
@@ -1007,7 +1241,7 @@ impl ::protobuf::reflect::ProtobufValue for Data {
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0eanalysis.proto\x12\x08analysis\":\n\x04Init\x12\x10\n\x08interval\
     \x18\x01\x20\x02(\r\x12\x10\n\x08duration\x18\x02\x20\x02(\r\x12\x0e\n\
-    \x06netInt\x18\x03\x20\x03(\t\"\x93\x02\n\x04Data\x12\x0c\n\x04time\x18\
+    \x06netInt\x18\x03\x20\x03(\t\"\xff\x02\n\x04Data\x12\x0c\n\x04time\x18\
     \x01\x20\x02(\x03\x12\x0e\n\x06netInt\x18\x02\x20\x02(\t\x12\x0e\n\x06rs\
     tAvg\x18\x03\x20\x01(\x01\x12\x0e\n\x06rstMin\x18\x04\x20\x01(\x01\x12\
     \x0e\n\x06rstMax\x18\x05\x20\x01(\x01\x12\x11\n\trstClient\x18\x06\x20\
@@ -1016,7 +1250,11 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     rRateMax\x18\n\x20\x01(\x01\x12\x15\n\rerrRateClient\x18\x0b\x20\x01(\
     \x01\x12\x0f\n\x07reqRate\x18\x0c\x20\x01(\x01\x12\x12\n\nreqRateMin\x18\
     \r\x20\x01(\x01\x12\x12\n\nreqRateMax\x18\x0e\x20\x01(\x01\x12\x15\n\rre\
-    qRateClient\x18\x0f\x20\x01(\x01\
+    qRateClient\x18\x0f\x20\x01(\x01\x12\x11\n\tclientAvg\x18\x10\x20\x01(\
+    \x01\x12\x11\n\tclientMin\x18\x11\x20\x01(\x01\x12\x11\n\tclientMax\x18\
+    \x12\x20\x01(\x01\x12\x0f\n\x07pathAvg\x18\x13\x20\x01(\x01\x12\x0f\n\
+    \x07pathMin\x18\x14\x20\x01(\x01\x12\x0f\n\x07pathMax\x18\x15\x20\x01(\
+    \x01\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {

@@ -86,6 +86,24 @@ int send_data(Result* result) {
 
 	msg.has_reqratemax = 1;
 	msg.reqratemax = result->req_rate_max;
+
+	msg.has_clientavg = 1;
+	msg.clientavg = result->client_avg;
+
+	msg.has_clientmin = 1;
+	msg.clientmin = result->client_min;
+
+	msg.has_clientmax = 1;
+	msg.clientmax = result->client_max;
+
+	msg.has_pathavg = 1;
+	msg.pathavg = result->path_avg;
+
+	msg.has_pathmin = 1;
+	msg.pathmin = result->path_min;
+
+	msg.has_pathmax = 1;
+	msg.pathmax = result->path_max;
 		
 	msg_len = analysis__data__get_packed_size(&msg);
 	
