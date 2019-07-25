@@ -18,26 +18,29 @@
 #include "hash_table.h"
 
 /* Initiate the hash table with no elems */
-int hash_init(hash_t* ht /* , int size /*, int type*/) {
-	if(ht == NULL) return 1;
-
+int hash_init(hash_t* ht, int (*hash_fn)(void*, void*), int (*compare_fn)(void*, void*), int (*update_fn)(void*, void*)) {
 	int ret, i;
-    //ht->type = type;
-    //ht->cnt = 0;
+	if(ht == NULL) return 1;
+	ht->size = HASH_SIZE;
 	
     ht->buckets = MALLOC(hash_mb_t2*, ht->size);
     for(i=0; i<ht->size; i++){
 		ht->buckets[i] = MALLOC(hash_mb_t2, 1);
-       	hash_mb_t2* bucket = ht->buckets[i];
-
-		bucket->first = NULL;
-		bucket->last = NULL;
-		bucket->elm_cnt = 0;
-		ret = pthread_mutex_init(&(bucket->mutex), NULL);
+		ht->buckets[i]->first = NULL;
+		ht->buckets[i]->last = NULL;
+		ht->buckets[i]->elm_cnt = 0;
+		ret = pthread_mutex_init(&(ht->buckets[i]->mutex), NULL);
 		if (ret != 0) {
 			return -1;
 		}
 	}
+
+	ht->hash_fn = hash_fn;
+    ht->compare_fn = compare_fn;
+    ht->update_fn = update_fn;
+
+	tl_init(&(ht->tl));
+
 	return 0;
 }
 
@@ -78,7 +81,9 @@ node* hash_find(void *value, hash_t* ht) {
 	
 	hash_mb_t *hm = NULL;
 	node	*e = NULL;
-	hm = ht->buckets[ht->hash_fn(value)];
+
+	int key = ht->hash_fn(value);
+	hm = ht->buckets[key];
 	pthread_mutex_lock(&(hm->mutex));
 
 	if (hm->elm_cnt > 0){
@@ -142,11 +147,12 @@ int hash_add(void *value, hash_t* ht) {
 
 	e = hash_find(value, ht);
 	if(e != NULL) {
-		free(value);
-		ht->update_fn(e->value);
+		free(value);	
+		ht->update_fn(e->value, ht);
 	} else {
+		Attr* attr = (Attr*)value;
 		e = hash_new(value, ht);
-		ht->update_fn(e->value);
+		ht->update_fn(e->value, ht);
 	}
 	return 0;
 }

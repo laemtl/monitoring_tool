@@ -43,12 +43,12 @@ export default {
         stats["rst"] = { 
           label: "Request service time",
           active: true,
-          max: 0.01
+          max: 1
         };
         stats["reqRate"] = { 
           label: "Request rate",
           active: true,
-          max: 4,
+          max: 2000,
           from: { ip: null, port: null } 
         };
         stats["errRate"] = { 
@@ -64,7 +64,7 @@ export default {
           to: { ip: null, port: null }
         };
         stats["client"] = { 
-          label: "Clients",
+          label: "Connections",
           active: true,
           max: 10
         };
@@ -98,8 +98,8 @@ export default {
   },
   methods: {
     openSocketListeners() {
-      //this.ws = new WebSocket('ws://bmj-cluster.cs.mcgill.ca:15480/ws/');
-      this.ws = new WebSocket('ws://127.0.0.1:8081/ws/');
+      this.ws = new WebSocket('ws://bmj-cluster.cs.mcgill.ca:15480/ws/');
+      //this.ws = new WebSocket('ws://127.0.0.1:8081/ws/');
       var el = this;
 
       // event emmited when connected

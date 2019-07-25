@@ -9,6 +9,7 @@
 #include "hash_table.h"
 #include "client.h"
 #include "queue.h"
+#include "top_list.h"
 
 #ifndef DEBUGGING
 #define DEBUGGING 2 
@@ -39,14 +40,6 @@ struct _metric {
     dbl_metric min;
     dbl_metric max;
 };
-
-typedef struct _top_list Top_list;
-struct _top_list {
-	void** top_list;
-    pthread_mutex_t mutex;
-    int size;
-    int count;
-};   
 
 // memset to 0 on init
 typedef struct _data Data;
@@ -89,11 +82,8 @@ struct _data {
     hash_mb_t *flow_hash_table[HASH_SIZE];
     int flow_cnt;	/* flows live in hash table */
 
-    hash_t client_ht;
-    Top_list client_tl;
-    
+    hash_t client_ht;    
     hash_t path_ht;
-    Top_list path_tl;
 };
 
 
@@ -137,7 +127,7 @@ void destr_fn(void *param);
 void init_once_metric(Metric* metric);
 void reset_metric(Metric* metric);
 void reset(Data* data);
-void init_data(Data* data);
+Data* init_data();
 static void thread_key_setup();
 void thread_init(Data* d);
 void print_tid();
@@ -154,7 +144,7 @@ void reset_metric_subtotal(Metric* metric);
 void update_metric_min(Metric* metric, double value);
 void update_metric_max(Metric* metric, double value);
 BOOL is_server_mode();
-void extract_data(const flow_t *flow);
+void extract_data(flow_t *flow);
 Result* get_result(Result* result);
 void process_rate(Data* data);
 void process_data();

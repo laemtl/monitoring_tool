@@ -11,9 +11,7 @@
 
 seq_t *seq_new(void){
 	seq_t *seq;
-	seq = MALLOC(seq_t, 1);
-	memset(seq, 0, sizeof(seq_t));
-	seq->processed = FALSE;
+	seq = CALLOC(seq_t, 1);
 	return seq;
 }
 
@@ -48,7 +46,7 @@ void order_free(order_t *order){
 
 seq_t *seq_pkt(packet_t *p){
 	seq_t *s;
-	s = MALLOC(seq_t, 1);
+	s = CALLOC(seq_t, 1);
 	s->pkt = p;
 	if ((p->tcp_flags & TH_ACK) == TH_ACK)
 		s->ack = TRUE;

@@ -164,11 +164,7 @@ void* connection_handler(int *socket) {
 			for (unsigned i = 0; i < init->n_netint; i++) { // Iterate through all repeated string
 				printf ("netInt: %s\n\n", init->netint[i]);
 		
-				Data* data = (Data*)calloc(1, sizeof(Data));
-				if(data == NULL) return EXIT_FAILURE;		
-				data->client_tl.size = 5;
-				init_data(data);
-
+				Data* data = init_data();
 				data->server_mode = TRUE;
 				data->client_sock = *socket;
 				data->interval = init->interval;

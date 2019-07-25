@@ -4,6 +4,7 @@
 #include <inttypes.h>
 #include <float.h>
 #include "data.h"
+#include "path.h"
 
 extern int flow_req;
 extern int flow_rsp;
@@ -49,11 +50,14 @@ void reset(Data* data) {
 	data->stamp++;
 
 	// TODO: clean on exit
-	//hash_clear(&(data->clients_ht)); 
+	//hash_clear(&(data->client_ht)); 
 	data->client_ht.sub_cnt = 0;
+	data->path_ht.sub_cnt = 0;
 }
 
-void init_data(Data* data) {
+Data* init_data() {
+	Data* data = CALLOC(Data, 1);
+		
 	init_once_metric(&(data->rst));
 	init_once_metric(&(data->err_rate));
 	init_once_metric(&(data->req_rate));
@@ -62,10 +66,12 @@ void init_data(Data* data) {
 	reset(data);	
 	data->status = 0;
 
-	client_init(data);
-	path_init(data);
-}
+    init_client(data);
+	init_path(data);
 
+	return data;
+};
+	
 static void thread_key_setup() {
 	int status;
     if ((status = pthread_key_create(&data, destr_fn )) < 0) {
@@ -181,46 +187,14 @@ BOOL is_server_mode() {
 	return data->server_mode;
 }
 
-void extract_data(const flow_t *flow){	
+void extract_data(flow_t *flow){	
 	Data* data = {0};
 	get_data(&data);
 
-	/*Convert IP addr */
-	//char *saddr = malloc(sizeof("aaa.bbb.ccc.ddd"));
-	//char *daddr = malloc(sizeof("aaa.bbb.ccc.ddd"));
-	
-	/*int n = sizeof("aaa.bbb.ccc.ddd") + 1;
-	char *saddr[n];
-	char *daddr[n];
-	strncpy(saddr, ip_ntos(flow->socket.saddr), n);
-	strncpy(daddr, ip_ntos(flow->socket.daddr), n);
-	saddr[n] = '\0';
-	daddr[n] = '\0';*/
-    
-	Client* c = CALLOC(Client, 1);
-	c->addr.ip = flow->socket.saddr;
-	c->addr.port = flow->socket.sport;
-	c->stamp = data->stamp;
-	pthread_mutex_init(&(c->mutex), NULL);
-
-	hash_add(c, &(data->client_ht));
-
-	/*node* nd = hash_find(c, &(data->client_ht));
-
-	if(nd != NULL) {
-		Addr* value = nd->value;
-
-		int n = sizeof("aaa.bbb.ccc.ddd") + 1;
-		char *saddr[n];
-		strncpy(saddr, ip_ntos(value->ip), n);
-		saddr[n] = '\0';
-
-		//printf("source infos: %s %" PRIu16 "\n", saddr, value->port);
-	} else {
-		//printf("nd is NULL \n");
-	}*/
-
-	//Addr* popular_clients;
+	if(!flow->processed) {
+		add_client(flow->socket.saddr, flow->socket.sport, data);
+		flow->processed = TRUE;				
+	}
 
 	if (flow->http_f != NULL){        	
 		http_pair_t *h = flow->http_f;
@@ -232,20 +206,17 @@ void extract_data(const flow_t *flow){
 					request_t *req = h->request_header;
 					flow_req++;
 
-					//if (parseURL)
-              		parseURI(req->uri);
-
-					inc_metric_subtotal(&(data->req_rate));
-					inc_metric_total(&(data->req_rate));
+					add_path(req->uri, data);
+					compute_req_rate(data);
 				}
 				
 				if(h->response_header != NULL && !h->rsp_processed) {
 					h->rsp_processed = TRUE;
 					flow_rsp++;
 
-					compute_rst(h);
+					compute_rst(h, data);
 					response_t *rsp = h->response_header;					
-					check_status(rsp);
+					compute_err_rate(rsp, data);
 				}
 				
 				if(h->response_header == NULL) d++;
@@ -255,10 +226,12 @@ void extract_data(const flow_t *flow){
 	}
 }
 
-void compute_rst(http_pair_t *h) {
-	Data* data = {0};
-	get_data(&data);
-	
+void compute_req_rate(Data* data) {
+	inc_metric_subtotal(&(data->req_rate));
+	inc_metric_total(&(data->req_rate));
+}
+
+void compute_rst(http_pair_t *h, Data* data) {
 	// Compute response time
 	double rst = (h->rsp_fb_sec + h->rsp_fb_usec * 0.000001) - (h->req_fb_sec + h->req_fb_usec * 0.000001);
 
@@ -274,11 +247,6 @@ void compute_rst(http_pair_t *h) {
 		//printf("rsp %lld %lld \n", (long long)h->rsp_fb_sec, (long long)h->rsp_fb_usec);
 	}
 
-	/*double rst, rstu;
-	rstu = h->rsp_fb_usec - h->req_fb_usec;
-	if (rstu < 0) rstu = (1000000 - h->rsp_fb_usec) + h->req_fb_usec;
-	rst = (h->rsp_fb_sec - h->req_fb_sec) + rstu*0.000001;*/
-
 	//int res = tcp_order_check(f->order);
 	//if(res == 0) printf("Unordered flow \n");
 	
@@ -288,10 +256,7 @@ void compute_rst(http_pair_t *h) {
 	update_metric_max(&(data->rst), rst);
 }
 
-void check_status(response_t *rsp) {
-	Data* data = {0};
-	get_data(&data);
-
+void compute_err_rate(response_t *rsp, Data* data) {
 	// Extract first digit of status code
 	int i = rsp->status;
 	while (i>=10) i=i/10;  
@@ -341,16 +306,18 @@ void process_rate(Data* data) {
 	reset_metric_subtotal(&(data->err_rate));	
 }
 
-void print_tl(Top_list tl) {
+void print_tl(top_list tl) {
     printf("Count : %d \n", tl.count);
     int i = 0;
     while (i < tl.count) {   
         int n = sizeof("aaa.bbb.ccc.ddd") + 1;
         char *saddr[n];
-        strncpy(saddr, ip_ntos(((Client*)tl.top_list[i])->addr.ip), n);
+		Attr* attr = (Attr*)(tl.list[i]);
+		Addr* addr = (Addr*)(attr->elem);
+        strncpy(saddr, ip_ntos(addr->ip), n);
         saddr[n] = '\0';
 
-        printf("IP: %s Port: %" PRIu16 "\n", saddr, ((Client*)tl.top_list[i])->addr.port);
+        printf("IP: %s Port: %" PRIu16 "\n", saddr, addr->port);
         i++;
     }
 }
@@ -404,7 +371,7 @@ void process_data() {
 #endif
 
 	if(data->status == -1) {
-		print_tl(data->client_tl);
+		print_tl(data->client_ht.tl);
 		//clear_tl();
 	}
 
@@ -440,56 +407,8 @@ void print_data(Result* result) {
     );
 }
 
-
 // Cumulated frequency of requested objects
 // For each objects, a different line
 // total number of requested object
 // 5 more popular
-
-// save DS and counter
-
-
-
-//BOOL parseURL=FALSE;
-
 //obj_total / req_total 
-
-void parseURI(const char *line) {
-	int total = 0;
-	int totalp=0;
-	char *path;
-	char *query;
-	u_int32_t len; 
-	const char *start_of_path;
-	const char *end_of_query;
-
-	start_of_path = strchr(line, '?');
-	if(start_of_path == NULL) {
-		start_of_path = line + strlen(line);
-	}
-
-	len = start_of_path - line;	
-	path = calloc(len+1, sizeof(char));
-	
-	if ( NULL == path ){ 
-        free(path);
-        return;
-	} else {        
-        (void)strncpy(path, line, len);
-        path[len] = '\0';
-	}
-    
-    start_of_path++;
-	
-    end_of_query = strchr(start_of_path, '\0');
-    printf("%s\n",end_of_query);
-    len = end_of_query - start_of_path;
-	query = malloc(sizeof(char) * (len + 1));
-	
-	if ( NULL == query ) {
-		free(query);
-	}
-    
-	(void)strncpy(query, start_of_path, len);
-    query[len] = '\0';
-}

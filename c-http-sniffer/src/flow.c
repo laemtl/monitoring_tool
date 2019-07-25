@@ -673,13 +673,13 @@ flow_extract_http(flow_t *f, BOOL closed){
 
 				/* Try to find the first pair without response */
 				while(tmp != NULL){
-					if(tmp->request_header->nxt_seq > ack) {
+					/*if(tmp->request_header->nxt_seq > ack) {
 						printf("ns: %" PRIu32 " ack: %" PRIu32" \n", tmp->request_header->nxt_seq, ack);
 						tmp = NULL;
 						break;
-					}
+					}*/
 
-					if(tmp->response_header == NULL && tmp->request_header->nxt_seq == ack) {
+					if(tmp->response_header == NULL /*&& tmp->request_header->nxt_seq == ack*/) {
 						//printf("ns: %" PRIu32 " ack: %" PRIu32" \n", tmp->request_header->nxt_seq, ack);
 						break;
 					}
@@ -784,12 +784,12 @@ flow_extract_http(flow_t *f, BOOL closed){
 				
 				/* Try to find the first pair without response */
 				while(tmp != NULL){
-					if(tmp->request_header->nxt_seq > ack) {
+					/*if(tmp->request_header->nxt_seq > ack) {
 						tmp = NULL;
 						break;
-					}
+					}*/
 					
-					if(tmp->response_header == NULL && tmp->request_header->nxt_seq == ack) {
+					if(tmp->response_header == NULL /*&& tmp->request_header->nxt_seq == ack*/) {
 						//printf("ns: %" PRIu32 " ack: %" PRIu32" \n", tmp->request_header->nxt_seq, ack);
 						break;
 					}

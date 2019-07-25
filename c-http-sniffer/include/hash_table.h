@@ -1,6 +1,7 @@
 
 
 #include <pthread.h>
+#include "top_list.h"
 
 #ifndef HTABLE_H
 #define HTABLE_H
@@ -34,13 +35,13 @@ struct _hash_t {
     hash_mb_t2** buckets;
     int tot_cnt;
     int sub_cnt;
-    int type;
+    top_list tl;
     int (*hash_fn)(void*);
     int (*compare_fn)(void*, void*);
-    void (*update_fn)(void*);
+    void (*update_fn)(void*, void*);
 };
 
-int hash_init(hash_t* ht /* , int size /*, int type*/);
+int hash_init(hash_t* ht, int (*hash_fn)(void*, void*), int (*compare_fn)(void*, void*), int (*update_fn)(void*, void*));
 node* hash_new(void *value, hash_t* ht);
 node* hash_find(void *value, hash_t* ht);
 node* hash_delete(void *value, hash_t* ht);

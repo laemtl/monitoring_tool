@@ -24,7 +24,6 @@ int raw_rsp = 0;
 int flow_req = 0;
 int flow_rsp = 0;
 
-Data* data = NULL;
 //int GP_CAP_FIN = 0; /* Flag for offline PCAP sniffing */
 
 void
@@ -376,8 +375,8 @@ capture_main(void* p){
 			pkt2->pkthdr = pkthdr;
 			size_t len = pkthdr.len;
 
-			char* r = MALLOC(char, len+1);
-        	memcpy(r, raw, len+1);
+			char* r = MALLOC(char, len);
+        	memcpy(r, raw, len);
 			pkt2->raw = r;
 			
 			queue_enq(&(data->raw_pkt_queue), pkt2);
@@ -465,19 +464,22 @@ void start_analysis(char* ipaddress, Data* data) {
 }
 
 void sigintHandler(int sig_num) { 
-      signal(SIGINT, sigintHandler); 
-      printf("pak: %d \n", pak);
-      printf("dpak: %d \n", pak_deq);
-	  printf("reqn: %d \n", req_n);
-      printf("rspn: %d \n", rsp_n);
+    Data* data = {0};
+	get_data(&data);
+	
+	signal(SIGINT, sigintHandler); 
+    printf("pak: %d \n", pak);
+	printf("dpak: %d \n", pak_deq);
+	printf("reqn: %d \n", req_n);
+	printf("rspn: %d \n", rsp_n);
 
-	  printf("raw_req: %d \n", raw_req);
-	  printf("raw_rsp: %d \n", raw_rsp);
-      printf("flow_req: %d \n", flow_req);
-      printf("flow_rsp: %d \n", flow_rsp);
+	printf("raw_req: %d \n", raw_req);
+	printf("raw_rsp: %d \n", raw_rsp);
+	printf("flow_req: %d \n", flow_req);
+	printf("flow_rsp: %d \n", flow_rsp);
 
-	  print_tl(data->client_tl);
-      exit(0);
+	print_tl(data->client_ht.tl);
+	exit(0);
 } 
 
 /**
@@ -487,6 +489,7 @@ int main(int argc, char *argv[]){
 	char* interface = NULL;
 	char* ipaddress = NULL;
 	int opt;
+
 	signal(SIGINT, sigintHandler);
 
    	// Parse arguments
@@ -510,11 +513,8 @@ int main(int argc, char *argv[]){
 	
 	// Interface is provided - RUN in app mode
 	} else {		
-		data = (Data*)calloc(1, sizeof(Data));
-		if(data == NULL) return EXIT_FAILURE;	
-		
-		data->client_tl.size = 5;
-		init_data(data);
+		Data* data = init_data();
+		thread_init(data);
 		data->interface = interface;
         data->interval = 5;
 		start_analysis(ipaddress, data);
