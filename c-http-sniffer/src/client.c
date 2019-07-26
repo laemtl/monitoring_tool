@@ -18,11 +18,10 @@ void init_client(Data* data) {
     hash_init(&(data->client_ht), client_hash_fn, addr_compare, update_attr);
 }
 
-void add_client(u_int32_t saddr, u_int16_t sport, Data* data) {
-    Addr* addr = CALLOC(Addr, 1);
-	addr->ip = saddr;
-	addr->port = sport;
-    add_attr(addr, &(data->client_ht));
+void add_client(u_int32_t saddr, Data* data) {
+    u_int32_t* addr = CALLOC(u_int32_t, 1);
+    addr = saddr;
+    add_attr(addr, &(data->conn_ht));
 }
 
 BOOL is_client_ht(hash_t* ht) {

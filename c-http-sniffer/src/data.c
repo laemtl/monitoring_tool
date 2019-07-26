@@ -198,8 +198,8 @@ void extract_data(flow_t *flow){
 	get_data(&data);
 
 	if(!flow->processed) {
-		add_conn(flow->socket.saddr, data);
-		add_client(flow->socket.saddr, flow->socket.sport, data);
+		add_conn(flow->socket.saddr, flow->socket.sport, data);
+		add_client(flow->socket.saddr, data);
 		flow->processed = TRUE;				
 	}
 
