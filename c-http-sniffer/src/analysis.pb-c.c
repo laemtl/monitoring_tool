@@ -344,36 +344,36 @@ static const ProtobufCFieldDescriptor analysis__data__field_descriptors[21] =
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "clientAvg",
+    "connRate",
     16,
     PROTOBUF_C_LABEL_OPTIONAL,
     PROTOBUF_C_TYPE_DOUBLE,
-    offsetof(Analysis__Data, has_clientavg),
-    offsetof(Analysis__Data, clientavg),
+    offsetof(Analysis__Data, has_connrate),
+    offsetof(Analysis__Data, connrate),
     NULL,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "clientMin",
+    "connRateMin",
     17,
     PROTOBUF_C_LABEL_OPTIONAL,
     PROTOBUF_C_TYPE_DOUBLE,
-    offsetof(Analysis__Data, has_clientmin),
-    offsetof(Analysis__Data, clientmin),
+    offsetof(Analysis__Data, has_connratemin),
+    offsetof(Analysis__Data, connratemin),
     NULL,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "clientMax",
+    "connRateMax",
     18,
     PROTOBUF_C_LABEL_OPTIONAL,
     PROTOBUF_C_TYPE_DOUBLE,
-    offsetof(Analysis__Data, has_clientmax),
-    offsetof(Analysis__Data, clientmax),
+    offsetof(Analysis__Data, has_connratemax),
+    offsetof(Analysis__Data, connratemax),
     NULL,
     NULL,
     0,             /* flags */
@@ -417,9 +417,9 @@ static const ProtobufCFieldDescriptor analysis__data__field_descriptors[21] =
   },
 };
 static const unsigned analysis__data__field_indices_by_name[] = {
-  15,   /* field[15] = clientAvg */
-  17,   /* field[17] = clientMax */
-  16,   /* field[16] = clientMin */
+  15,   /* field[15] = connRate */
+  17,   /* field[17] = connRateMax */
+  16,   /* field[16] = connRateMin */
   7,   /* field[7] = errRate */
   10,   /* field[10] = errRateClient */
   9,   /* field[9] = errRateMax */

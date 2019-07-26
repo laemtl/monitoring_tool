@@ -61,6 +61,9 @@ struct _data {
     Metric err_rate;
     Metric req_rate;
     Metric tp;
+
+    hash_t conn_ht;
+    Metric conn_rate;
     
     Queue raw_pkt_queue;
 
@@ -106,9 +109,9 @@ struct _result {
     
     double tp;
 
-    double client_avg;
-    int client_min;
-    int client_max;
+    double conn_rate;
+    int conn_rate_min;
+    int conn_rate_max;
 
     double path_avg;
     int path_min;

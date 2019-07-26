@@ -31,11 +31,19 @@ struct _node {
 // memset to 0 on init
 typedef struct _hash_t hash_t;
 struct _hash_t {
+    pthread_mutex_t mutex;
+
+    // number of buckets in the ht
     int size;
-    hash_mb_t2** buckets;
+    // total number of item in the hash table
     int tot_cnt;
-    int sub_cnt;
+    // total number of updated item in the hash table
+    // within the current interval (1 sec for rate computation)
+    int int_cnt;
+
+    hash_mb_t2** buckets;
     top_list tl;
+
     int (*hash_fn)(void*);
     int (*compare_fn)(void*, void*);
     void (*update_fn)(void*, void*);

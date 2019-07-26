@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <inttypes.h>
 
 #include "util.h"
 #include "data.h"
@@ -44,45 +45,88 @@ int sort_tl(void** tl, int n_index, int (*compare_fn)(void*, void*)) {
 }
 
 void update_tl(Attr* elem, hash_t* ht) {
-    top_list tl = ht->tl;
+    top_list* tl = &(ht->tl);
 
-    // if the client is already in the top list, return
-    int count = tl.count;
-    if(is_top(tl.list, count, (void*)elem, ht->compare_fn)) return;
-    pthread_mutex_lock(&(tl.mutex));
-    // We have a spot left, add the client in the list
+    // if the attr is already in the top list, return
+    int count = tl->count;
+    if(is_top(tl->list, count, (void*)elem, ht->compare_fn)) return;
+    pthread_mutex_lock(&(tl->mutex));
+    // We have a spot left, add the attr in the list
     int size = ht->tl.size;
     
     if(count < 5) {
-        tl.list[count] = MALLOC(Attr, 1);
-        memcpy(tl.list[count], elem, sizeof(elem));
-        sort_tl(tl.list, count, req_compare);
-        // TODO: need a lock
-        tl.count++;
+        tl->list[count] = MALLOC(Attr, 1);
 
-        pthread_mutex_unlock(&(tl.mutex));
+        // Copy the element because it can be removed from the hash table
+        memcpy(tl->list[count], elem, sizeof(elem));
+        sort_tl(tl->list, count, req_compare);
+        tl->count++;
+
+        pthread_mutex_unlock(&(tl->mutex));
         return;
     }
 
-    Attr* min = tl.list[size-1]; 
+    Attr* min = tl->list[size-1]; 
 
    
     if(min->req_tot < elem->req_tot) {
-
-        // Remove last element from top list
-        //((Client*)data->clients_tl.list[size-1])->is_top = FALSE;
-        
         // Insert new element in top list
-        memcpy(tl.list[size-1], elem, sizeof(elem));
-        //data->clients_tl.list[size-1] = c;
-        //c->is_top = TRUE;
-
+        // Copy the element because it can be removed from the hash table
+        memcpy(tl->list[size-1], elem, sizeof(elem));
+       
         // Sort top list
-        sort_tl(tl.list, tl.size-1, req_compare);
+        sort_tl(tl->list, tl->size-1, req_compare);
 
-        pthread_mutex_unlock(&(tl.mutex));
+        pthread_mutex_unlock(&(tl->mutex));
         return;
     }
 
-    pthread_mutex_unlock(&(tl.mutex));
+    pthread_mutex_unlock(&(tl->mutex));
+}
+
+void print_conn_tl(top_list* tl) {
+    printf("Count : %d \n", tl->count);
+    int i = 0;
+    while (i < tl->count) {   
+        int n = sizeof("aaa.bbb.ccc.ddd") + 1;
+        char *saddr[n];
+		Attr* attr = (Attr*)(tl->list[i]);
+		Addr* addr = (Addr*)(attr->elem);
+        strncpy(saddr, ip_ntos(addr->ip), n);
+        saddr[n] = '\0';
+
+        printf("IP: %s Port: %" PRIu16 "\n", saddr, addr->port);
+        i++;
+    }
+}
+
+void print_client_tl(top_list* tl) {
+    printf("Count : %d \n", tl->count);
+    int i = 0;
+    while (i < tl->count) {   
+        int n = sizeof("aaa.bbb.ccc.ddd") + 1;
+        char *saddr[n];
+		Attr* attr = (Attr*)(tl->list[i]);
+		Addr* addr = (Addr*)(attr->elem);
+        strncpy(saddr, ip_ntos(addr->ip), n);
+        saddr[n] = '\0';
+
+        printf("IP: %s \n", saddr, addr->port);
+        i++;
+    }
+}
+
+void print_path_tl(top_list* tl) {
+    printf("Count : %d \n", tl->count);
+    int i = 0;
+    while (i < tl->count) {   
+        Attr* attr = (Attr*)(tl->list[i]);
+		char* path = (char*)(attr->elem);
+        printf("path: %s \n", path);
+        i++;
+    }
+}
+
+void clear_tl() {
+
 }

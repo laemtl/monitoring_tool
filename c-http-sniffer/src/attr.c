@@ -19,9 +19,16 @@ void update_attr(Attr* a, hash_t* ht) {
     // Increment the subtotal count 
     if(a->stamp < data->stamp) {
         a->stamp = data->stamp; 
-        ht->sub_cnt++;
-    } 
-	pthread_mutex_unlock(&(a->mutex));   
+        pthread_mutex_unlock(&(a->mutex)); 
+
+        pthread_mutex_lock(&(ht->mutex));
+        ht->int_cnt++;
+        pthread_mutex_unlock(&(ht->mutex));
+        
+    } else {
+        pthread_mutex_unlock(&(a->mutex)); 
+    }
+	  
 
     update_tl(a, ht); 
 }

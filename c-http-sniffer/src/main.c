@@ -351,7 +351,7 @@ capture_main(void* p){
 	//extern int GP_CAP_FIN;
 	
 	if ( livemode==1 ) {
-		cap = pcap_open_live(interface, 65535, 0, 1000, errbuf);
+		cap = pcap_open_live(interface, 65535, 0, -1, errbuf);
 	} else {
 		cap = pcap_open_offline(interface, errbuf);
 	}
@@ -478,7 +478,9 @@ void sigintHandler(int sig_num) {
 	printf("flow_req: %d \n", flow_req);
 	printf("flow_rsp: %d \n", flow_rsp);
 
-	print_tl(data->client_ht.tl);
+	print_conn_tl(&(data->conn_ht.tl));
+	print_client_tl(&(data->client_ht.tl));
+	print_path_tl(&(data->path_ht.tl));
 	exit(0);
 } 
 

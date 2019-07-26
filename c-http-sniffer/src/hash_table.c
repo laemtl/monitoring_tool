@@ -21,6 +21,10 @@
 int hash_init(hash_t* ht, int (*hash_fn)(void*, void*), int (*compare_fn)(void*, void*), int (*update_fn)(void*, void*)) {
 	int ret, i;
 	if(ht == NULL) return 1;
+
+	ret = pthread_mutex_init(&(ht->mutex), NULL);
+	if (ret != 0) return -1;
+
 	ht->size = HASH_SIZE;
 	
     ht->buckets = MALLOC(hash_mb_t2*, ht->size);
@@ -30,9 +34,7 @@ int hash_init(hash_t* ht, int (*hash_fn)(void*, void*), int (*compare_fn)(void*,
 		ht->buckets[i]->last = NULL;
 		ht->buckets[i]->elm_cnt = 0;
 		ret = pthread_mutex_init(&(ht->buckets[i]->mutex), NULL);
-		if (ret != 0) {
-			return -1;
-		}
+		if (ret != 0) return -1;
 	}
 
 	ht->hash_fn = hash_fn;
@@ -69,7 +71,7 @@ node* hash_new(void *value, hash_t* ht) {
 	n->hmb = hm;
 	hm->elm_cnt++;
 	ht->tot_cnt++;
-	ht->sub_cnt++;
+	ht->int_cnt++;
 
 	pthread_mutex_unlock(&(hm->mutex));
 	return n;
@@ -130,7 +132,7 @@ node* hash_delete(void *value, hash_t* ht) {
 	n->prev = NULL;
 	hm->elm_cnt--;
 	ht->tot_cnt--;
-	ht->sub_cnt--;
+	ht->int_cnt--;
 	return n;
 }
 
@@ -171,7 +173,7 @@ int hash_clear(hash_t* ht) {
 
 	node* elem = NULL;
 	ht->tot_cnt = 0;
-	ht->sub_cnt = 0;
+	ht->int_cnt = 0;
 	for(i=0; i<ht->size; i++){
 		while(ht->buckets[i]->first != NULL ){
 			elem = ht->buckets[i]->first;
@@ -233,4 +235,10 @@ int hash_scnt(hash_t* ht) {
 void hash_print(hash_t* ht) {
 	if(ht == NULL) return 1;
 	printf("(Hash size)%d : (Consumed)%d : (Flows)%d\n", hash_size(ht), hash_scnt(ht), hash_cnt(ht) );
+}
+
+void reset_int_cnt(hash_t* ht) {
+    pthread_mutex_lock(&(ht->mutex));
+	ht->int_cnt = 0;
+	pthread_mutex_unlock(&(ht->mutex));
 }

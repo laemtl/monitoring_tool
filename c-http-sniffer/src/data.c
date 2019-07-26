@@ -47,12 +47,9 @@ void reset(Data* data) {
 	reset_metric(&(data->tp));
 
 	data->int_step = 0;
-	data->stamp++;
 
 	// TODO: clean on exit
 	//hash_clear(&(data->client_ht)); 
-	data->client_ht.sub_cnt = 0;
-	data->path_ht.sub_cnt = 0;
 }
 
 Data* init_data() {
@@ -66,6 +63,7 @@ Data* init_data() {
 	reset(data);	
 	data->status = 0;
 
+	init_conn(data);
     init_client(data);
 	init_path(data);
 
@@ -145,6 +143,14 @@ double get_req_rate() {
 	return (double)req_total/data->interval;
 }
 
+double get_conn_rate() {
+	Data* data = {0};
+	get_data(&data);
+
+	int conn_total = data->conn_ht.int_cnt;
+	return (double)conn_total/data->interval;
+}
+
 void add_metric_sum(Metric* metric, double amt) {
     pthread_mutex_lock(&(metric->sum.mutex));
 	metric->sum.value += amt;
@@ -192,6 +198,7 @@ void extract_data(flow_t *flow){
 	get_data(&data);
 
 	if(!flow->processed) {
+		add_conn(flow->socket.saddr, data);
 		add_client(flow->socket.saddr, flow->socket.sport, data);
 		flow->processed = TRUE;				
 	}
@@ -286,8 +293,8 @@ Result* get_result(Result* result) {
 	result->req_rate_min = get_metric_min(data->req_rate);
 	result->req_rate_max = data->req_rate.max.value;
 
-	result->client_avg = data->client_ht.sub_cnt;
-	result->path_avg = data->path_ht.sub_cnt;
+	result->conn_rate =  get_conn_rate();
+	result->path_avg = data->path_ht.int_cnt;
 	
 	return result;
 }
@@ -301,29 +308,12 @@ void process_rate(Data* data) {
 	double err_rate_subtotals = get_err_rate_subtotals();
 	update_metric_min(&(data->err_rate), err_rate_subtotals);
 	update_metric_max(&(data->err_rate), err_rate_subtotals);
+
+	update_metric_min(&(data->conn_rate), data->conn_ht.int_cnt);
+	update_metric_max(&(data->conn_rate), data->conn_ht.int_cnt);
 	
 	reset_metric_subtotal(&(data->req_rate));
 	reset_metric_subtotal(&(data->err_rate));	
-}
-
-void print_tl(top_list tl) {
-    printf("Count : %d \n", tl.count);
-    int i = 0;
-    while (i < tl.count) {   
-        int n = sizeof("aaa.bbb.ccc.ddd") + 1;
-        char *saddr[n];
-		Attr* attr = (Attr*)(tl.list[i]);
-		Addr* addr = (Addr*)(attr->elem);
-        strncpy(saddr, ip_ntos(addr->ip), n);
-        saddr[n] = '\0';
-
-        printf("IP: %s Port: %" PRIu16 "\n", saddr, addr->port);
-        i++;
-    }
-}
-
-void clear_tl() {
-
 }
 
 void flow_hash_process() {
@@ -360,6 +350,12 @@ void process_data() {
 	flow_hash_process();
 	
 	process_rate(data);
+	data->stamp++;	
+
+	reset_int_cnt(data->conn_ht);
+	reset_int_cnt(data->client_ht);
+	reset_int_cnt(data->path_ht);
+		
 	if(data->int_step < data->interval) return;
 
 	Result* result = calloc(1, sizeof(Result));
@@ -371,7 +367,9 @@ void process_data() {
 #endif
 
 	if(data->status == -1) {
-		print_tl(data->client_ht.tl);
+		print_conn_tl(&(data->conn_ht.tl));
+		print_client_tl(&(data->client_ht.tl));
+		print_path_tl(&(data->path_ht.tl));
 		//clear_tl();
 	}
 
@@ -402,7 +400,7 @@ void print_data(Result* result) {
 		result->rst_avg, result->rst_min, result->rst_max, 
     	result->req_rate, result->req_rate_min, result->req_rate_max,
         result->err_rate, result->err_rate_min, result->err_rate_max,
-		result->client_avg,
+		result->conn_rate,
 		result->path_avg
     );
 }

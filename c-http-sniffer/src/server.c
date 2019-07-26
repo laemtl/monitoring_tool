@@ -87,14 +87,14 @@ int send_data(Result* result) {
 	msg.has_reqratemax = 1;
 	msg.reqratemax = result->req_rate_max;
 
-	msg.has_clientavg = 1;
-	msg.clientavg = result->client_avg;
+	msg.has_connrate = 1;
+	msg.connrate = result->conn_rate;
 
-	msg.has_clientmin = 1;
-	msg.clientmin = result->client_min;
+	msg.has_connratemin = 1;
+	msg.connratemin = result->conn_rate_min;
 
-	msg.has_clientmax = 1;
-	msg.clientmax = result->client_max;
+	msg.has_connratemax = 1;
+	msg.connratemax = result->conn_rate_max;
 
 	msg.has_pathavg = 1;
 	msg.pathavg = result->path_avg;

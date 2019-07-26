@@ -68,12 +68,12 @@ struct  _Analysis__Data
   double reqratemax;
   protobuf_c_boolean has_reqrateclient;
   double reqrateclient;
-  protobuf_c_boolean has_clientavg;
-  double clientavg;
-  protobuf_c_boolean has_clientmin;
-  double clientmin;
-  protobuf_c_boolean has_clientmax;
-  double clientmax;
+  protobuf_c_boolean has_connrate;
+  double connrate;
+  protobuf_c_boolean has_connratemin;
+  double connratemin;
+  protobuf_c_boolean has_connratemax;
+  double connratemax;
   protobuf_c_boolean has_pathavg;
   double pathavg;
   protobuf_c_boolean has_pathmin;
