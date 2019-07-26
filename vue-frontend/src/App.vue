@@ -64,7 +64,7 @@ export default {
           to: { ip: null, port: null }
         };
         stats["connRate"] = { 
-          label: "Connections",
+          label: "Connection rate",
           active: true,
           max: 10
         };

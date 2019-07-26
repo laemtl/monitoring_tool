@@ -45,6 +45,7 @@ void reset(Data* data) {
 	reset_metric(&(data->err_rate));
 	reset_metric(&(data->req_rate));
 	reset_metric(&(data->tp));
+	reset_metric(&(data->conn_rate));
 
 	data->int_step = 0;
 
@@ -107,12 +108,12 @@ double get_metric_min(Metric metric) {
 	return metric.min.value;
 }
 
-double get_rst_avg(Metric rst) {
+double get_rst_avg() {
 	Data* data = {0};
 	get_data(&data);
 
-	int req_total = rst.total.value; 
-	if (req_total != 0) return rst.sum.value/req_total;
+	int req_total = data->rst.total.value; 
+	if (req_total != 0) return data->rst.sum.value/req_total;
 	return 0;
 }
 
@@ -147,8 +148,7 @@ double get_conn_rate() {
 	Data* data = {0};
 	get_data(&data);
 
-	int conn_total = data->conn_ht.int_cnt;
-	return (double)conn_total/data->interval;
+	return (double)data->conn_rate.sum.value/data->interval;
 }
 
 void add_metric_sum(Metric* metric, double amt) {
@@ -281,7 +281,7 @@ Result* get_result(Result* result) {
 	result->interface = data->interface;	
 	result->client_sock = data->client_sock;
 
-	result->rst_avg = get_rst_avg(data->rst);
+	result->rst_avg = get_rst_avg();
 	result->rst_min = get_metric_min(data->rst);
     result->rst_max = data->rst.max.value;
 	
@@ -293,7 +293,10 @@ Result* get_result(Result* result) {
 	result->req_rate_min = get_metric_min(data->req_rate);
 	result->req_rate_max = data->req_rate.max.value;
 
-	result->conn_rate =  get_conn_rate();
+	result->conn_rate = get_conn_rate();
+	result->conn_rate_min = data->conn_rate.min.value;
+	result->conn_rate_max = data->conn_rate.max.value;
+	
 	result->path_avg = data->path_ht.int_cnt;
 	
 	return result;
@@ -309,11 +312,14 @@ void process_rate(Data* data) {
 	update_metric_min(&(data->err_rate), err_rate_subtotals);
 	update_metric_max(&(data->err_rate), err_rate_subtotals);
 
-	update_metric_min(&(data->conn_rate), data->conn_ht.int_cnt);
-	update_metric_max(&(data->conn_rate), data->conn_ht.int_cnt);
+	int conn_int_cnt = data->conn_ht.int_cnt;
+	add_metric_sum(&(data->conn_rate), conn_int_cnt);
+	update_metric_min(&(data->conn_rate), conn_int_cnt);
+	update_metric_max(&(data->conn_rate), conn_int_cnt);
 	
 	reset_metric_subtotal(&(data->req_rate));
 	reset_metric_subtotal(&(data->err_rate));	
+	reset_metric_subtotal(&(data->conn_rate));	
 }
 
 void flow_hash_process() {
@@ -352,9 +358,9 @@ void process_data() {
 	process_rate(data);
 	data->stamp++;	
 
-	reset_int_cnt(data->conn_ht);
-	reset_int_cnt(data->client_ht);
-	reset_int_cnt(data->path_ht);
+	reset_int_cnt(&(data->conn_ht));
+	reset_int_cnt(&(data->client_ht));
+	reset_int_cnt(&(data->path_ht));
 		
 	if(data->int_step < data->interval) return;
 
@@ -395,12 +401,12 @@ void print_data(Result* result) {
 	memset(time_buf, 0, sizeof(time_buf));
 	strftime(time_buf, sizeof(time_buf), "%Y%m%d %H:%M:%S", timeinfo);
 
-	printf("%s - %f %f %f %f %f %f %f %f %f %f %f \n", 
+	printf("%s - %f %f %f %f %f %f %f %f %f %f %f %f %f \n", 
 		time_buf, 
 		result->rst_avg, result->rst_min, result->rst_max, 
     	result->req_rate, result->req_rate_min, result->req_rate_max,
         result->err_rate, result->err_rate_min, result->err_rate_max,
-		result->conn_rate,
+		result->conn_rate, result->conn_rate_min, result->conn_rate_max,
 		result->path_avg
     );
 }

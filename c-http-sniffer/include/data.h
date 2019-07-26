@@ -110,8 +110,8 @@ struct _result {
     double tp;
 
     double conn_rate;
-    int conn_rate_min;
-    int conn_rate_max;
+    double conn_rate_min;
+    double conn_rate_max;
 
     double path_avg;
     int path_min;
@@ -136,7 +136,7 @@ void thread_init(Data* d);
 void print_tid();
 void get_data(Data** d);
 double get_metric_min(Metric metric);
-double get_rst_avg(Metric metric);
+double get_rst_avg();
 double get_err_rate();
 double get_err_rate_subtotals();
 double get_req_rate();
