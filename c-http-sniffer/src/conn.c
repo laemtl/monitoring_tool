@@ -3,7 +3,7 @@
 #include "data.h";
 #include <inttypes.h>
 
-int conn_hash_fn(Attr* c) {
+u_int32_t conn_hash_fn(Attr* c) {
     Data* data = {0};
 	get_data(&data);
     return ((((Addr*)c->elem)->port & 0xff) | ((((Addr*)c->elem)->ip & 0xff) << 8)) % data->conn_ht.size;

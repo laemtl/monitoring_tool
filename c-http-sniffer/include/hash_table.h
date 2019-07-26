@@ -31,9 +31,8 @@ struct _node {
 // memset to 0 on init
 typedef struct _hash_t hash_t;
 struct _hash_t {
-    pthread_mutex_t mutex;
-
     // number of buckets in the ht
+    pthread_mutex_t mutex;
     int size;
     // total number of item in the hash table
     int tot_cnt;
