@@ -9,19 +9,19 @@ int client_hash_fn(Attr* c) {
     return ((((Addr*)c->elem)->port & 0xff) | ((((Addr*)c->elem)->ip & 0xff) << 8)) % data->client_ht.size;
 }
 
-int addr_compare(Attr* c1, Attr* c2) {
-    if((((Addr*)c1->elem)->ip == ((Addr*)c2->elem)->ip) && (((Addr*)c1->elem)->port == ((Addr*)c2->elem)->port)) return 0;
+int ip_compare(Attr* c1, Attr* c2) {
+    if((((Addr*)c1->elem)->ip == ((Addr*)c2->elem)->ip)) return 0;
     return 1;
 }
 
 void init_client(Data* data) {
-    hash_init(&(data->client_ht), client_hash_fn, addr_compare, update_attr);
+    hash_init(&(data->client_ht), client_hash_fn, ip_compare, update_attr);
 }
 
 void add_client(u_int32_t saddr, Data* data) {
     u_int32_t* addr = CALLOC(u_int32_t, 1);
     addr = saddr;
-    add_attr(addr, &(data->conn_ht));
+    add_attr(addr, &(data->client_ht));
 }
 
 BOOL is_client_ht(hash_t* ht) {

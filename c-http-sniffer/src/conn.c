@@ -9,8 +9,8 @@ int conn_hash_fn(Attr* c) {
     return ((((Addr*)c->elem)->port & 0xff) | ((((Addr*)c->elem)->ip & 0xff) << 8)) % data->conn_ht.size;
 }
 
-int ip_compare(Attr* c1, Attr* c2) {
-    if((((Addr*)c1->elem)->ip == ((Addr*)c2->elem)->ip)) return 0;
+int addr_compare(Attr* c1, Attr* c2) {
+    if((((Addr*)c1->elem)->ip == ((Addr*)c2->elem)->ip) && (((Addr*)c1->elem)->port == ((Addr*)c2->elem)->port)) return 0;
     return 1;
 }
 
@@ -22,7 +22,7 @@ void add_conn(u_int32_t saddr, u_int16_t sport, Data* data) {
     Addr* addr = CALLOC(Addr, 1);
 	addr->ip = saddr;
 	addr->port = sport;
-    add_attr(addr, &(data->client_ht));
+    add_attr(addr, &(data->conn_ht));
 }
 
 BOOL is_conn_ht(hash_t* ht) {

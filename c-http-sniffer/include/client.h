@@ -21,6 +21,6 @@ struct _client {
 };*/
 
 int client_hash_fn(Attr* a);
-int addr_compare(Attr* a1, Attr* a2);
+int ip_compare(Attr* a1, Attr* a2);
 
 #endif

@@ -7,6 +7,6 @@
 #include "attr.h"
 
 int conn_hash_fn(Attr* a);
-int ip_compare(Attr* a1, Attr* a2);
+int addr_compare(Attr* a1, Attr* a2);
 
 #endif
