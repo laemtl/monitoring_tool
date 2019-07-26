@@ -20,7 +20,7 @@ struct _client {
     pthread_mutex_t mutex;
 };*/
 
-int client_hash_fn(Attr* a);
+u_int32_t client_hash_fn(Attr* a);
 int ip_compare(Attr* a1, Attr* a2);
 
 #endif

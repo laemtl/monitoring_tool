@@ -84,7 +84,7 @@ node* hash_find(void *value, hash_t* ht) {
 	hash_mb_t *hm = NULL;
 	node	*e = NULL;
 
-	int key = ht->hash_fn(value);
+	u_int32_t key = ht->hash_fn(value);
 	hm = ht->buckets[key];
 	pthread_mutex_lock(&(hm->mutex));
 
@@ -132,7 +132,6 @@ node* hash_delete(void *value, hash_t* ht) {
 	n->prev = NULL;
 	hm->elm_cnt--;
 	ht->tot_cnt--;
-	ht->int_cnt--;
 	return n;
 }
 

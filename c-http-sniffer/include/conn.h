@@ -6,7 +6,7 @@
 
 #include "attr.h"
 
-int conn_hash_fn(Attr* a);
+u_int32_t conn_hash_fn(Attr* a);
 int addr_compare(Attr* a1, Attr* a2);
 
 #endif

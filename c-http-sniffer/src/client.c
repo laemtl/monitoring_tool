@@ -3,10 +3,13 @@
 #include "data.h";
 #include <inttypes.h>
 
-int client_hash_fn(Attr* c) {
+u_int32_t client_hash_fn(Attr* a) {
+    if(a == NULL) return;
+
     Data* data = {0};
 	get_data(&data);
-    return ((((Addr*)c->elem)->port & 0xff) | ((((Addr*)c->elem)->ip & 0xff) << 8)) % data->client_ht.size;
+
+    return *(u_int32_t*)(a->elem) % data->client_ht.size;
 }
 
 int ip_compare(Attr* c1, Attr* c2) {
@@ -20,7 +23,7 @@ void init_client(Data* data) {
 
 void add_client(u_int32_t saddr, Data* data) {
     u_int32_t* addr = CALLOC(u_int32_t, 1);
-    addr = saddr;
+    *addr = saddr;
     add_attr(addr, &(data->client_ht));
 }
 
