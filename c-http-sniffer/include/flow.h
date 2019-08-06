@@ -114,7 +114,7 @@ flow_t* flow_hash_new(flow_s s);		    /* Create a new record in hash table accor
 flow_t* flow_hash_delete(flow_t *f);	    /* Delete a flow record in hash table */
 flow_t* flow_hash_find(flow_s s);		    /* Try to find a flow record in hash table based on its socket */
 int flow_hash_add_packet(packet_t *packet);	/* Add a packet to one of the flow records in hash table */
-int flow_hash_clear(void);	                /* Clear all records of flow hash table */
+int flow_hash_clear(void* data);	                /* Clear all records of flow hash table */
 int flow_hash_size(void);	                /* Size of flow hash table */
 int flow_hash_fcnt(void);	                /* Number of flows online */
 int flow_hash_scnt(void);	                /* Count of hash slots consumed */

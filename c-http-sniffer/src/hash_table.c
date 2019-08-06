@@ -18,7 +18,7 @@
 #include "hash_table.h"
 
 /* Initiate the hash table with no elems */
-int hash_init(hash_t* ht, int (*hash_fn)(void*, void*), int (*compare_fn)(void*, void*), int (*update_fn)(void*, void*)) {
+int hash_init(hash_t* ht, int (*hash_fn)(void*, void*), int (*compare_fn)(void*, void*), void (*update_fn)(void*, void*), void (*free_fn)(void*)) {
 	int ret, i;
 	if(ht == NULL) return 1;
 
@@ -40,12 +40,10 @@ int hash_init(hash_t* ht, int (*hash_fn)(void*, void*), int (*compare_fn)(void*,
 	ht->hash_fn = hash_fn;
     ht->compare_fn = compare_fn;
     ht->update_fn = update_fn;
-
-	tl_init(&(ht->tl));
+	ht->free_fn = free_fn;
 
 	return 0;
 }
-
 
 /* Create a new record in hash table */
 node* hash_new(void *value, hash_t* ht) {
@@ -85,6 +83,7 @@ node* hash_find(void *value, hash_t* ht) {
 	node	*e = NULL;
 
 	u_int32_t key = ht->hash_fn(value);
+	
 	hm = ht->buckets[key];
 	pthread_mutex_lock(&(hm->mutex));
 
@@ -141,17 +140,15 @@ node* hash_delete(void *value, hash_t* ht) {
  * Otherwise, make a new record and add the value to it.
  */
 
-int hash_add(void *value, hash_t* ht) {
+int hash_add(void* value, hash_t* ht) {
 	if(ht == NULL || value == NULL) return 1;
 		
 	node *e = NULL;
-
 	e = hash_find(value, ht);
 	if(e != NULL) {
-		free(value);	
+		ht->free_fn(value);	
 		ht->update_fn(e->value, ht);
 	} else {
-		Attr* attr = (Attr*)value;
 		e = hash_new(value, ht);
 		ht->update_fn(e->value, ht);
 	}
@@ -165,7 +162,6 @@ int hash_clear(hash_t* ht) {
 	}
 
 	int i;
-	
 	for(i=0; i<ht->size; i++){
 		pthread_mutex_lock(&(ht->buckets[i]->mutex));
 	}
@@ -177,7 +173,7 @@ int hash_clear(hash_t* ht) {
 		while(ht->buckets[i]->first != NULL ){
 			elem = ht->buckets[i]->first;
 			ht->buckets[i]->first = ht->buckets[i]->first->next;
-			free(elem->value);
+			ht->free_fn(elem->value);
 			free(elem);
 			ht->buckets[i]->elm_cnt--;
 		}
@@ -190,6 +186,16 @@ int hash_clear(hash_t* ht) {
 	}
 
 	return 0;
+}
+
+void hash_reset(hash_t* ht) {
+    int i;
+	for(i=0; i<ht->size; i++){
+		free(ht->buckets[i]);
+	}
+	free(ht->buckets);
+
+	tl_delete(&(ht->tl));
 }
 
 /* Return the size of hash table */

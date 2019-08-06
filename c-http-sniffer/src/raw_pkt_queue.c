@@ -2,6 +2,7 @@
 #include "raw_packet.h"
 
 void raw_packet_free(raw_pkt* p) {
+    free(p->raw);
     free(p);
 }
 

@@ -181,11 +181,11 @@ flow_hash_add_packet(packet_t *packet)
 
 /* Clear the flow hash table thoroughly */
 int 
-flow_hash_clear(void)
+flow_hash_clear(void* d)
 {
-	Data* data = {0};
-	get_data(&data);
-	int i = 0;
+	Data* data = (Data*)d;
+
+	int i;
 	for(i=0; i<HASH_SIZE; i++){
 		pthread_mutex_lock(&(data->flow_hash_table[i]->mutex));
 	}
@@ -207,6 +207,16 @@ flow_hash_clear(void)
 		pthread_mutex_unlock(&(data->flow_hash_table[i]->mutex));
 	}
 	return 0;
+}
+
+/* Initiate the flow hash table with no flows */
+void 
+flow_hash_reset(Data* data)
+{
+	int i;
+	for(i=0; i<HASH_SIZE; i++){
+		free(data->flow_hash_table[i]);
+	}
 }
 
 /* Return the size of hash table */

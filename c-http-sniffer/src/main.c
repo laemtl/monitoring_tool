@@ -296,7 +296,6 @@ process_flow_queue(Data* data){
 			flow_extract_http(flow, TRUE);
 			extract_data(flow);
 			flow_free(flow);
-
 			continue;
 		} else {
 			nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
@@ -316,12 +315,12 @@ scrubbing_flow_htbl(Data* data){
 
 	while(1){
 		sleep(10);
-		/*if (data->status == 1){*/
+		if (data->status == 1){
 			num = flow_scrubber(60*10);	// flow timeout in seconds
-		/*} else if (data->status == -1){
+		} else if (data->status == -1){
 			num = flow_scrubber(-1); // cleanse all flows
 			break;
-		}*/
+		}
 	}
 	pthread_exit(NULL);
 }
@@ -351,7 +350,7 @@ capture_main(void* p){
 	//extern int GP_CAP_FIN;
 	
 	if ( livemode==1 ) {
-		cap = pcap_open_live(interface, 65535, 0, -1, errbuf);
+		cap = pcap_open_live(interface, 65535, 0, 1000, errbuf);
 	} else {
 		cap = pcap_open_offline(interface, errbuf);
 	}
@@ -418,7 +417,7 @@ void start_analysis(char* ipaddress, Data* data) {
 	/* Initialization of packet and flow data structures */
 	
 	packet_queue_init((void*)data);
-	flow_init((void*) data);
+	flow_init((void*)data);
 	data->status = 1;
 
 	/* Start packet receiving thread */
@@ -449,6 +448,7 @@ void start_analysis(char* ipaddress, Data* data) {
 	pthread_join(job_flow_q, &thread_result);
 	pthread_join(job_scrb_htbl, &thread_result);
 	pthread_join(job_pkt, &thread_result);
+	
 #if DEBUGGING == 1
 	pthread_join(job_debug_p, &thread_result);
 #endif
@@ -456,11 +456,15 @@ void start_analysis(char* ipaddress, Data* data) {
 	time(&end);
 	printf("Time elapsed: %d s\n", (int)(end - start));
 
-	//if(data == NULL) printf("Data is NULL \n");	
-	free(data);
-	data = NULL;
+	//if(data == NULL) printf("Data is NULL \n");
+	
+	flow_hash_clear(data);
+	flow_hash_reset(data);
+	delete_data(data);
+	//data = NULL;
+
 	free(param);
-	param = NULL;
+	//param = NULL;
 }
 
 void sigintHandler(int sig_num) { 
@@ -479,8 +483,8 @@ void sigintHandler(int sig_num) {
 	printf("flow_rsp: %d \n", flow_rsp);
 
 	print_conn_tl(&(data->conn_ht.tl));
-	print_client_tl(&(data->client_ht.tl));
-	print_path_tl(&(data->path_ht.tl));
+	//print_client_tl(&(data->client_ht.tl));
+	//print_path_tl(&(data->path_ht.tl));
 	exit(0);
 } 
 
@@ -493,6 +497,7 @@ int main(int argc, char *argv[]){
 	int opt;
 
 	signal(SIGINT, sigintHandler);
+	printf("My process ID : %d\n", getpid());
 
    	// Parse arguments
 	while((opt = getopt(argc, argv, ":i:f:o:p:h")) != -1){

@@ -129,7 +129,7 @@ export default {
                 element: document.querySelector(".chart_container.ref" + this.ucid + " .chart"),
                 width: "360",
                 height: "180",
-                renderer: "line",
+                renderer: this.graph.stat.type,
                 min: 0,
                 max: this.graph.stat.max,
                 series: this.getSeriesConfig()
@@ -186,11 +186,13 @@ export default {
         /* Insert received datapoints into the chart */
         insertDatapoints(messages, chart) {
             for (let i = 0; i < messages.length; i++) {
-                console.log(messages);
+                //console.log(messages);
 
                 var params = {};
                 //for (var j = 0; j < this.graph.netInt.length; j++) {
-                params.Average = messages[i].avg;
+                if(typeof messages[i].min !== 'undefined') {
+                    params.Average = messages[i].avg;
+                }
 
                 if(typeof messages[i].min !== 'undefined') {
                     params.Min = messages[i].min;
@@ -198,6 +200,19 @@ export default {
 
                 if(typeof messages[i].max !== 'undefined') {
                     params.Max = messages[i].max;
+                }
+
+                if(typeof messages[i].cfreq !== 'undefined') {
+                    for (var j = 0; j < messages[i].cfreq.length; j++) {
+                        /*if(this.graph.id == "client") {
+                            console.log("--");
+                            console.log(messages[i].cfreq[j].name);
+                            console.log(messages[i].cfreq[j].freq);
+                            console.log("--");
+                        }*/
+                        
+                        params[messages[i].cfreq[j].name] = messages[i].cfreq[j].freq;
+                    }
                 }
 
                 //}
@@ -229,6 +244,7 @@ export default {
             }
         },
         processMessage(message) {
+            //console.log(message.data);
             //if(this.graph.id == "reqRate") console.log(message);
             /* Check if displayed values have to be updated */
             //this.updateDisplayedValues();

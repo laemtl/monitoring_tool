@@ -42,22 +42,26 @@ export default {
         var stats = {};
         stats["rst"] = { 
           label: "Request service time",
+          type: "line",
           active: true,
-          max: 1
+          max: 0.8
         };
         stats["reqRate"] = { 
           label: "Request rate",
+          type: "line",
           active: true,
-          max: 2000,
+          max: 40,
           from: { ip: null, port: null } 
         };
         stats["errRate"] = { 
           label: "Error rate",
+          type: "line",
           active: true,
-          max: 1000
+          max: 1.1
         };
         stats["tp"] = { 
           label: "Throughput",
+          type: "line",
           active: true,
           max: 5,
           from: { ip: null, port: null },
@@ -65,14 +69,41 @@ export default {
         };
         stats["connRate"] = { 
           label: "Connection rate",
+          type: "line",
           active: true,
-          max: 10
+          max: 2
         };
-        stats["path"] = { 
-          label: "Paths",
+        stats["client"] = { 
+          label: "Clients",
+          type: "area",
           active: true,
-          max: 10
+          max: 1.1
+        };        
+        stats["req_path"] = { 
+          label: "Request paths",
+          type: "area",
+          active: true,
+          max: 1.1
         };
+        stats["req_method"] = { 
+          label: "Request methods",
+          type: "area",
+          active: true,
+          max: 1.1
+        };
+        stats["req_type"] = { 
+          label: "Request type",
+          type: "area",
+          active: true,
+          max: 1.1
+        };
+        stats["rsp_status"] = { 
+          label: "Response status",
+          type: "area",
+          active: true,
+          max: 1.1
+        };
+
         return stats;
       }
     }
@@ -120,8 +151,11 @@ export default {
       this.ws.onmessage = function (message) {
         try {
           var data = JSON.parse(message.data);
-          
+                    
           for (var id in el.activeStats) {
+            //console.log(id);
+            //console.log(data[id]);
+
             if(typeof data[id] !== 'undefined') {
               configBus.$emit(id, {
                 netInt: data.netInt, 

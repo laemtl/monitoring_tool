@@ -96,15 +96,97 @@ int send_data(Result* result) {
 	msg.has_connratemax = 1;
 	msg.connratemax = result->conn_rate_max;
 
-	msg.has_pathavg = 1;
-	msg.pathavg = result->path_avg;
+	/* */
+	Analysis__Conn **conns;
+	int c1 = result->conn_tl.count;
+	conns = MALLOC(Analysis__Conn*, c1);
 
-	msg.has_pathmin = 1;
-	msg.pathmin = result->path_min;
+	int i;
+	for(i = 0; i < c1; i++) {
+		conns[i] = MALLOC(Analysis__Conn, 1);
+		analysis__conn__init(conns[i]);
+		conns[i]->ip = ((Addr*)result->conn_tl.list[i])->ip;
+		conns[i]->port = ((Addr*)result->conn_tl.list[i])->port;;
+	} 
+	msg.n_conns = c1;
+	msg.conns = conns;
 
-	msg.has_pathmax = 1;
-	msg.pathmax = result->path_max;
-		
+	/* */
+	Analysis__Freq **client;
+	int c2 = result->client.count;
+	client = MALLOC(Analysis__Freq*, c2); 
+	
+	int j;
+	for(j = 0; j < c2; j++) {
+		client[j] = MALLOC(Analysis__Freq, 1);
+		analysis__freq__init(client[j]);
+		client[j]->name = result->client.list[j].name;
+		client[j]->freq = result->client.list[j].c_freq;
+	}
+	msg.n_client = c2;
+	msg.client = client;
+
+	/* */
+	Analysis__Freq **req_path;
+	int c3 = result->req_path.count;
+	req_path = MALLOC(Analysis__Freq*, c3); 
+	
+	int k;
+	for(k = 0; k < c3; k++) {
+		req_path[k] = MALLOC(Analysis__Freq, 1);
+		analysis__freq__init(req_path[k]);
+		req_path[k]->name = result->req_path.list[k].name;
+		req_path[k]->freq = result->req_path.list[k].c_freq;
+	}
+	msg.n_req_path = c3;
+	msg.req_path = req_path;
+
+	/* */
+	Analysis__Freq **req_method;
+	int c4 = result->req_method.count;
+	req_method = MALLOC(Analysis__Freq*, c4); 
+	
+	int l;
+	for(l = 0; l < c4; l++) {
+		req_method[l] = MALLOC(Analysis__Freq, 1);
+		analysis__freq__init(req_method[l]);
+		req_method[l]->name = result->req_method.list[l].name;
+		req_method[l]->freq = result->req_method.list[l].c_freq;
+	}
+	msg.n_req_method = c4;
+	msg.req_method = req_method;
+
+	/* */
+	Analysis__Freq **req_type;
+	int c5 = result->req_type.count;
+	req_type = MALLOC(Analysis__Freq*, c5); 
+	
+	int m;
+	for(m = 0; m < c5; m++) {
+		req_type[m] = MALLOC(Analysis__Freq, 1);
+		analysis__freq__init(req_type[m]);
+		req_type[m]->name = result->req_type.list[m].name;
+		req_type[m]->freq = result->req_type.list[m].c_freq;
+	}
+	msg.n_req_type = c5;
+	msg.req_type = req_type;
+
+	/* */
+	Analysis__Freq **rsp_status;
+	int c6 = result->rsp_status.count;
+	rsp_status = MALLOC(Analysis__Freq*, c6); 
+	
+	int n;
+	for(n = 0; n < c6; n++) {
+		rsp_status[n] = MALLOC(Analysis__Freq, 1);
+		analysis__freq__init(rsp_status[n]);
+		rsp_status[n]->name = result->rsp_status.list[n].name;
+		rsp_status[n]->freq = result->rsp_status.list[n].c_freq;
+	}
+	msg.n_rsp_status = c6;
+	msg.rsp_status = rsp_status;
+
+
 	msg_len = analysis__data__get_packed_size(&msg);
 	
 	// Max size of varint_len is 10 bytes
@@ -124,6 +206,25 @@ int send_data(Result* result) {
 	} 
 
 	free(buf); // Free the allocated serialized buffer
+	
+	for(i = 0; i < c1; i++) free(conns[i]); 
+	free(conns);
+
+	for(j = 0; j < c2; j++) free(client[j]);
+	free(client);
+	
+	for(k = 0; k < c3; k++) free(req_path[k]);
+	free(req_path);
+	
+	for(l = 0; l < c4; l++) free(req_method[l]);
+	free(req_method);
+	
+	for(m = 0; m < c5; m++) free(req_type[m]);
+	free(req_type);
+	
+	for(n = 0; n < c6; n++) free(rsp_status[n]);
+	free(rsp_status);
+ 	
 	return 0;
 }
 
@@ -205,7 +306,6 @@ void* connection_handler(int *socket) {
 }*/
 
 void onExit(int signum) {
-	printf("\nReady to exit\n");
 	stop_server();
 
 	printf("pak: %d \n", pak);

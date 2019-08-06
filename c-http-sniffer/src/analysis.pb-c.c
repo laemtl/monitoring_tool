@@ -97,6 +97,96 @@ void   analysis__data__free_unpacked
   assert(message->base.descriptor == &analysis__data__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
+void   analysis__conn__init
+                     (Analysis__Conn         *message)
+{
+  static const Analysis__Conn init_value = ANALYSIS__CONN__INIT;
+  *message = init_value;
+}
+size_t analysis__conn__get_packed_size
+                     (const Analysis__Conn *message)
+{
+  assert(message->base.descriptor == &analysis__conn__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
+}
+size_t analysis__conn__pack
+                     (const Analysis__Conn *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &analysis__conn__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
+}
+size_t analysis__conn__pack_to_buffer
+                     (const Analysis__Conn *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &analysis__conn__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
+}
+Analysis__Conn *
+       analysis__conn__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (Analysis__Conn *)
+     protobuf_c_message_unpack (&analysis__conn__descriptor,
+                                allocator, len, data);
+}
+void   analysis__conn__free_unpacked
+                     (Analysis__Conn *message,
+                      ProtobufCAllocator *allocator)
+{
+  if(!message)
+    return;
+  assert(message->base.descriptor == &analysis__conn__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
+}
+void   analysis__freq__init
+                     (Analysis__Freq         *message)
+{
+  static const Analysis__Freq init_value = ANALYSIS__FREQ__INIT;
+  *message = init_value;
+}
+size_t analysis__freq__get_packed_size
+                     (const Analysis__Freq *message)
+{
+  assert(message->base.descriptor == &analysis__freq__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
+}
+size_t analysis__freq__pack
+                     (const Analysis__Freq *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &analysis__freq__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
+}
+size_t analysis__freq__pack_to_buffer
+                     (const Analysis__Freq *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &analysis__freq__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
+}
+Analysis__Freq *
+       analysis__freq__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (Analysis__Freq *)
+     protobuf_c_message_unpack (&analysis__freq__descriptor,
+                                allocator, len, data);
+}
+void   analysis__freq__free_unpacked
+                     (Analysis__Freq *message,
+                      ProtobufCAllocator *allocator)
+{
+  if(!message)
+    return;
+  assert(message->base.descriptor == &analysis__freq__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
+}
 static const ProtobufCFieldDescriptor analysis__init__field_descriptors[3] =
 {
   {
@@ -161,7 +251,7 @@ const ProtobufCMessageDescriptor analysis__init__descriptor =
   (ProtobufCMessageInit) analysis__init__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor analysis__data__field_descriptors[21] =
+static const ProtobufCFieldDescriptor analysis__data__field_descriptors[24] =
 {
   {
     "time",
@@ -380,58 +470,97 @@ static const ProtobufCFieldDescriptor analysis__data__field_descriptors[21] =
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "pathAvg",
+    "conns",
     19,
-    PROTOBUF_C_LABEL_OPTIONAL,
-    PROTOBUF_C_TYPE_DOUBLE,
-    offsetof(Analysis__Data, has_pathavg),
-    offsetof(Analysis__Data, pathavg),
-    NULL,
+    PROTOBUF_C_LABEL_REPEATED,
+    PROTOBUF_C_TYPE_MESSAGE,
+    offsetof(Analysis__Data, n_conns),
+    offsetof(Analysis__Data, conns),
+    &analysis__conn__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "pathMin",
+    "client",
     20,
-    PROTOBUF_C_LABEL_OPTIONAL,
-    PROTOBUF_C_TYPE_DOUBLE,
-    offsetof(Analysis__Data, has_pathmin),
-    offsetof(Analysis__Data, pathmin),
-    NULL,
+    PROTOBUF_C_LABEL_REPEATED,
+    PROTOBUF_C_TYPE_MESSAGE,
+    offsetof(Analysis__Data, n_client),
+    offsetof(Analysis__Data, client),
+    &analysis__freq__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "pathMax",
+    "req_path",
     21,
-    PROTOBUF_C_LABEL_OPTIONAL,
-    PROTOBUF_C_TYPE_DOUBLE,
-    offsetof(Analysis__Data, has_pathmax),
-    offsetof(Analysis__Data, pathmax),
+    PROTOBUF_C_LABEL_REPEATED,
+    PROTOBUF_C_TYPE_MESSAGE,
+    offsetof(Analysis__Data, n_req_path),
+    offsetof(Analysis__Data, req_path),
+    &analysis__freq__descriptor,
     NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "req_method",
+    22,
+    PROTOBUF_C_LABEL_REPEATED,
+    PROTOBUF_C_TYPE_MESSAGE,
+    offsetof(Analysis__Data, n_req_method),
+    offsetof(Analysis__Data, req_method),
+    &analysis__freq__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "req_type",
+    23,
+    PROTOBUF_C_LABEL_REPEATED,
+    PROTOBUF_C_TYPE_MESSAGE,
+    offsetof(Analysis__Data, n_req_type),
+    offsetof(Analysis__Data, req_type),
+    &analysis__freq__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "rsp_status",
+    24,
+    PROTOBUF_C_LABEL_REPEATED,
+    PROTOBUF_C_TYPE_MESSAGE,
+    offsetof(Analysis__Data, n_rsp_status),
+    offsetof(Analysis__Data, rsp_status),
+    &analysis__freq__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
 static const unsigned analysis__data__field_indices_by_name[] = {
+  19,   /* field[19] = client */
   15,   /* field[15] = connRate */
   17,   /* field[17] = connRateMax */
   16,   /* field[16] = connRateMin */
+  18,   /* field[18] = conns */
   7,   /* field[7] = errRate */
   10,   /* field[10] = errRateClient */
   9,   /* field[9] = errRateMax */
   8,   /* field[8] = errRateMin */
   1,   /* field[1] = netInt */
-  18,   /* field[18] = pathAvg */
-  20,   /* field[20] = pathMax */
-  19,   /* field[19] = pathMin */
   11,   /* field[11] = reqRate */
   14,   /* field[14] = reqRateClient */
   13,   /* field[13] = reqRateMax */
   12,   /* field[12] = reqRateMin */
+  21,   /* field[21] = req_method */
+  20,   /* field[20] = req_path */
+  22,   /* field[22] = req_type */
+  23,   /* field[23] = rsp_status */
   2,   /* field[2] = rstAvg */
   5,   /* field[5] = rstClient */
   4,   /* field[4] = rstMax */
@@ -442,7 +571,7 @@ static const unsigned analysis__data__field_indices_by_name[] = {
 static const ProtobufCIntRange analysis__data__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 0, 21 }
+  { 0, 24 }
 };
 const ProtobufCMessageDescriptor analysis__data__descriptor =
 {
@@ -452,10 +581,112 @@ const ProtobufCMessageDescriptor analysis__data__descriptor =
   "Analysis__Data",
   "analysis",
   sizeof(Analysis__Data),
-  21,
+  24,
   analysis__data__field_descriptors,
   analysis__data__field_indices_by_name,
   1,  analysis__data__number_ranges,
   (ProtobufCMessageInit) analysis__data__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
+static const ProtobufCFieldDescriptor analysis__conn__field_descriptors[2] =
+{
+  {
+    "ip",
+    1,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_UINT32,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__Conn, ip),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "port",
+    2,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_UINT32,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__Conn, port),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
+static const unsigned analysis__conn__field_indices_by_name[] = {
+  0,   /* field[0] = ip */
+  1,   /* field[1] = port */
+};
+static const ProtobufCIntRange analysis__conn__number_ranges[1 + 1] =
+{
+  { 1, 0 },
+  { 0, 2 }
+};
+const ProtobufCMessageDescriptor analysis__conn__descriptor =
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "analysis.Conn",
+  "Conn",
+  "Analysis__Conn",
+  "analysis",
+  sizeof(Analysis__Conn),
+  2,
+  analysis__conn__field_descriptors,
+  analysis__conn__field_indices_by_name,
+  1,  analysis__conn__number_ranges,
+  (ProtobufCMessageInit) analysis__conn__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
+static const ProtobufCFieldDescriptor analysis__freq__field_descriptors[2] =
+{
+  {
+    "name",
+    1,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_STRING,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__Freq, name),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "freq",
+    2,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_DOUBLE,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__Freq, freq),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
+static const unsigned analysis__freq__field_indices_by_name[] = {
+  1,   /* field[1] = freq */
+  0,   /* field[0] = name */
+};
+static const ProtobufCIntRange analysis__freq__number_ranges[1 + 1] =
+{
+  { 1, 0 },
+  { 0, 2 }
+};
+const ProtobufCMessageDescriptor analysis__freq__descriptor =
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "analysis.Freq",
+  "Freq",
+  "Analysis__Freq",
+  "analysis",
+  sizeof(Analysis__Freq),
+  2,
+  analysis__freq__field_descriptors,
+  analysis__freq__field_indices_by_name,
+  1,  analysis__freq__number_ranges,
+  (ProtobufCMessageInit) analysis__freq__init,
   NULL,NULL,NULL    /* reserved[123] */
 };

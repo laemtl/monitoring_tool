@@ -33,7 +33,21 @@ message Data {
     optional double connRateMin = 17;
     optional double connRateMax = 18;
     
-    optional double pathAvg = 19;
-    optional double pathMin = 20;
-    optional double pathMax = 21;
- };
+    repeated Conn conns = 19;
+
+    repeated Freq client = 20;
+    repeated Freq req_path = 21;
+    repeated Freq req_method = 22;
+    repeated Freq req_type = 23;
+    repeated Freq rsp_status = 24;
+};
+
+message Conn {
+    required uint32 ip = 1;
+    required uint32 port = 2; 
+}
+
+message Freq {
+    required string name = 1;
+    required double freq = 2; 
+}

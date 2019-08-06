@@ -21,6 +21,7 @@ struct _hash_mb_t2 {
 	int		elm_cnt;
 };
 
+// TODO : add mutex
 struct _node {
 	node		*next;
 	node		*prev;
@@ -46,9 +47,10 @@ struct _hash_t {
     int (*hash_fn)(void*);
     int (*compare_fn)(void*, void*);
     void (*update_fn)(void*, void*);
+    void (*free_fn)(void*);
 };
 
-int hash_init(hash_t* ht, int (*hash_fn)(void*, void*), int (*compare_fn)(void*, void*), int (*update_fn)(void*, void*));
+int hash_init(hash_t* ht, int (*hash_fn)(void*, void*), int (*compare_fn)(void*, void*), void (*update_fn)(void*, void*), void (*free_fn)(void*));
 node* hash_new(void *value, hash_t* ht);
 node* hash_find(void *value, hash_t* ht);
 node* hash_delete(void *value, hash_t* ht);

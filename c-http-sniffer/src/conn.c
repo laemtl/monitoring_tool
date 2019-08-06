@@ -14,10 +14,6 @@ int addr_compare(Attr* c1, Attr* c2) {
     return 1;
 }
 
-void init_conn(Data* data) {
-    hash_init(&(data->conn_ht), conn_hash_fn, addr_compare, update_attr);
-}
-
 void add_conn(u_int32_t saddr, u_int16_t sport, Data* data) {
     Addr* addr = CALLOC(Addr, 1);
 	addr->ip = saddr;
@@ -31,4 +27,11 @@ BOOL is_conn_ht(hash_t* ht) {
 	
 	if(ht == &(data->conn_ht)) return TRUE;
 	return FALSE;
+}
+
+char* addr_to_str(u_int32_t ip) {
+	int n = sizeof("aaa.bbb.ccc.ddd") + 1;
+	char *saddr = CALLOC(char, n);
+	strncpy(saddr, ip_ntos(ip), n);
+	return saddr;
 }

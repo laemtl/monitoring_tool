@@ -17,6 +17,8 @@ PROTOBUF_C__BEGIN_DECLS
 
 typedef struct _Analysis__Init Analysis__Init;
 typedef struct _Analysis__Data Analysis__Data;
+typedef struct _Analysis__Conn Analysis__Conn;
+typedef struct _Analysis__Freq Analysis__Freq;
 
 
 /* --- enums --- */
@@ -74,16 +76,44 @@ struct  _Analysis__Data
   double connratemin;
   protobuf_c_boolean has_connratemax;
   double connratemax;
-  protobuf_c_boolean has_pathavg;
-  double pathavg;
-  protobuf_c_boolean has_pathmin;
-  double pathmin;
-  protobuf_c_boolean has_pathmax;
-  double pathmax;
+  size_t n_conns;
+  Analysis__Conn **conns;
+  size_t n_client;
+  Analysis__Freq **client;
+  size_t n_req_path;
+  Analysis__Freq **req_path;
+  size_t n_req_method;
+  Analysis__Freq **req_method;
+  size_t n_req_type;
+  Analysis__Freq **req_type;
+  size_t n_rsp_status;
+  Analysis__Freq **rsp_status;
 };
 #define ANALYSIS__DATA__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&analysis__data__descriptor) \
-    , 0, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+    , 0, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,NULL, 0,NULL, 0,NULL, 0,NULL, 0,NULL, 0,NULL }
+
+
+struct  _Analysis__Conn
+{
+  ProtobufCMessage base;
+  uint32_t ip;
+  uint32_t port;
+};
+#define ANALYSIS__CONN__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&analysis__conn__descriptor) \
+    , 0, 0 }
+
+
+struct  _Analysis__Freq
+{
+  ProtobufCMessage base;
+  char *name;
+  double freq;
+};
+#define ANALYSIS__FREQ__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&analysis__freq__descriptor) \
+    , NULL, 0 }
 
 
 /* Analysis__Init methods */
@@ -124,6 +154,44 @@ Analysis__Data *
 void   analysis__data__free_unpacked
                      (Analysis__Data *message,
                       ProtobufCAllocator *allocator);
+/* Analysis__Conn methods */
+void   analysis__conn__init
+                     (Analysis__Conn         *message);
+size_t analysis__conn__get_packed_size
+                     (const Analysis__Conn   *message);
+size_t analysis__conn__pack
+                     (const Analysis__Conn   *message,
+                      uint8_t             *out);
+size_t analysis__conn__pack_to_buffer
+                     (const Analysis__Conn   *message,
+                      ProtobufCBuffer     *buffer);
+Analysis__Conn *
+       analysis__conn__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data);
+void   analysis__conn__free_unpacked
+                     (Analysis__Conn *message,
+                      ProtobufCAllocator *allocator);
+/* Analysis__Freq methods */
+void   analysis__freq__init
+                     (Analysis__Freq         *message);
+size_t analysis__freq__get_packed_size
+                     (const Analysis__Freq   *message);
+size_t analysis__freq__pack
+                     (const Analysis__Freq   *message,
+                      uint8_t             *out);
+size_t analysis__freq__pack_to_buffer
+                     (const Analysis__Freq   *message,
+                      ProtobufCBuffer     *buffer);
+Analysis__Freq *
+       analysis__freq__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data);
+void   analysis__freq__free_unpacked
+                     (Analysis__Freq *message,
+                      ProtobufCAllocator *allocator);
 /* --- per-message closures --- */
 
 typedef void (*Analysis__Init_Closure)
@@ -131,6 +199,12 @@ typedef void (*Analysis__Init_Closure)
                   void *closure_data);
 typedef void (*Analysis__Data_Closure)
                  (const Analysis__Data *message,
+                  void *closure_data);
+typedef void (*Analysis__Conn_Closure)
+                 (const Analysis__Conn *message,
+                  void *closure_data);
+typedef void (*Analysis__Freq_Closure)
+                 (const Analysis__Freq *message,
                   void *closure_data);
 
 /* --- services --- */
@@ -140,6 +214,8 @@ typedef void (*Analysis__Data_Closure)
 
 extern const ProtobufCMessageDescriptor analysis__init__descriptor;
 extern const ProtobufCMessageDescriptor analysis__data__descriptor;
+extern const ProtobufCMessageDescriptor analysis__conn__descriptor;
+extern const ProtobufCMessageDescriptor analysis__freq__descriptor;
 
 PROTOBUF_C__END_DECLS
 

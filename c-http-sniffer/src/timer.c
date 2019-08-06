@@ -19,11 +19,12 @@
 #define CLOCKID CLOCK_REALTIME
 #define SIG SIGRTMIN
 
-void stop_analysis() {
+void stop_analysis(int tid) {
 	Data* data = {0};
 	get_data(&data);
 
 	data->status = -1;
+	timer_delete(tid);
 	pthread_exit(NULL);
 }
 
@@ -37,7 +38,7 @@ static pid_t gettid(void) {
 	return syscall(SYS_gettid);
 }
 
-void create_timer(long start, long interval, int* status, void (*callback) (void)) {
+void create_timer(long start, long interval, int* status, void (*callback) (int)) {
 	sigset_t mask;
 	int sig;
 	timer_t timerid;
@@ -97,8 +98,8 @@ void create_timer(long start, long interval, int* status, void (*callback) (void
 			// printf("signal: %d", sig);
 			continue;
 		}
-			
-		callback();
+		
+		callback(timerid);
 	}
 }
 
@@ -113,14 +114,11 @@ void start_timer(Data* data) {
     pthread_t timer_duration;
     if(data->duration > 0) {	    
 	    pthread_create(&timer_duration, NULL, (void*)start_duration_timer, data);
+		pthread_detach(timer_duration);
     }
 
 	// start an interval timer wich fires every seconds to compute rates
 	start_interval_timer(1, &(data->status));
-	
-    if(data->duration > 0) {
-        pthread_join(timer_duration, NULL);
-    }
 }
 
 void start_interval_timer(uint32_t interval, int* status) {

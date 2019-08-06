@@ -7,14 +7,12 @@
 #include <stdlib.h>
 #include "flow.h"
 #include "hash_table.h"
-#include "client.h"
 #include "queue.h"
-#include "top_list.h"
+#include "client.h"
 
 #ifndef DEBUGGING
 #define DEBUGGING 2 
 #endif
-
 
 #define EPSILON	1e-7
 #define CLOSE(a,b) (fabs(a - b)<EPSILON)
@@ -46,6 +44,8 @@ typedef struct _data Data;
 struct _data {
     BOOL server_mode;
     int client_sock;
+
+    pthread_mutex_t lock;
     
     // 0: started, 1: running, -1: stopped
     int status;
@@ -56,6 +56,11 @@ struct _data {
     uint32_t stamp;
     
     Addr destination;
+    int req_tot;
+    int rsp_tot;
+    int rsp_int_tot;
+    int rsp_sec_tot;
+    int flow_tot;
     
     Metric rst;
     Metric err_rate;
@@ -86,36 +91,11 @@ struct _data {
     int flow_cnt;	/* flows live in hash table */
 
     hash_t client_ht;    
-    hash_t path_ht;
-};
-
-
-typedef struct _result Result;
-struct _result {
-    const char* interface;
-    int client_sock;
-
-	double rst_avg;
-    double rst_min;
-    double rst_max;
-
-	double err_rate;
-    double err_rate_min;
-    double err_rate_max;
-
-    double req_rate;
-    double req_rate_min;
-    double req_rate_max;
+    hash_t req_path_ht;
     
-    double tp;
-
-    double conn_rate;
-    double conn_rate_min;
-    double conn_rate_max;
-
-    double path_avg;
-    int path_min;
-    int path_max;
+    // TODO: lock
+    int req_type[41];
+    int rsp_status[599];
 };
 
 typedef struct _capt Capture;
@@ -131,6 +111,7 @@ void init_once_metric(Metric* metric);
 void reset_metric(Metric* metric);
 void reset(Data* data);
 Data* init_data();
+void delete_data();
 static void thread_key_setup();
 void thread_init(Data* d);
 void print_tid();
@@ -148,9 +129,9 @@ void update_metric_min(Metric* metric, double value);
 void update_metric_max(Metric* metric, double value);
 BOOL is_server_mode();
 void extract_data(flow_t *flow);
-Result* get_result(Result* result);
+Result* get_result();
 void process_rate(Data* data);
-void process_data();
+void process_data(int tid);
 void print_data(Result* result);
 
 #endif

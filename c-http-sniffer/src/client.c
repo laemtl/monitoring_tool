@@ -1,6 +1,4 @@
-#include "attr.h";
 #include "client.h";
-#include "data.h";
 #include <inttypes.h>
 
 u_int32_t client_hash_fn(Attr* a) {
@@ -17,8 +15,17 @@ int ip_compare(Attr* c1, Attr* c2) {
     return 1;
 }
 
-void init_client(Data* data) {
-    hash_init(&(data->client_ht), client_hash_fn, ip_compare, update_attr);
+void client_cfl_add(Addr* addr, int cnt, Result* r) {
+	Data* data = {0};
+	get_data(&data);
+	if(data->flow_tot <= 0) return;
+	
+	double freq = (double) cnt / data->flow_tot;
+   
+    if(freq > MIN_FREQ) {
+		char* c = addr_to_str(addr->ip);
+	    cfl_add(c, freq, &(r->client));
+	}
 }
 
 void add_client(u_int32_t saddr, Data* data) {
