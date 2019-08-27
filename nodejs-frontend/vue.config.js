@@ -2,6 +2,9 @@ const path = require("path");
 const webpack = require('webpack');
 
 module.exports = {
+  devServer: {
+    disableHostCheck: true
+  },
   outputDir: path.resolve(__dirname, "./dist"),
   chainWebpack: config => {
     config

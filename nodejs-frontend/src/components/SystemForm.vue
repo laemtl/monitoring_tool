@@ -83,6 +83,17 @@
                                     v-on:change="configChange(id)"
                                 ></v-switch>
 
+                                <v-layout v-if="id == 'client' && stat.active">
+                                    <v-flex md8>
+                                        <v-text-field class="pa-0 ma-0"
+                                        v-model="clientCnt"
+                                        :rules="timeRules"
+                                        validate-on-blur 
+                                        label="Clients #"
+                                        ></v-text-field>
+                                    </v-flex>    
+                                </v-layout>
+
                                 <v-layout v-if="stat.from && stat.active">
                                     <v-flex md8>
                                         <v-text-field class="pa-0 ma-0"
@@ -157,7 +168,7 @@
 
 <script>    
 const isIp = require('is-ip');
-const ipLength = 45, portLength = 5;
+const ipLength = 45, portLength = 5, clientCnt = 5;
 import { configBus } from '../main';
 
 export default {
@@ -172,6 +183,7 @@ export default {
         duration: null,
         ipLength: ipLength,
         portLength: portLength,
+        clientCnt: 5,
         //ipRules: [v => !!v && isIp(v) && v.length <= ipLength || 'Invalid IP'],
         //portRules: [v => !!v && !isNaN(v) && v.length > 0 && v.length <= portLength || 'Invalid port'],
    
@@ -180,7 +192,7 @@ export default {
             (v) => ((v === null || v.length === 0) || isIp(v) && v.length <= ipLength) || 'Invalid IP'
         ],
         portRules: [v => ((v === null || v.length === 0) || !!v && !isNaN(v) && v.length > 0 && v.length <= portLength) || 'Invalid port'],
-        timeRules: [v => !!v && !isNaN(v) && v.length > 0 && v > 0 || 'Invalid value'],
+        timeRules: [v => !!v && !isNaN(v) && v > 0 || 'Invalid value'],
         error: null
       }
     },
@@ -200,7 +212,8 @@ export default {
                 configBus.$emit('run', { 
                     interval: this.interval, 
                     duration: this.duration,
-                    netInt: this.netInt
+                    netInt: this.netInt,
+                    clientCnt: this.clientCnt
                 });
                 this.drawer = false;
             }

@@ -46,14 +46,14 @@ export default {
           active: true,
           max: 0.8
         };
-        stats["reqRate"] = { 
+        stats["req_rate"] = { 
           label: "Request rate",
           type: "line",
           active: true,
           max: 40,
           from: { ip: null, port: null } 
         };
-        stats["errRate"] = { 
+        stats["err_rate"] = { 
           label: "Error rate",
           type: "line",
           active: true,
@@ -67,7 +67,7 @@ export default {
           from: { ip: null, port: null },
           to: { ip: null, port: null }
         };
-        stats["connRate"] = { 
+        stats["conn_rate"] = { 
           label: "Connection rate",
           type: "line",
           active: true,
@@ -129,8 +129,8 @@ export default {
   },
   methods: {
     openSocketListeners() {
-      this.ws = new WebSocket('ws://bmj-cluster.cs.mcgill.ca:15480/ws/');
-      //this.ws = new WebSocket('ws://127.0.0.1:8081/ws/');
+      //this.ws = new WebSocket('ws://bmj-cluster.cs.mcgill.ca:15480/ws/');
+      this.ws = new WebSocket('ws://127.0.0.1:8081/ws/');
       var el = this;
 
       // event emmited when connected
@@ -151,10 +151,12 @@ export default {
       this.ws.onmessage = function (message) {
         try {
           var data = JSON.parse(message.data);
-                    
+          
+          console.log(data);
+
           for (var id in el.activeStats) {
-            //console.log(id);
-            //console.log(data[id]);
+            console.log(id);
+            console.log(data[id]);
 
             if(typeof data[id] !== 'undefined') {
               configBus.$emit(id, {
@@ -185,7 +187,7 @@ export default {
       this.interval = params.interval;
       this.status = 'is running';
       var duration = parseInt(params.duration, 10) * 1000;
-      
+
       /*var timer = accurateInterval(function(scheduledTime) {        
         el.closeSocketListeners();
         el.status = 'is stopped';
@@ -200,7 +202,8 @@ export default {
           type: "Init",
           net_int: params.netInt,
           interval: parseInt(params.interval),
-          duration: parseInt(params.duration)
+          duration: parseInt(params.duration),
+          clientCnt: parseInt(params.clientCnt)
         }));
       });
     });
