@@ -90,6 +90,8 @@ void req_path_cfl_add(char* req_path, int cnt, Result* r) {
 }
 
 void add_req_path(const char *uri, Data* data) {
+	if(!data->req_path_active && !data->req_method_active) return;
+
 	char* req_path = extract_req_path(uri);
 	add_attr(req_path, &(data->req_path_ht));
 }

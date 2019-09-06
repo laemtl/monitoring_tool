@@ -24,7 +24,8 @@ void stop_analysis(int tid) {
 	get_data(&data);
 
 	data->status = -1;
-	timer_delete(tid);
+
+	//timer_delete(tid);
 	pthread_exit(NULL);
 }
 

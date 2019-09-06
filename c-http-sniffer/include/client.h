@@ -16,6 +16,6 @@ struct _addr {
 
 u_int32_t client_hash_fn(Attr* a);
 int ip_compare(Attr* a1, Attr* a2);
-void client_cfl_add(Addr* addr, int cnt, Result* r);
+void client_cfl_add(u_int32_t* addr, int cnt, Result* r);
 
 #endif

@@ -30,8 +30,9 @@ void *check_calloc(unsigned long size)
 }
 
 char *ip_ntos(u_int32_t n){
-	static char buf[sizeof("aaa.bbb.ccc.ddd")];
-	memset(buf, '\0', 15);
+	char* buf = CALLOC(char, sizeof("aaa.bbb.ccc.ddd"));
+	//static char buf[sizeof("aaa.bbb.ccc.ddd")];
+	//memset(buf, '\0', 15);
 
 	sprintf(buf, "%d.%d.%d.%d",
 			(n & 0xff000000) >> 24,

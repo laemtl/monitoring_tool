@@ -83,7 +83,7 @@ node* hash_find(void *value, hash_t* ht) {
 	node	*e = NULL;
 
 	u_int32_t key = ht->hash_fn(value);
-	
+
 	hm = ht->buckets[key];
 	pthread_mutex_lock(&(hm->mutex));
 
@@ -195,7 +195,7 @@ void hash_reset(hash_t* ht) {
 	}
 	free(ht->buckets);
 
-	tl_delete(&(ht->tl));
+	//tl_delete(&(ht->tl));
 }
 
 /* Return the size of hash table */

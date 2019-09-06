@@ -93,14 +93,13 @@ void print_conn_tl(top_list* tl) {
     printf("Count : %d \n", tl->count);
     int i = 0;
     while (i < tl->count) {   
-        int n = sizeof("aaa.bbb.ccc.ddd") + 1;
-        char *saddr[n];
 		Attr* attr = (Attr*)(tl->list[i]);
 		Addr* addr = (Addr*)(attr->elem);
-        strncpy(saddr, ip_ntos(addr->ip), n);
-        saddr[n] = '\0';
+        char *saddr = ip_ntos(addr->ip);
 
         printf("IP: %s Port: %" PRIu16 "\n", saddr, addr->port);
+        free(saddr);
+
         i++;
     }
 }

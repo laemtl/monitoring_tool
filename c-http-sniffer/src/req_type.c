@@ -20,6 +20,8 @@ void req_type_cfl_add(int i, int cnt, Result* r) {
 
 // Atomic increment
 void add_req_type(http_mthd type, Data* data) {
+    if(!data->req_type_active) return;
+    
     int* cnt = &(data->req_type[type]);  
 	__atomic_fetch_add(cnt, 1, __ATOMIC_SEQ_CST);
 }

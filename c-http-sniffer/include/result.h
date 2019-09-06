@@ -27,7 +27,7 @@ struct _result {
     double conn_rate_min;
     double conn_rate_max;
     
-    top_list conn_tl;
+    //top_list conn_tl;
 
     cf_list client;
     cf_list req_path;

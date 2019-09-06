@@ -31,7 +31,7 @@ struct _dbl_metric {
 
 typedef struct _metric Metric;
 struct _metric {
-    int status;
+    BOOL active;
     int_metric subtotal;
     int_metric total;
     dbl_metric sum;
@@ -53,6 +53,12 @@ struct _data {
     uint32_t interval;
     uint32_t int_step;
     uint32_t duration;
+    //uint32_t topclient_cnt;
+
+    BOOL has_client_ip;
+    BOOL has_client_port;
+    Addr client;
+
     uint32_t stamp;
     
     Addr destination;
@@ -65,7 +71,9 @@ struct _data {
     Metric rst;
     Metric err_rate;
     Metric req_rate;
+    
     Metric tp;
+    Addr server;
 
     hash_t conn_ht;
     Metric conn_rate;
@@ -91,11 +99,18 @@ struct _data {
     int flow_cnt;	/* flows live in hash table */
 
     hash_t client_ht;    
+    BOOL client_active;
+    
     hash_t req_path_ht;
+    BOOL req_path_active;
+    BOOL req_method_active;
     
     // TODO: lock
     int req_type[41];
+    BOOL req_type_active;
+    
     int rsp_status[599];
+    BOOL rsp_status_active;
 };
 
 typedef struct _capt Capture;

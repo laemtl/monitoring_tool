@@ -17,8 +17,8 @@ PROTOBUF_C__BEGIN_DECLS
 
 typedef struct _Analysis__Init Analysis__Init;
 typedef struct _Analysis__Data Analysis__Data;
-typedef struct _Analysis__Conn Analysis__Conn;
 typedef struct _Analysis__Freq Analysis__Freq;
+typedef struct _Analysis__Close Analysis__Close;
 
 
 /* --- enums --- */
@@ -29,14 +29,26 @@ typedef struct _Analysis__Freq Analysis__Freq;
 struct  _Analysis__Init
 {
   ProtobufCMessage base;
-  uint32_t interval;
-  uint32_t duration;
   size_t n_netint;
   char **netint;
+  uint32_t interval;
+  uint32_t duration;
+  /*
+   *required uint32 topClientCnt = 4;
+   */
+  uint32_t activemetric;
+  protobuf_c_boolean has_clientip;
+  uint32_t clientip;
+  protobuf_c_boolean has_clientport;
+  uint32_t clientport;
+  protobuf_c_boolean has_serverip;
+  uint32_t serverip;
+  protobuf_c_boolean has_serverport;
+  uint32_t serverport;
 };
 #define ANALYSIS__INIT__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&analysis__init__descriptor) \
-    , 0, 0, 0,NULL }
+    , 0,NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 
 
 struct  _Analysis__Data
@@ -52,8 +64,6 @@ struct  _Analysis__Data
   double rstmax;
   protobuf_c_boolean has_rstclient;
   double rstclient;
-  protobuf_c_boolean has_tp;
-  double tp;
   protobuf_c_boolean has_errrate;
   double errrate;
   protobuf_c_boolean has_errratemin;
@@ -76,8 +86,6 @@ struct  _Analysis__Data
   double connratemin;
   protobuf_c_boolean has_connratemax;
   double connratemax;
-  size_t n_conns;
-  Analysis__Conn **conns;
   size_t n_client;
   Analysis__Freq **client;
   size_t n_req_path;
@@ -88,21 +96,22 @@ struct  _Analysis__Data
   Analysis__Freq **req_type;
   size_t n_rsp_status;
   Analysis__Freq **rsp_status;
+  protobuf_c_boolean has_tpavg;
+  double tpavg;
+  protobuf_c_boolean has_tpmin;
+  double tpmin;
+  protobuf_c_boolean has_tpmax;
+  double tpmax;
+  protobuf_c_boolean has_tprevavg;
+  double tprevavg;
+  protobuf_c_boolean has_tprevmin;
+  double tprevmin;
+  protobuf_c_boolean has_tprevmax;
+  double tprevmax;
 };
 #define ANALYSIS__DATA__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&analysis__data__descriptor) \
-    , 0, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,NULL, 0,NULL, 0,NULL, 0,NULL, 0,NULL, 0,NULL }
-
-
-struct  _Analysis__Conn
-{
-  ProtobufCMessage base;
-  uint32_t ip;
-  uint32_t port;
-};
-#define ANALYSIS__CONN__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&analysis__conn__descriptor) \
-    , 0, 0 }
+    , 0, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,NULL, 0,NULL, 0,NULL, 0,NULL, 0,NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 
 
 struct  _Analysis__Freq
@@ -114,6 +123,15 @@ struct  _Analysis__Freq
 #define ANALYSIS__FREQ__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&analysis__freq__descriptor) \
     , NULL, 0 }
+
+
+struct  _Analysis__Close
+{
+  ProtobufCMessage base;
+};
+#define ANALYSIS__CLOSE__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&analysis__close__descriptor) \
+     }
 
 
 /* Analysis__Init methods */
@@ -154,25 +172,6 @@ Analysis__Data *
 void   analysis__data__free_unpacked
                      (Analysis__Data *message,
                       ProtobufCAllocator *allocator);
-/* Analysis__Conn methods */
-void   analysis__conn__init
-                     (Analysis__Conn         *message);
-size_t analysis__conn__get_packed_size
-                     (const Analysis__Conn   *message);
-size_t analysis__conn__pack
-                     (const Analysis__Conn   *message,
-                      uint8_t             *out);
-size_t analysis__conn__pack_to_buffer
-                     (const Analysis__Conn   *message,
-                      ProtobufCBuffer     *buffer);
-Analysis__Conn *
-       analysis__conn__unpack
-                     (ProtobufCAllocator  *allocator,
-                      size_t               len,
-                      const uint8_t       *data);
-void   analysis__conn__free_unpacked
-                     (Analysis__Conn *message,
-                      ProtobufCAllocator *allocator);
 /* Analysis__Freq methods */
 void   analysis__freq__init
                      (Analysis__Freq         *message);
@@ -192,6 +191,25 @@ Analysis__Freq *
 void   analysis__freq__free_unpacked
                      (Analysis__Freq *message,
                       ProtobufCAllocator *allocator);
+/* Analysis__Close methods */
+void   analysis__close__init
+                     (Analysis__Close         *message);
+size_t analysis__close__get_packed_size
+                     (const Analysis__Close   *message);
+size_t analysis__close__pack
+                     (const Analysis__Close   *message,
+                      uint8_t             *out);
+size_t analysis__close__pack_to_buffer
+                     (const Analysis__Close   *message,
+                      ProtobufCBuffer     *buffer);
+Analysis__Close *
+       analysis__close__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data);
+void   analysis__close__free_unpacked
+                     (Analysis__Close *message,
+                      ProtobufCAllocator *allocator);
 /* --- per-message closures --- */
 
 typedef void (*Analysis__Init_Closure)
@@ -200,11 +218,11 @@ typedef void (*Analysis__Init_Closure)
 typedef void (*Analysis__Data_Closure)
                  (const Analysis__Data *message,
                   void *closure_data);
-typedef void (*Analysis__Conn_Closure)
-                 (const Analysis__Conn *message,
-                  void *closure_data);
 typedef void (*Analysis__Freq_Closure)
                  (const Analysis__Freq *message,
+                  void *closure_data);
+typedef void (*Analysis__Close_Closure)
+                 (const Analysis__Close *message,
                   void *closure_data);
 
 /* --- services --- */
@@ -214,8 +232,8 @@ typedef void (*Analysis__Freq_Closure)
 
 extern const ProtobufCMessageDescriptor analysis__init__descriptor;
 extern const ProtobufCMessageDescriptor analysis__data__descriptor;
-extern const ProtobufCMessageDescriptor analysis__conn__descriptor;
 extern const ProtobufCMessageDescriptor analysis__freq__descriptor;
+extern const ProtobufCMessageDescriptor analysis__close__descriptor;
 
 PROTOBUF_C__END_DECLS
 

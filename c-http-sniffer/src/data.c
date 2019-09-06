@@ -74,7 +74,7 @@ Data* init_data() {
 	data->status = 0;
 
 	hash_init(&(data->conn_ht), conn_hash_fn, addr_compare, update_attr, delete_attr);
-	tl_init(&(data->conn_ht.tl));
+	//tl_init(&(data->conn_ht.tl));
 
 	hash_init(&(data->client_ht), client_hash_fn, ip_compare, update_attr, delete_attr);
 	hash_init(&(data->req_path_ht), req_path_hash_fn, req_path_compare, update_attr, delete_attr);
@@ -232,9 +232,23 @@ void extract_data(flow_t *flow){
 	get_data(&data);
 	pthread_mutex_lock(&(data->lock));
 
+	if(data->has_client_ip) {
+		printf("has client \n");
+		if(data->client.ip != flow->socket.saddr) {
+			pthread_mutex_unlock(&(data->lock));
+			return;
+		}
+		
+		if(data->has_client_port) {
+			if(data->client.port != flow->socket.sport) {
+				pthread_mutex_unlock(&(data->lock));
+				return;
+			}
+		}
+	}
+
 	if(!flow->processed) {
 		add_conn(flow->socket.saddr, flow->socket.sport, data);
-		add_client(flow->socket.saddr, data);
 		data->flow_tot++;
 		flow->processed = TRUE;				
 	}
@@ -249,6 +263,7 @@ void extract_data(flow_t *flow){
 					flow_req++;
 
 					data->req_tot++;
+					add_client(flow->socket.saddr, data);
 					add_req_path(req->uri, data);
 					add_req_type(req->method, data);
 					compute_req_rate(data);
@@ -276,11 +291,15 @@ void extract_data(flow_t *flow){
 }
 
 void compute_req_rate(Data* data) {
+	if(!data->req_rate.active) return;
+
 	inc_metric_subtotal(&(data->req_rate));
 	inc_metric_total(&(data->req_rate));
 }
 
 void compute_rst(http_pair_t *h, Data* data) {
+	if(!data->rst.active) return;
+
 	// Compute response time
 	double rst = (h->rsp_fb_sec + h->rsp_fb_usec * 0.000001) - (h->req_fb_sec + h->req_fb_usec * 0.000001);
 
@@ -306,6 +325,8 @@ void compute_rst(http_pair_t *h, Data* data) {
 }
 
 void compute_err_rate(int status, Data* data) {
+	if(!data->err_rate.active) return;
+
 	// Extract first digit of status code
 	int i = status;
 	while (i>=10) i=i/10;  
@@ -362,68 +383,89 @@ Result* get_result() {
 	result->interface = data->interface;	
 	result->client_sock = data->client_sock;
 
-	result->rst_avg = get_rst_avg();
-	result->rst_min = get_metric_min(data->rst);
-    result->rst_max = data->rst.max.value;
+	if(data->rst.active) {
+		result->rst_avg = get_rst_avg();
+		result->rst_min = get_metric_min(data->rst);
+    	result->rst_max = data->rst.max.value;
+	}
 	
-	result->err_rate = get_err_rate();    
-	result->err_rate_min = get_metric_min(data->err_rate);   
-	result->err_rate_max = data->err_rate.max.value;   
+	if(data->err_rate.active) {
+		result->err_rate = get_err_rate();    
+		result->err_rate_min = get_metric_min(data->err_rate);   
+		result->err_rate_max = data->err_rate.max.value;   
+	}
+
+	if(data->req_rate.active) {
+		result->req_rate = get_req_rate(); 
+		result->req_rate_min = get_metric_min(data->req_rate);
+		result->req_rate_max = data->req_rate.max.value;
+	}
+
+	if(data->conn_rate.active) {
+		result->conn_rate = get_conn_rate();
+		result->conn_rate_min = data->conn_rate.min.value;
+		result->conn_rate_max = data->conn_rate.max.value;
 	
-	result->req_rate = get_req_rate(); 
-	result->req_rate_min = get_metric_min(data->req_rate);
-	result->req_rate_max = data->req_rate.max.value;
+		//result->conn_tl = data->conn_ht.tl;
+	}
 
-	result->conn_rate = get_conn_rate();
-	result->conn_rate_min = data->conn_rate.min.value;
-	result->conn_rate_max = data->conn_rate.max.value;
+	if(data->client_active) {
+		cfl_init(&(result->client));
+		extract_freq_ht(&(data->client_ht), result, client_cfl_add);
+	}
 
-	result->conn_tl = data->conn_ht.tl;
-	
-	cfl_init(&(result->client));
-	cfl_init(&(result->req_path));
-	cfl_init(&(result->req_method));
-	cfl_init(&(result->req_type));
-	cfl_init(&(result->rsp_status));
+	// TODO: can have duplicate path (ex: path/meth1 & path/meth2)
+	if(data->req_path_active || data->req_method_active) {
+		cfl_init(&(result->req_path));
+		cfl_init(&(result->req_method));
+		extract_freq_ht(&(data->req_path_ht), result, req_path_cfl_add);
+	}
 
-	extract_freq_ht(&(data->client_ht), result, client_cfl_add);
-	extract_freq_ht(&(data->req_path_ht), result, req_path_cfl_add);
+	if(data->req_type_active) {
+		cfl_init(&(result->req_type));
+		int size_rt = sizeof(data->req_type)/sizeof(data->req_type[0]);
+		extract_freq_ar(&(data->req_type), size_rt, result, req_type_cfl_add);
+	}
 
-	int size_rt = sizeof(data->req_type)/sizeof(data->req_type[0]);
-	extract_freq_ar(&(data->req_type), size_rt, result, req_type_cfl_add);
-	
-	int size_rs = sizeof(data->rsp_status)/sizeof(data->rsp_status[0]);
-	extract_freq_ar(&(data->rsp_status), size_rs, result, rsp_status_cfl_add);
+	if(data->rsp_status_active) {
+		cfl_init(&(result->rsp_status));
+		int size_rs = sizeof(data->rsp_status)/sizeof(data->rsp_status[0]);
+		extract_freq_ar(&(data->rsp_status), size_rs, result, rsp_status_cfl_add);
+	}
 
 	return result;
 }
 
 // TODO: check if status active
 void process_rate(Data* data) {
-	int req_subtotal = data->req_rate.subtotal.value;
-	update_metric_min(&(data->req_rate), req_subtotal);
-	update_metric_max(&(data->req_rate), req_subtotal);
-	
-	double err_rate_subtotals = get_err_rate_subtotals();
-	update_metric_min(&(data->err_rate), err_rate_subtotals);
-	update_metric_max(&(data->err_rate), err_rate_subtotals);
+	if(data->req_rate.active) {
+		int req_subtotal = data->req_rate.subtotal.value;
+		update_metric_min(&(data->req_rate), req_subtotal);
+		update_metric_max(&(data->req_rate), req_subtotal);
+		reset_metric_subtotal(&(data->req_rate));
+	}
 
-	int conn_int_cnt = data->conn_ht.int_cnt;
-	add_metric_sum(&(data->conn_rate), conn_int_cnt);
-	update_metric_min(&(data->conn_rate), conn_int_cnt);
-	update_metric_max(&(data->conn_rate), conn_int_cnt);
-	
-	reset_metric_subtotal(&(data->req_rate));
-	reset_metric_subtotal(&(data->err_rate));	
-	reset_metric_subtotal(&(data->conn_rate));	
-	data->rsp_sec_tot = 0;
+	if(data->err_rate.active) {
+		double err_rate_subtotals = get_err_rate_subtotals();
+		update_metric_min(&(data->err_rate), err_rate_subtotals);
+		update_metric_max(&(data->err_rate), err_rate_subtotals);
+		reset_metric_subtotal(&(data->err_rate));
+	}
+
+	if(data->conn_rate.active) {
+		int conn_int_cnt = data->conn_ht.int_cnt;
+		add_metric_sum(&(data->conn_rate), conn_int_cnt);
+		update_metric_min(&(data->conn_rate), conn_int_cnt);
+		update_metric_max(&(data->conn_rate), conn_int_cnt);
+		reset_metric_subtotal(&(data->conn_rate));
+	}
 }
 
 void flow_hash_process() {
 	Data* data = {0};
 	get_data(&data);
 	int i = 0;
-	flow_t	*flow, *flow_next = NULL;
+	flow_t *flow, *flow_next = NULL;
 
 	for(i=0; i<HASH_SIZE; i++){
 		pthread_mutex_lock(&(data->flow_hash_table[i]->mutex));
@@ -442,6 +484,33 @@ void flow_hash_process() {
 	return 0;
 }
 
+void free_result(Result* result) {
+	Data* data = {0};
+	get_data(&data);
+
+	if(data->client_active) {
+		cfl_delete(&(result->client));
+	}
+
+	if(data->req_path_active) {
+		cfl_delete(&(result->req_path));
+	}
+	
+	if(data->req_method_active) {
+		cfl_delete(&(result->req_method));
+	}
+	
+	if(data->req_type_active) {
+		cfl_delete(&(result->req_type));
+	}
+	
+	if(data->rsp_status_active) {
+		cfl_delete(&(result->rsp_status));
+	}
+	
+	free(result);
+}
+
 void process_data(int tid) {
 	Data* data = {0};
 	get_data(&data);
@@ -456,6 +525,9 @@ void process_data(int tid) {
 	process_rate(data);
 	data->stamp++;	
 
+	data->rsp_sec_tot = 0;
+
+	// reset interval (1 sec) counter
 	reset_int_cnt(&(data->conn_ht));
 	reset_int_cnt(&(data->client_ht));
 	reset_int_cnt(&(data->req_path_ht));
@@ -476,9 +548,9 @@ void process_data(int tid) {
 #endif
 
 	if(data->status == -1) {
-		timer_delete(tid);
+		//timer_delete(tid);
 
-		print_conn_tl(&(data->conn_ht.tl));
+		//print_conn_tl(&(data->conn_ht.tl));
 
 		printf("pak: %d \n", pak);
     	printf("dpak: %d \n", pak_deq);
@@ -491,12 +563,7 @@ void process_data(int tid) {
 		send_data(result);
 	} 
 
-	cfl_delete(&(result->client));
-	cfl_delete(&(result->req_path));
-	cfl_delete(&(result->req_method));
-	cfl_delete(&(result->req_type));
-	cfl_delete(&(result->rsp_status));
-	free(result);
+	free_result(result);
 	
 	if(data->status < 0) {
 		pthread_exit(NULL);		
@@ -514,13 +581,13 @@ void print_data(Result* result) {
 	memset(time_buf, 0, sizeof(time_buf));
 	strftime(time_buf, sizeof(time_buf), "%Y%m%d %H:%M:%S", timeinfo);
 
-	printf("%s - %f %f %f %f %f %f %f %f %f %f %f %f \n", 
+	/*printf("%s - %f %f %f %f %f %f %f %f %f %f %f %f \n", 
 		time_buf, 
 		result->rst_avg, result->rst_min, result->rst_max, 
     	result->req_rate, result->req_rate_min, result->req_rate_max,
         result->err_rate, result->err_rate_min, result->err_rate_max,
 		result->conn_rate, result->conn_rate_min, result->conn_rate_max
-    );
+    );*/
 	
 	/*printf("Client cumulated freq list \n");
 	print_cfl(&(result->client));

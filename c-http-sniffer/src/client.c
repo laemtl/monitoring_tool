@@ -11,24 +11,26 @@ u_int32_t client_hash_fn(Attr* a) {
 }
 
 int ip_compare(Attr* c1, Attr* c2) {
-    if((((Addr*)c1->elem)->ip == ((Addr*)c2->elem)->ip)) return 0;
+    if(*(u_int32_t*)c1->elem == *(u_int32_t*)c2->elem) return 0;
     return 1;
 }
 
-void client_cfl_add(Addr* addr, int cnt, Result* r) {
+void client_cfl_add(u_int32_t* addr, int cnt, Result* r) {
 	Data* data = {0};
 	get_data(&data);
+
 	if(data->flow_tot <= 0) return;
 	
-	double freq = (double) cnt / data->flow_tot;
-   
+	double freq = (double) cnt / data->req_tot;
+	//double freq = (double) cnt / data->flow_tot;
     if(freq > MIN_FREQ) {
-		char* c = addr_to_str(addr->ip);
-	    cfl_add(c, freq, &(r->client));
+	    cfl_add(ip_ntos(*addr), freq, &(r->client));
 	}
 }
 
 void add_client(u_int32_t saddr, Data* data) {
+	if(!data->client_active) return;
+
     u_int32_t* addr = CALLOC(u_int32_t, 1);
     *addr = saddr;
     add_attr(addr, &(data->client_ht));

@@ -8,6 +8,6 @@
 
 u_int32_t conn_hash_fn(Attr* a);
 int addr_compare(Attr* a1, Attr* a2);
-char* addr_to_str(u_int32_t ip);
+//char* addr_to_str(u_int32_t ip);
 
 #endif

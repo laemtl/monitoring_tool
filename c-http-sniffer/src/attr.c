@@ -40,7 +40,7 @@ void update_attr(Attr* a, hash_t* ht) {
 
     pthread_mutex_unlock(&(a->mutex));   
 
-    if(is_conn_ht(ht)) update_tl(a, ht); 
+    //if(is_conn_ht(ht)) update_tl(a, ht); 
 }
 
 void add_attr(void* e, hash_t* ht) {

@@ -482,7 +482,7 @@ void sigintHandler(int sig_num) {
 	printf("flow_req: %d \n", flow_req);
 	printf("flow_rsp: %d \n", flow_rsp);
 
-	print_conn_tl(&(data->conn_ht.tl));
+	//print_conn_tl(&(data->conn_ht.tl));
 	//print_client_tl(&(data->client_ht.tl));
 	//print_path_tl(&(data->path_ht.tl));
 	exit(0);

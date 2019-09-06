@@ -47,10 +47,23 @@ int encode_varint(uint8_t *const buffer, uint64_t value) {
 * Returns -1 on any error.
 */
 int send_data(Result* result) {
+	Data* data = {0};
+	get_data(&data);
+	
 	Analysis__Data msg = ANALYSIS__DATA__INIT;
 	void *buf;                 // Buffer to store serialized data
 	uint64_t msg_len;          // Length of serialized data
+	
+	//Analysis__Conn **conns;
+	Analysis__Freq **client;
+	Analysis__Freq **req_path;
+	Analysis__Freq **req_method;
+	Analysis__Freq **req_type;
+	Analysis__Freq **rsp_status;
 
+	int i, j, k, l, m, n, 
+	c1, c2, c3, c4, c5, c6; 
+	
 	if(result->client_sock == NULL) {
 		printf("Socket is not defined\n");
 		return EXIT_FAILURE;
@@ -59,133 +72,150 @@ int send_data(Result* result) {
 	int varint_len_len;
 
 	msg.netint = result->interface;
-	
-	msg.has_rstavg = 1;
-	msg.rstavg = result->rst_avg;
 
-	msg.has_rstmin = 1;
-	msg.rstmin = result->rst_min;
+	msg.has_rstavg = 0;
+	msg.has_rstmin = 0;
+	msg.has_rstmax = 0;
+	if(data->rst.active) {
+		msg.has_rstavg = 1;
+		msg.rstavg = result->rst_avg;
 
-	msg.has_rstmax = 1;
-	msg.rstmax = result->rst_max;
+		msg.has_rstmin = 1;
+		msg.rstmin = result->rst_min;
 
-	msg.has_errrate = 1;
-	msg.errrate = result->err_rate;
-
-	msg.has_errratemin = 1;
-	msg.errratemin = result->err_rate_min;
-
-	msg.has_errratemax = 1;
-	msg.errratemax = result->err_rate_max;
-
-	msg.has_reqrate = 1;
-	msg.reqrate = result->req_rate;
-
-	msg.has_reqratemin = 1;
-	msg.reqratemin = result->req_rate_min;
-
-	msg.has_reqratemax = 1;
-	msg.reqratemax = result->req_rate_max;
-
-	msg.has_connrate = 1;
-	msg.connrate = result->conn_rate;
-
-	msg.has_connratemin = 1;
-	msg.connratemin = result->conn_rate_min;
-
-	msg.has_connratemax = 1;
-	msg.connratemax = result->conn_rate_max;
-
-	/* */
-	Analysis__Conn **conns;
-	int c1 = result->conn_tl.count;
-	conns = MALLOC(Analysis__Conn*, c1);
-
-	int i;
-	for(i = 0; i < c1; i++) {
-		conns[i] = MALLOC(Analysis__Conn, 1);
-		analysis__conn__init(conns[i]);
-		conns[i]->ip = ((Addr*)result->conn_tl.list[i])->ip;
-		conns[i]->port = ((Addr*)result->conn_tl.list[i])->port;;
-	} 
-	msg.n_conns = c1;
-	msg.conns = conns;
-
-	/* */
-	Analysis__Freq **client;
-	int c2 = result->client.count;
-	client = MALLOC(Analysis__Freq*, c2); 
-	
-	int j;
-	for(j = 0; j < c2; j++) {
-		client[j] = MALLOC(Analysis__Freq, 1);
-		analysis__freq__init(client[j]);
-		client[j]->name = result->client.list[j].name;
-		client[j]->freq = result->client.list[j].c_freq;
+		msg.has_rstmax = 1;
+		msg.rstmax = result->rst_max;
 	}
-	msg.n_client = c2;
-	msg.client = client;
 
-	/* */
-	Analysis__Freq **req_path;
-	int c3 = result->req_path.count;
-	req_path = MALLOC(Analysis__Freq*, c3); 
-	
-	int k;
-	for(k = 0; k < c3; k++) {
-		req_path[k] = MALLOC(Analysis__Freq, 1);
-		analysis__freq__init(req_path[k]);
-		req_path[k]->name = result->req_path.list[k].name;
-		req_path[k]->freq = result->req_path.list[k].c_freq;
+	msg.has_errrate = 0;
+	msg.has_errratemin = 0;
+	msg.has_errratemax = 0;
+	if(data->err_rate.active) {
+		msg.has_errrate = 1;
+		msg.errrate = result->err_rate;
+
+		msg.has_errratemin = 1;
+		msg.errratemin = result->err_rate_min;
+
+		msg.has_errratemax = 1;
+		msg.errratemax = result->err_rate_max;
 	}
-	msg.n_req_path = c3;
-	msg.req_path = req_path;
 
-	/* */
-	Analysis__Freq **req_method;
-	int c4 = result->req_method.count;
-	req_method = MALLOC(Analysis__Freq*, c4); 
-	
-	int l;
-	for(l = 0; l < c4; l++) {
-		req_method[l] = MALLOC(Analysis__Freq, 1);
-		analysis__freq__init(req_method[l]);
-		req_method[l]->name = result->req_method.list[l].name;
-		req_method[l]->freq = result->req_method.list[l].c_freq;
+	msg.has_reqrate = 0;
+	msg.has_reqratemin = 0;
+	msg.has_reqratemax = 0;
+	if(data->req_rate.active) {
+		msg.has_reqrate = 1;
+		msg.reqrate = result->req_rate;
+
+		msg.has_reqratemin = 1;
+		msg.reqratemin = result->req_rate_min;
+
+		msg.has_reqratemax = 1;
+		msg.reqratemax = result->req_rate_max;
 	}
-	msg.n_req_method = c4;
-	msg.req_method = req_method;
 
-	/* */
-	Analysis__Freq **req_type;
-	int c5 = result->req_type.count;
-	req_type = MALLOC(Analysis__Freq*, c5); 
-	
-	int m;
-	for(m = 0; m < c5; m++) {
-		req_type[m] = MALLOC(Analysis__Freq, 1);
-		analysis__freq__init(req_type[m]);
-		req_type[m]->name = result->req_type.list[m].name;
-		req_type[m]->freq = result->req_type.list[m].c_freq;
+	msg.has_connrate = 0;
+	msg.has_connratemin = 0;
+	msg.has_connratemax = 0;
+	if(data->conn_rate.active) {
+		msg.has_connrate = 1;
+		msg.connrate = result->conn_rate;
+
+		msg.has_connratemin = 1;
+		msg.connratemin = result->conn_rate_min;
+
+		msg.has_connratemax = 1;
+		msg.connratemax = result->conn_rate_max;
+
+		/* */
+		/*c1 = result->conn_tl.count;
+		conns = MALLOC(Analysis__Conn*, c1);
+
+		for(i = 0; i < c1; i++) {
+			conns[i] = MALLOC(Analysis__Conn, 1);
+			analysis__conn__init(conns[i]);
+			conns[i]->ip = ((Addr*)result->conn_tl.list[i])->ip;
+			conns[i]->port = ((Addr*)result->conn_tl.list[i])->port;
+		} 
+		msg.n_conns = c1;
+		msg.conns = conns;*/
 	}
-	msg.n_req_type = c5;
-	msg.req_type = req_type;
 
-	/* */
-	Analysis__Freq **rsp_status;
-	int c6 = result->rsp_status.count;
-	rsp_status = MALLOC(Analysis__Freq*, c6); 
-	
-	int n;
-	for(n = 0; n < c6; n++) {
-		rsp_status[n] = MALLOC(Analysis__Freq, 1);
-		analysis__freq__init(rsp_status[n]);
-		rsp_status[n]->name = result->rsp_status.list[n].name;
-		rsp_status[n]->freq = result->rsp_status.list[n].c_freq;
+	if(data->client_active) {
+		/* */
+		c2 = result->client.count;
+		client = MALLOC(Analysis__Freq*, c2); 
+		
+		for(j = 0; j < c2; j++) {
+			client[j] = MALLOC(Analysis__Freq, 1);
+			analysis__freq__init(client[j]);
+			client[j]->name = result->client.list[j].name;
+			client[j]->freq = result->client.list[j].c_freq;
+		}
+		msg.n_client = c2;
+		msg.client = client;
 	}
-	msg.n_rsp_status = c6;
-	msg.rsp_status = rsp_status;
 
+	if(data->req_path_active) {
+		/* */
+		c3 = result->req_path.count;
+		req_path = MALLOC(Analysis__Freq*, c3); 
+		
+		for(k = 0; k < c3; k++) {
+			req_path[k] = MALLOC(Analysis__Freq, 1);
+			analysis__freq__init(req_path[k]);
+			req_path[k]->name = result->req_path.list[k].name;
+			req_path[k]->freq = result->req_path.list[k].c_freq;
+		}
+		msg.n_req_path = c3;
+		msg.req_path = req_path;
+	}
+
+	if(data->req_method_active) {
+		/* */
+		c4 = result->req_method.count;
+		req_method = MALLOC(Analysis__Freq*, c4); 
+	
+		for(l = 0; l < c4; l++) {
+			req_method[l] = MALLOC(Analysis__Freq, 1);
+			analysis__freq__init(req_method[l]);
+			req_method[l]->name = result->req_method.list[l].name;
+			req_method[l]->freq = result->req_method.list[l].c_freq;
+		}
+		msg.n_req_method = c4;
+		msg.req_method = req_method;
+	}
+
+	if(data->req_type_active) {
+		/* */
+		c5 = result->req_type.count;
+		req_type = MALLOC(Analysis__Freq*, c5); 
+		
+		for(m = 0; m < c5; m++) {
+			req_type[m] = MALLOC(Analysis__Freq, 1);
+			analysis__freq__init(req_type[m]);
+			req_type[m]->name = result->req_type.list[m].name;
+			req_type[m]->freq = result->req_type.list[m].c_freq;
+		}
+		msg.n_req_type = c5;
+		msg.req_type = req_type;
+	}
+
+	if(data->rsp_status_active) {
+		/* */
+		c6 = result->rsp_status.count;
+		rsp_status = MALLOC(Analysis__Freq*, c6); 
+		
+		for(n = 0; n < c6; n++) {
+			rsp_status[n] = MALLOC(Analysis__Freq, 1);
+			analysis__freq__init(rsp_status[n]);
+			rsp_status[n]->name = result->rsp_status.list[n].name;
+			rsp_status[n]->freq = result->rsp_status.list[n].c_freq;
+		}
+		msg.n_rsp_status = c6;
+		msg.rsp_status = rsp_status;
+	}
 
 	msg_len = analysis__data__get_packed_size(&msg);
 	
@@ -207,24 +237,36 @@ int send_data(Result* result) {
 
 	free(buf); // Free the allocated serialized buffer
 	
-	for(i = 0; i < c1; i++) free(conns[i]); 
-	free(conns);
+	/*if(data->conn_rate.active) {
+		for(i = 0; i < c1; i++) free(conns[i]); 
+		free(conns);
+	}*/
 
-	for(j = 0; j < c2; j++) free(client[j]);
-	free(client);
+	if(data->client_active) {
+		for(j = 0; j < c2; j++) free(client[j]);
+		free(client);
+	}
+
+	if(data->req_path_active) {
+		for(k = 0; k < c3; k++) free(req_path[k]);
+		free(req_path);
+	}
+
+	if(data->req_method_active) {
+		for(l = 0; l < c4; l++) free(req_method[l]);
+		free(req_method);
+	}
+
+	if(data->req_type_active) {
+		for(m = 0; m < c5; m++) free(req_type[m]);
+		free(req_type);
+	}
 	
-	for(k = 0; k < c3; k++) free(req_path[k]);
-	free(req_path);
-	
-	for(l = 0; l < c4; l++) free(req_method[l]);
-	free(req_method);
-	
-	for(m = 0; m < c5; m++) free(req_type[m]);
-	free(req_type);
-	
-	for(n = 0; n < c6; n++) free(rsp_status[n]);
-	free(rsp_status);
- 	
+	if(data->rsp_status_active) {
+		for(n = 0; n < c6; n++) free(rsp_status[n]);
+		free(rsp_status);
+	}
+
 	return 0;
 }
 
@@ -261,6 +303,21 @@ void* connection_handler(int *socket) {
 			// display the message's fields.
 			printf("Received: interval: %d\n", init->interval);  // required field
 			printf("Received: duration: %d\n", init->duration);  // required field
+			//printf("Received: top_client_cnt: %d\n", init->topclientcnt);  // required field
+			printf("Received: active_metric: %d\n", init->activemetric);  // required field
+			printf("Received: client IP: %s\n", ip_ntos(init->clientip));
+			printf("Received: client port: %d\n", init->clientport);
+
+			BOOL rst_active = (init->activemetric & (1<<0));
+			BOOL req_rate_active = (init->activemetric & (1<<1));
+			BOOL err_rate_active = (init->activemetric & (1<<2));
+			BOOL tp_active = (init->activemetric & (1<<3));
+			BOOL conn_rate_active = (init->activemetric & (1<<4));
+			BOOL client_active = (init->activemetric & (1<<5));
+			BOOL req_path_active = (init->activemetric & (1<<6));
+			BOOL req_method_active = (init->activemetric & (1<<7));
+			BOOL req_type_active = (init->activemetric & (1<<8));
+			BOOL rsp_status_active = (init->activemetric & (1<<9));
 
 			for (unsigned i = 0; i < init->n_netint; i++) { // Iterate through all repeated string
 				printf ("netInt: %s\n\n", init->netint[i]);
@@ -271,6 +328,30 @@ void* connection_handler(int *socket) {
 				data->interval = init->interval;
 				data->duration = init->duration;
 				data->interface = init->netint[i];
+
+				if(init->has_clientip) {
+					data->has_client_ip = TRUE;
+					data->client.ip = init->clientip;
+				
+					if(init->has_clientport) {
+						data->has_client_port = TRUE;
+						data->client.port = init->clientport;
+					}
+				}
+
+				//data->conn_ht.tl.size = init->topclientcnt;
+
+				data->rst.active = rst_active;
+				data->req_rate.active = req_rate_active;
+				data->err_rate.active = err_rate_active;
+				data->tp.active = tp_active;
+				data->conn_rate.active = conn_rate_active;
+
+				data->client_active = client_active;
+				data->req_path_active = req_path_active;
+				data->req_method_active = req_method_active;
+				data->req_type_active = req_type_active;
+				data->rsp_status_active = rsp_status_active;
 			
 				start_analysis(NULL, data);
 			}
