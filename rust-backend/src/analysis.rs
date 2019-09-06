@@ -24,9 +24,14 @@ use protobuf::ProtobufEnum as ProtobufEnum_imported_for_functions;
 #[derive(PartialEq,Clone,Default)]
 pub struct Init {
     // message fields
+    netInt: ::protobuf::RepeatedField<::std::string::String>,
     interval: ::std::option::Option<u32>,
     duration: ::std::option::Option<u32>,
-    netInt: ::protobuf::RepeatedField<::std::string::String>,
+    activeMetric: ::std::option::Option<u32>,
+    clientIP: ::std::option::Option<u32>,
+    clientPort: ::std::option::Option<u32>,
+    serverIP: ::std::option::Option<u32>,
+    serverPort: ::std::option::Option<u32>,
     // special fields
     pub unknown_fields: ::protobuf::UnknownFields,
     pub cached_size: ::protobuf::CachedSize,
@@ -43,45 +48,7 @@ impl Init {
         ::std::default::Default::default()
     }
 
-    // required uint32 interval = 1;
-
-
-    pub fn get_interval(&self) -> u32 {
-        self.interval.unwrap_or(0)
-    }
-    pub fn clear_interval(&mut self) {
-        self.interval = ::std::option::Option::None;
-    }
-
-    pub fn has_interval(&self) -> bool {
-        self.interval.is_some()
-    }
-
-    // Param is passed by value, moved
-    pub fn set_interval(&mut self, v: u32) {
-        self.interval = ::std::option::Option::Some(v);
-    }
-
-    // required uint32 duration = 2;
-
-
-    pub fn get_duration(&self) -> u32 {
-        self.duration.unwrap_or(0)
-    }
-    pub fn clear_duration(&mut self) {
-        self.duration = ::std::option::Option::None;
-    }
-
-    pub fn has_duration(&self) -> bool {
-        self.duration.is_some()
-    }
-
-    // Param is passed by value, moved
-    pub fn set_duration(&mut self, v: u32) {
-        self.duration = ::std::option::Option::Some(v);
-    }
-
-    // repeated string netInt = 3;
+    // repeated string netInt = 1;
 
 
     pub fn get_netInt(&self) -> &[::std::string::String] {
@@ -105,6 +72,139 @@ impl Init {
     pub fn take_netInt(&mut self) -> ::protobuf::RepeatedField<::std::string::String> {
         ::std::mem::replace(&mut self.netInt, ::protobuf::RepeatedField::new())
     }
+
+    // required uint32 interval = 2;
+
+
+    pub fn get_interval(&self) -> u32 {
+        self.interval.unwrap_or(0)
+    }
+    pub fn clear_interval(&mut self) {
+        self.interval = ::std::option::Option::None;
+    }
+
+    pub fn has_interval(&self) -> bool {
+        self.interval.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_interval(&mut self, v: u32) {
+        self.interval = ::std::option::Option::Some(v);
+    }
+
+    // required uint32 duration = 3;
+
+
+    pub fn get_duration(&self) -> u32 {
+        self.duration.unwrap_or(0)
+    }
+    pub fn clear_duration(&mut self) {
+        self.duration = ::std::option::Option::None;
+    }
+
+    pub fn has_duration(&self) -> bool {
+        self.duration.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_duration(&mut self, v: u32) {
+        self.duration = ::std::option::Option::Some(v);
+    }
+
+    // required uint32 activeMetric = 5;
+
+
+    pub fn get_activeMetric(&self) -> u32 {
+        self.activeMetric.unwrap_or(0)
+    }
+    pub fn clear_activeMetric(&mut self) {
+        self.activeMetric = ::std::option::Option::None;
+    }
+
+    pub fn has_activeMetric(&self) -> bool {
+        self.activeMetric.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_activeMetric(&mut self, v: u32) {
+        self.activeMetric = ::std::option::Option::Some(v);
+    }
+
+    // optional uint32 clientIP = 6;
+
+
+    pub fn get_clientIP(&self) -> u32 {
+        self.clientIP.unwrap_or(0)
+    }
+    pub fn clear_clientIP(&mut self) {
+        self.clientIP = ::std::option::Option::None;
+    }
+
+    pub fn has_clientIP(&self) -> bool {
+        self.clientIP.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_clientIP(&mut self, v: u32) {
+        self.clientIP = ::std::option::Option::Some(v);
+    }
+
+    // optional uint32 clientPort = 7;
+
+
+    pub fn get_clientPort(&self) -> u32 {
+        self.clientPort.unwrap_or(0)
+    }
+    pub fn clear_clientPort(&mut self) {
+        self.clientPort = ::std::option::Option::None;
+    }
+
+    pub fn has_clientPort(&self) -> bool {
+        self.clientPort.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_clientPort(&mut self, v: u32) {
+        self.clientPort = ::std::option::Option::Some(v);
+    }
+
+    // optional uint32 serverIP = 8;
+
+
+    pub fn get_serverIP(&self) -> u32 {
+        self.serverIP.unwrap_or(0)
+    }
+    pub fn clear_serverIP(&mut self) {
+        self.serverIP = ::std::option::Option::None;
+    }
+
+    pub fn has_serverIP(&self) -> bool {
+        self.serverIP.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_serverIP(&mut self, v: u32) {
+        self.serverIP = ::std::option::Option::Some(v);
+    }
+
+    // optional uint32 serverPort = 9;
+
+
+    pub fn get_serverPort(&self) -> u32 {
+        self.serverPort.unwrap_or(0)
+    }
+    pub fn clear_serverPort(&mut self) {
+        self.serverPort = ::std::option::Option::None;
+    }
+
+    pub fn has_serverPort(&self) -> bool {
+        self.serverPort.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_serverPort(&mut self, v: u32) {
+        self.serverPort = ::std::option::Option::Some(v);
+    }
 }
 
 impl ::protobuf::Message for Init {
@@ -115,6 +215,9 @@ impl ::protobuf::Message for Init {
         if self.duration.is_none() {
             return false;
         }
+        if self.activeMetric.is_none() {
+            return false;
+        }
         true
     }
 
@@ -123,21 +226,56 @@ impl ::protobuf::Message for Init {
             let (field_number, wire_type) = is.read_tag_unpack()?;
             match field_number {
                 1 => {
-                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
-                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
-                    }
-                    let tmp = is.read_uint32()?;
-                    self.interval = ::std::option::Option::Some(tmp);
+                    ::protobuf::rt::read_repeated_string_into(wire_type, is, &mut self.netInt)?;
                 },
                 2 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_uint32()?;
-                    self.duration = ::std::option::Option::Some(tmp);
+                    self.interval = ::std::option::Option::Some(tmp);
                 },
                 3 => {
-                    ::protobuf::rt::read_repeated_string_into(wire_type, is, &mut self.netInt)?;
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint32()?;
+                    self.duration = ::std::option::Option::Some(tmp);
+                },
+                5 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint32()?;
+                    self.activeMetric = ::std::option::Option::Some(tmp);
+                },
+                6 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint32()?;
+                    self.clientIP = ::std::option::Option::Some(tmp);
+                },
+                7 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint32()?;
+                    self.clientPort = ::std::option::Option::Some(tmp);
+                },
+                8 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint32()?;
+                    self.serverIP = ::std::option::Option::Some(tmp);
+                },
+                9 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint32()?;
+                    self.serverPort = ::std::option::Option::Some(tmp);
                 },
                 _ => {
                     ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
@@ -151,30 +289,60 @@ impl ::protobuf::Message for Init {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u32 {
         let mut my_size = 0;
+        for value in &self.netInt {
+            my_size += ::protobuf::rt::string_size(1, &value);
+        };
         if let Some(v) = self.interval {
-            my_size += ::protobuf::rt::value_size(1, v, ::protobuf::wire_format::WireTypeVarint);
-        }
-        if let Some(v) = self.duration {
             my_size += ::protobuf::rt::value_size(2, v, ::protobuf::wire_format::WireTypeVarint);
         }
-        for value in &self.netInt {
-            my_size += ::protobuf::rt::string_size(3, &value);
-        };
+        if let Some(v) = self.duration {
+            my_size += ::protobuf::rt::value_size(3, v, ::protobuf::wire_format::WireTypeVarint);
+        }
+        if let Some(v) = self.activeMetric {
+            my_size += ::protobuf::rt::value_size(5, v, ::protobuf::wire_format::WireTypeVarint);
+        }
+        if let Some(v) = self.clientIP {
+            my_size += ::protobuf::rt::value_size(6, v, ::protobuf::wire_format::WireTypeVarint);
+        }
+        if let Some(v) = self.clientPort {
+            my_size += ::protobuf::rt::value_size(7, v, ::protobuf::wire_format::WireTypeVarint);
+        }
+        if let Some(v) = self.serverIP {
+            my_size += ::protobuf::rt::value_size(8, v, ::protobuf::wire_format::WireTypeVarint);
+        }
+        if let Some(v) = self.serverPort {
+            my_size += ::protobuf::rt::value_size(9, v, ::protobuf::wire_format::WireTypeVarint);
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
         self.cached_size.set(my_size);
         my_size
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
+        for v in &self.netInt {
+            os.write_string(1, &v)?;
+        };
         if let Some(v) = self.interval {
-            os.write_uint32(1, v)?;
-        }
-        if let Some(v) = self.duration {
             os.write_uint32(2, v)?;
         }
-        for v in &self.netInt {
-            os.write_string(3, &v)?;
-        };
+        if let Some(v) = self.duration {
+            os.write_uint32(3, v)?;
+        }
+        if let Some(v) = self.activeMetric {
+            os.write_uint32(5, v)?;
+        }
+        if let Some(v) = self.clientIP {
+            os.write_uint32(6, v)?;
+        }
+        if let Some(v) = self.clientPort {
+            os.write_uint32(7, v)?;
+        }
+        if let Some(v) = self.serverIP {
+            os.write_uint32(8, v)?;
+        }
+        if let Some(v) = self.serverPort {
+            os.write_uint32(9, v)?;
+        }
         os.write_unknown_fields(self.get_unknown_fields())?;
         ::std::result::Result::Ok(())
     }
@@ -217,6 +385,11 @@ impl ::protobuf::Message for Init {
         unsafe {
             descriptor.get(|| {
                 let mut fields = ::std::vec::Vec::new();
+                fields.push(::protobuf::reflect::accessor::make_repeated_field_accessor::<_, ::protobuf::types::ProtobufTypeString>(
+                    "netInt",
+                    |m: &Init| { &m.netInt },
+                    |m: &mut Init| { &mut m.netInt },
+                ));
                 fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
                     "interval",
                     |m: &Init| { &m.interval },
@@ -227,10 +400,30 @@ impl ::protobuf::Message for Init {
                     |m: &Init| { &m.duration },
                     |m: &mut Init| { &mut m.duration },
                 ));
-                fields.push(::protobuf::reflect::accessor::make_repeated_field_accessor::<_, ::protobuf::types::ProtobufTypeString>(
-                    "netInt",
-                    |m: &Init| { &m.netInt },
-                    |m: &mut Init| { &mut m.netInt },
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
+                    "activeMetric",
+                    |m: &Init| { &m.activeMetric },
+                    |m: &mut Init| { &mut m.activeMetric },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
+                    "clientIP",
+                    |m: &Init| { &m.clientIP },
+                    |m: &mut Init| { &mut m.clientIP },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
+                    "clientPort",
+                    |m: &Init| { &m.clientPort },
+                    |m: &mut Init| { &mut m.clientPort },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
+                    "serverIP",
+                    |m: &Init| { &m.serverIP },
+                    |m: &mut Init| { &mut m.serverIP },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
+                    "serverPort",
+                    |m: &Init| { &m.serverPort },
+                    |m: &mut Init| { &mut m.serverPort },
                 ));
                 ::protobuf::reflect::MessageDescriptor::new::<Init>(
                     "Init",
@@ -254,9 +447,14 @@ impl ::protobuf::Message for Init {
 
 impl ::protobuf::Clear for Init {
     fn clear(&mut self) {
+        self.netInt.clear();
         self.interval = ::std::option::Option::None;
         self.duration = ::std::option::Option::None;
-        self.netInt.clear();
+        self.activeMetric = ::std::option::Option::None;
+        self.clientIP = ::std::option::Option::None;
+        self.clientPort = ::std::option::Option::None;
+        self.serverIP = ::std::option::Option::None;
+        self.serverPort = ::std::option::Option::None;
         self.unknown_fields.clear();
     }
 }
@@ -282,7 +480,6 @@ pub struct Data {
     rstMin: ::std::option::Option<f64>,
     rstMax: ::std::option::Option<f64>,
     rstClient: ::std::option::Option<f64>,
-    tp: ::std::option::Option<f64>,
     errRate: ::std::option::Option<f64>,
     errRateMin: ::std::option::Option<f64>,
     errRateMax: ::std::option::Option<f64>,
@@ -294,12 +491,17 @@ pub struct Data {
     connRate: ::std::option::Option<f64>,
     connRateMin: ::std::option::Option<f64>,
     connRateMax: ::std::option::Option<f64>,
-    conns: ::protobuf::RepeatedField<Conn>,
     client: ::protobuf::RepeatedField<Freq>,
     req_path: ::protobuf::RepeatedField<Freq>,
     req_method: ::protobuf::RepeatedField<Freq>,
     req_type: ::protobuf::RepeatedField<Freq>,
     rsp_status: ::protobuf::RepeatedField<Freq>,
+    tpAvg: ::std::option::Option<f64>,
+    tpMin: ::std::option::Option<f64>,
+    tpMax: ::std::option::Option<f64>,
+    tpRevAvg: ::std::option::Option<f64>,
+    tpRevMin: ::std::option::Option<f64>,
+    tpRevMax: ::std::option::Option<f64>,
     // special fields
     pub unknown_fields: ::protobuf::UnknownFields,
     pub cached_size: ::protobuf::CachedSize,
@@ -447,26 +649,7 @@ impl Data {
         self.rstClient = ::std::option::Option::Some(v);
     }
 
-    // optional double tp = 7;
-
-
-    pub fn get_tp(&self) -> f64 {
-        self.tp.unwrap_or(0.)
-    }
-    pub fn clear_tp(&mut self) {
-        self.tp = ::std::option::Option::None;
-    }
-
-    pub fn has_tp(&self) -> bool {
-        self.tp.is_some()
-    }
-
-    // Param is passed by value, moved
-    pub fn set_tp(&mut self, v: f64) {
-        self.tp = ::std::option::Option::Some(v);
-    }
-
-    // optional double errRate = 8;
+    // optional double errRate = 7;
 
 
     pub fn get_errRate(&self) -> f64 {
@@ -485,7 +668,7 @@ impl Data {
         self.errRate = ::std::option::Option::Some(v);
     }
 
-    // optional double errRateMin = 9;
+    // optional double errRateMin = 8;
 
 
     pub fn get_errRateMin(&self) -> f64 {
@@ -504,7 +687,7 @@ impl Data {
         self.errRateMin = ::std::option::Option::Some(v);
     }
 
-    // optional double errRateMax = 10;
+    // optional double errRateMax = 9;
 
 
     pub fn get_errRateMax(&self) -> f64 {
@@ -523,7 +706,7 @@ impl Data {
         self.errRateMax = ::std::option::Option::Some(v);
     }
 
-    // optional double errRateClient = 11;
+    // optional double errRateClient = 10;
 
 
     pub fn get_errRateClient(&self) -> f64 {
@@ -542,7 +725,7 @@ impl Data {
         self.errRateClient = ::std::option::Option::Some(v);
     }
 
-    // optional double reqRate = 12;
+    // optional double reqRate = 11;
 
 
     pub fn get_reqRate(&self) -> f64 {
@@ -561,7 +744,7 @@ impl Data {
         self.reqRate = ::std::option::Option::Some(v);
     }
 
-    // optional double reqRateMin = 13;
+    // optional double reqRateMin = 12;
 
 
     pub fn get_reqRateMin(&self) -> f64 {
@@ -580,7 +763,7 @@ impl Data {
         self.reqRateMin = ::std::option::Option::Some(v);
     }
 
-    // optional double reqRateMax = 14;
+    // optional double reqRateMax = 13;
 
 
     pub fn get_reqRateMax(&self) -> f64 {
@@ -599,7 +782,7 @@ impl Data {
         self.reqRateMax = ::std::option::Option::Some(v);
     }
 
-    // optional double reqRateClient = 15;
+    // optional double reqRateClient = 14;
 
 
     pub fn get_reqRateClient(&self) -> f64 {
@@ -618,7 +801,7 @@ impl Data {
         self.reqRateClient = ::std::option::Option::Some(v);
     }
 
-    // optional double connRate = 16;
+    // optional double connRate = 15;
 
 
     pub fn get_connRate(&self) -> f64 {
@@ -637,7 +820,7 @@ impl Data {
         self.connRate = ::std::option::Option::Some(v);
     }
 
-    // optional double connRateMin = 17;
+    // optional double connRateMin = 16;
 
 
     pub fn get_connRateMin(&self) -> f64 {
@@ -656,7 +839,7 @@ impl Data {
         self.connRateMin = ::std::option::Option::Some(v);
     }
 
-    // optional double connRateMax = 18;
+    // optional double connRateMax = 17;
 
 
     pub fn get_connRateMax(&self) -> f64 {
@@ -675,32 +858,7 @@ impl Data {
         self.connRateMax = ::std::option::Option::Some(v);
     }
 
-    // repeated .analysis.Conn conns = 19;
-
-
-    pub fn get_conns(&self) -> &[Conn] {
-        &self.conns
-    }
-    pub fn clear_conns(&mut self) {
-        self.conns.clear();
-    }
-
-    // Param is passed by value, moved
-    pub fn set_conns(&mut self, v: ::protobuf::RepeatedField<Conn>) {
-        self.conns = v;
-    }
-
-    // Mutable pointer to the field.
-    pub fn mut_conns(&mut self) -> &mut ::protobuf::RepeatedField<Conn> {
-        &mut self.conns
-    }
-
-    // Take field
-    pub fn take_conns(&mut self) -> ::protobuf::RepeatedField<Conn> {
-        ::std::mem::replace(&mut self.conns, ::protobuf::RepeatedField::new())
-    }
-
-    // repeated .analysis.Freq client = 20;
+    // repeated .analysis.Freq client = 18;
 
 
     pub fn get_client(&self) -> &[Freq] {
@@ -725,7 +883,7 @@ impl Data {
         ::std::mem::replace(&mut self.client, ::protobuf::RepeatedField::new())
     }
 
-    // repeated .analysis.Freq req_path = 21;
+    // repeated .analysis.Freq req_path = 19;
 
 
     pub fn get_req_path(&self) -> &[Freq] {
@@ -750,7 +908,7 @@ impl Data {
         ::std::mem::replace(&mut self.req_path, ::protobuf::RepeatedField::new())
     }
 
-    // repeated .analysis.Freq req_method = 22;
+    // repeated .analysis.Freq req_method = 20;
 
 
     pub fn get_req_method(&self) -> &[Freq] {
@@ -775,7 +933,7 @@ impl Data {
         ::std::mem::replace(&mut self.req_method, ::protobuf::RepeatedField::new())
     }
 
-    // repeated .analysis.Freq req_type = 23;
+    // repeated .analysis.Freq req_type = 21;
 
 
     pub fn get_req_type(&self) -> &[Freq] {
@@ -800,7 +958,7 @@ impl Data {
         ::std::mem::replace(&mut self.req_type, ::protobuf::RepeatedField::new())
     }
 
-    // repeated .analysis.Freq rsp_status = 24;
+    // repeated .analysis.Freq rsp_status = 22;
 
 
     pub fn get_rsp_status(&self) -> &[Freq] {
@@ -824,6 +982,120 @@ impl Data {
     pub fn take_rsp_status(&mut self) -> ::protobuf::RepeatedField<Freq> {
         ::std::mem::replace(&mut self.rsp_status, ::protobuf::RepeatedField::new())
     }
+
+    // optional double tpAvg = 23;
+
+
+    pub fn get_tpAvg(&self) -> f64 {
+        self.tpAvg.unwrap_or(0.)
+    }
+    pub fn clear_tpAvg(&mut self) {
+        self.tpAvg = ::std::option::Option::None;
+    }
+
+    pub fn has_tpAvg(&self) -> bool {
+        self.tpAvg.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_tpAvg(&mut self, v: f64) {
+        self.tpAvg = ::std::option::Option::Some(v);
+    }
+
+    // optional double tpMin = 24;
+
+
+    pub fn get_tpMin(&self) -> f64 {
+        self.tpMin.unwrap_or(0.)
+    }
+    pub fn clear_tpMin(&mut self) {
+        self.tpMin = ::std::option::Option::None;
+    }
+
+    pub fn has_tpMin(&self) -> bool {
+        self.tpMin.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_tpMin(&mut self, v: f64) {
+        self.tpMin = ::std::option::Option::Some(v);
+    }
+
+    // optional double tpMax = 25;
+
+
+    pub fn get_tpMax(&self) -> f64 {
+        self.tpMax.unwrap_or(0.)
+    }
+    pub fn clear_tpMax(&mut self) {
+        self.tpMax = ::std::option::Option::None;
+    }
+
+    pub fn has_tpMax(&self) -> bool {
+        self.tpMax.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_tpMax(&mut self, v: f64) {
+        self.tpMax = ::std::option::Option::Some(v);
+    }
+
+    // optional double tpRevAvg = 26;
+
+
+    pub fn get_tpRevAvg(&self) -> f64 {
+        self.tpRevAvg.unwrap_or(0.)
+    }
+    pub fn clear_tpRevAvg(&mut self) {
+        self.tpRevAvg = ::std::option::Option::None;
+    }
+
+    pub fn has_tpRevAvg(&self) -> bool {
+        self.tpRevAvg.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_tpRevAvg(&mut self, v: f64) {
+        self.tpRevAvg = ::std::option::Option::Some(v);
+    }
+
+    // optional double tpRevMin = 27;
+
+
+    pub fn get_tpRevMin(&self) -> f64 {
+        self.tpRevMin.unwrap_or(0.)
+    }
+    pub fn clear_tpRevMin(&mut self) {
+        self.tpRevMin = ::std::option::Option::None;
+    }
+
+    pub fn has_tpRevMin(&self) -> bool {
+        self.tpRevMin.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_tpRevMin(&mut self, v: f64) {
+        self.tpRevMin = ::std::option::Option::Some(v);
+    }
+
+    // optional double tpRevMax = 28;
+
+
+    pub fn get_tpRevMax(&self) -> f64 {
+        self.tpRevMax.unwrap_or(0.)
+    }
+    pub fn clear_tpRevMax(&mut self) {
+        self.tpRevMax = ::std::option::Option::None;
+    }
+
+    pub fn has_tpRevMax(&self) -> bool {
+        self.tpRevMax.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_tpRevMax(&mut self, v: f64) {
+        self.tpRevMax = ::std::option::Option::Some(v);
+    }
 }
 
 impl ::protobuf::Message for Data {
@@ -834,11 +1106,6 @@ impl ::protobuf::Message for Data {
         if self.netInt.is_none() {
             return false;
         }
-        for v in &self.conns {
-            if !v.is_initialized() {
-                return false;
-            }
-        };
         for v in &self.client {
             if !v.is_initialized() {
                 return false;
@@ -914,102 +1181,134 @@ impl ::protobuf::Message for Data {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_double()?;
-                    self.tp = ::std::option::Option::Some(tmp);
+                    self.errRate = ::std::option::Option::Some(tmp);
                 },
                 8 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_double()?;
-                    self.errRate = ::std::option::Option::Some(tmp);
+                    self.errRateMin = ::std::option::Option::Some(tmp);
                 },
                 9 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_double()?;
-                    self.errRateMin = ::std::option::Option::Some(tmp);
+                    self.errRateMax = ::std::option::Option::Some(tmp);
                 },
                 10 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_double()?;
-                    self.errRateMax = ::std::option::Option::Some(tmp);
+                    self.errRateClient = ::std::option::Option::Some(tmp);
                 },
                 11 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_double()?;
-                    self.errRateClient = ::std::option::Option::Some(tmp);
+                    self.reqRate = ::std::option::Option::Some(tmp);
                 },
                 12 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_double()?;
-                    self.reqRate = ::std::option::Option::Some(tmp);
+                    self.reqRateMin = ::std::option::Option::Some(tmp);
                 },
                 13 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_double()?;
-                    self.reqRateMin = ::std::option::Option::Some(tmp);
+                    self.reqRateMax = ::std::option::Option::Some(tmp);
                 },
                 14 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_double()?;
-                    self.reqRateMax = ::std::option::Option::Some(tmp);
+                    self.reqRateClient = ::std::option::Option::Some(tmp);
                 },
                 15 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_double()?;
-                    self.reqRateClient = ::std::option::Option::Some(tmp);
+                    self.connRate = ::std::option::Option::Some(tmp);
                 },
                 16 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_double()?;
-                    self.connRate = ::std::option::Option::Some(tmp);
+                    self.connRateMin = ::std::option::Option::Some(tmp);
                 },
                 17 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_double()?;
-                    self.connRateMin = ::std::option::Option::Some(tmp);
+                    self.connRateMax = ::std::option::Option::Some(tmp);
                 },
                 18 => {
+                    ::protobuf::rt::read_repeated_message_into(wire_type, is, &mut self.client)?;
+                },
+                19 => {
+                    ::protobuf::rt::read_repeated_message_into(wire_type, is, &mut self.req_path)?;
+                },
+                20 => {
+                    ::protobuf::rt::read_repeated_message_into(wire_type, is, &mut self.req_method)?;
+                },
+                21 => {
+                    ::protobuf::rt::read_repeated_message_into(wire_type, is, &mut self.req_type)?;
+                },
+                22 => {
+                    ::protobuf::rt::read_repeated_message_into(wire_type, is, &mut self.rsp_status)?;
+                },
+                23 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_double()?;
-                    self.connRateMax = ::std::option::Option::Some(tmp);
-                },
-                19 => {
-                    ::protobuf::rt::read_repeated_message_into(wire_type, is, &mut self.conns)?;
-                },
-                20 => {
-                    ::protobuf::rt::read_repeated_message_into(wire_type, is, &mut self.client)?;
-                },
-                21 => {
-                    ::protobuf::rt::read_repeated_message_into(wire_type, is, &mut self.req_path)?;
-                },
-                22 => {
-                    ::protobuf::rt::read_repeated_message_into(wire_type, is, &mut self.req_method)?;
-                },
-                23 => {
-                    ::protobuf::rt::read_repeated_message_into(wire_type, is, &mut self.req_type)?;
+                    self.tpAvg = ::std::option::Option::Some(tmp);
                 },
                 24 => {
-                    ::protobuf::rt::read_repeated_message_into(wire_type, is, &mut self.rsp_status)?;
+                    if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_double()?;
+                    self.tpMin = ::std::option::Option::Some(tmp);
+                },
+                25 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_double()?;
+                    self.tpMax = ::std::option::Option::Some(tmp);
+                },
+                26 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_double()?;
+                    self.tpRevAvg = ::std::option::Option::Some(tmp);
+                },
+                27 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_double()?;
+                    self.tpRevMin = ::std::option::Option::Some(tmp);
+                },
+                28 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_double()?;
+                    self.tpRevMax = ::std::option::Option::Some(tmp);
                 },
                 _ => {
                     ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
@@ -1041,9 +1340,6 @@ impl ::protobuf::Message for Data {
         if let Some(v) = self.rstClient {
             my_size += 9;
         }
-        if let Some(v) = self.tp {
-            my_size += 9;
-        }
         if let Some(v) = self.errRate {
             my_size += 9;
         }
@@ -1069,7 +1365,7 @@ impl ::protobuf::Message for Data {
             my_size += 9;
         }
         if let Some(v) = self.connRate {
-            my_size += 10;
+            my_size += 9;
         }
         if let Some(v) = self.connRateMin {
             my_size += 10;
@@ -1077,10 +1373,6 @@ impl ::protobuf::Message for Data {
         if let Some(v) = self.connRateMax {
             my_size += 10;
         }
-        for value in &self.conns {
-            let len = value.compute_size();
-            my_size += 2 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
-        };
         for value in &self.client {
             let len = value.compute_size();
             my_size += 2 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
@@ -1101,6 +1393,24 @@ impl ::protobuf::Message for Data {
             let len = value.compute_size();
             my_size += 2 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
         };
+        if let Some(v) = self.tpAvg {
+            my_size += 10;
+        }
+        if let Some(v) = self.tpMin {
+            my_size += 10;
+        }
+        if let Some(v) = self.tpMax {
+            my_size += 10;
+        }
+        if let Some(v) = self.tpRevAvg {
+            my_size += 10;
+        }
+        if let Some(v) = self.tpRevMin {
+            my_size += 10;
+        }
+        if let Some(v) = self.tpRevMax {
+            my_size += 10;
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
         self.cached_size.set(my_size);
         my_size
@@ -1125,72 +1435,82 @@ impl ::protobuf::Message for Data {
         if let Some(v) = self.rstClient {
             os.write_double(6, v)?;
         }
-        if let Some(v) = self.tp {
+        if let Some(v) = self.errRate {
             os.write_double(7, v)?;
         }
-        if let Some(v) = self.errRate {
+        if let Some(v) = self.errRateMin {
             os.write_double(8, v)?;
         }
-        if let Some(v) = self.errRateMin {
+        if let Some(v) = self.errRateMax {
             os.write_double(9, v)?;
         }
-        if let Some(v) = self.errRateMax {
+        if let Some(v) = self.errRateClient {
             os.write_double(10, v)?;
         }
-        if let Some(v) = self.errRateClient {
+        if let Some(v) = self.reqRate {
             os.write_double(11, v)?;
         }
-        if let Some(v) = self.reqRate {
+        if let Some(v) = self.reqRateMin {
             os.write_double(12, v)?;
         }
-        if let Some(v) = self.reqRateMin {
+        if let Some(v) = self.reqRateMax {
             os.write_double(13, v)?;
         }
-        if let Some(v) = self.reqRateMax {
+        if let Some(v) = self.reqRateClient {
             os.write_double(14, v)?;
         }
-        if let Some(v) = self.reqRateClient {
+        if let Some(v) = self.connRate {
             os.write_double(15, v)?;
         }
-        if let Some(v) = self.connRate {
+        if let Some(v) = self.connRateMin {
             os.write_double(16, v)?;
         }
-        if let Some(v) = self.connRateMin {
+        if let Some(v) = self.connRateMax {
             os.write_double(17, v)?;
         }
-        if let Some(v) = self.connRateMax {
-            os.write_double(18, v)?;
-        }
-        for v in &self.conns {
-            os.write_tag(19, ::protobuf::wire_format::WireTypeLengthDelimited)?;
-            os.write_raw_varint32(v.get_cached_size())?;
-            v.write_to_with_cached_sizes(os)?;
-        };
         for v in &self.client {
-            os.write_tag(20, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_tag(18, ::protobuf::wire_format::WireTypeLengthDelimited)?;
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
         };
         for v in &self.req_path {
-            os.write_tag(21, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_tag(19, ::protobuf::wire_format::WireTypeLengthDelimited)?;
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
         };
         for v in &self.req_method {
-            os.write_tag(22, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_tag(20, ::protobuf::wire_format::WireTypeLengthDelimited)?;
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
         };
         for v in &self.req_type {
-            os.write_tag(23, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_tag(21, ::protobuf::wire_format::WireTypeLengthDelimited)?;
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
         };
         for v in &self.rsp_status {
-            os.write_tag(24, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_tag(22, ::protobuf::wire_format::WireTypeLengthDelimited)?;
             os.write_raw_varint32(v.get_cached_size())?;
             v.write_to_with_cached_sizes(os)?;
         };
+        if let Some(v) = self.tpAvg {
+            os.write_double(23, v)?;
+        }
+        if let Some(v) = self.tpMin {
+            os.write_double(24, v)?;
+        }
+        if let Some(v) = self.tpMax {
+            os.write_double(25, v)?;
+        }
+        if let Some(v) = self.tpRevAvg {
+            os.write_double(26, v)?;
+        }
+        if let Some(v) = self.tpRevMin {
+            os.write_double(27, v)?;
+        }
+        if let Some(v) = self.tpRevMax {
+            os.write_double(28, v)?;
+        }
         os.write_unknown_fields(self.get_unknown_fields())?;
         ::std::result::Result::Ok(())
     }
@@ -1264,11 +1584,6 @@ impl ::protobuf::Message for Data {
                     |m: &mut Data| { &mut m.rstClient },
                 ));
                 fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
-                    "tp",
-                    |m: &Data| { &m.tp },
-                    |m: &mut Data| { &mut m.tp },
-                ));
-                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
                     "errRate",
                     |m: &Data| { &m.errRate },
                     |m: &mut Data| { &mut m.errRate },
@@ -1323,11 +1638,6 @@ impl ::protobuf::Message for Data {
                     |m: &Data| { &m.connRateMax },
                     |m: &mut Data| { &mut m.connRateMax },
                 ));
-                fields.push(::protobuf::reflect::accessor::make_repeated_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<Conn>>(
-                    "conns",
-                    |m: &Data| { &m.conns },
-                    |m: &mut Data| { &mut m.conns },
-                ));
                 fields.push(::protobuf::reflect::accessor::make_repeated_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<Freq>>(
                     "client",
                     |m: &Data| { &m.client },
@@ -1352,6 +1662,36 @@ impl ::protobuf::Message for Data {
                     "rsp_status",
                     |m: &Data| { &m.rsp_status },
                     |m: &mut Data| { &mut m.rsp_status },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
+                    "tpAvg",
+                    |m: &Data| { &m.tpAvg },
+                    |m: &mut Data| { &mut m.tpAvg },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
+                    "tpMin",
+                    |m: &Data| { &m.tpMin },
+                    |m: &mut Data| { &mut m.tpMin },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
+                    "tpMax",
+                    |m: &Data| { &m.tpMax },
+                    |m: &mut Data| { &mut m.tpMax },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
+                    "tpRevAvg",
+                    |m: &Data| { &m.tpRevAvg },
+                    |m: &mut Data| { &mut m.tpRevAvg },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
+                    "tpRevMin",
+                    |m: &Data| { &m.tpRevMin },
+                    |m: &mut Data| { &mut m.tpRevMin },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
+                    "tpRevMax",
+                    |m: &Data| { &m.tpRevMax },
+                    |m: &mut Data| { &mut m.tpRevMax },
                 ));
                 ::protobuf::reflect::MessageDescriptor::new::<Data>(
                     "Data",
@@ -1381,7 +1721,6 @@ impl ::protobuf::Clear for Data {
         self.rstMin = ::std::option::Option::None;
         self.rstMax = ::std::option::Option::None;
         self.rstClient = ::std::option::Option::None;
-        self.tp = ::std::option::Option::None;
         self.errRate = ::std::option::Option::None;
         self.errRateMin = ::std::option::Option::None;
         self.errRateMax = ::std::option::Option::None;
@@ -1393,12 +1732,17 @@ impl ::protobuf::Clear for Data {
         self.connRate = ::std::option::Option::None;
         self.connRateMin = ::std::option::Option::None;
         self.connRateMax = ::std::option::Option::None;
-        self.conns.clear();
         self.client.clear();
         self.req_path.clear();
         self.req_method.clear();
         self.req_type.clear();
         self.rsp_status.clear();
+        self.tpAvg = ::std::option::Option::None;
+        self.tpMin = ::std::option::Option::None;
+        self.tpMax = ::std::option::Option::None;
+        self.tpRevAvg = ::std::option::Option::None;
+        self.tpRevMin = ::std::option::Option::None;
+        self.tpRevMax = ::std::option::Option::None;
         self.unknown_fields.clear();
     }
 }
@@ -1410,217 +1754,6 @@ impl ::std::fmt::Debug for Data {
 }
 
 impl ::protobuf::reflect::ProtobufValue for Data {
-    fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
-        ::protobuf::reflect::ProtobufValueRef::Message(self)
-    }
-}
-
-#[derive(PartialEq,Clone,Default)]
-pub struct Conn {
-    // message fields
-    ip: ::std::option::Option<u32>,
-    port: ::std::option::Option<u32>,
-    // special fields
-    pub unknown_fields: ::protobuf::UnknownFields,
-    pub cached_size: ::protobuf::CachedSize,
-}
-
-impl<'a> ::std::default::Default for &'a Conn {
-    fn default() -> &'a Conn {
-        <Conn as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl Conn {
-    pub fn new() -> Conn {
-        ::std::default::Default::default()
-    }
-
-    // required uint32 ip = 1;
-
-
-    pub fn get_ip(&self) -> u32 {
-        self.ip.unwrap_or(0)
-    }
-    pub fn clear_ip(&mut self) {
-        self.ip = ::std::option::Option::None;
-    }
-
-    pub fn has_ip(&self) -> bool {
-        self.ip.is_some()
-    }
-
-    // Param is passed by value, moved
-    pub fn set_ip(&mut self, v: u32) {
-        self.ip = ::std::option::Option::Some(v);
-    }
-
-    // required uint32 port = 2;
-
-
-    pub fn get_port(&self) -> u32 {
-        self.port.unwrap_or(0)
-    }
-    pub fn clear_port(&mut self) {
-        self.port = ::std::option::Option::None;
-    }
-
-    pub fn has_port(&self) -> bool {
-        self.port.is_some()
-    }
-
-    // Param is passed by value, moved
-    pub fn set_port(&mut self, v: u32) {
-        self.port = ::std::option::Option::Some(v);
-    }
-}
-
-impl ::protobuf::Message for Conn {
-    fn is_initialized(&self) -> bool {
-        if self.ip.is_none() {
-            return false;
-        }
-        if self.port.is_none() {
-            return false;
-        }
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream) -> ::protobuf::ProtobufResult<()> {
-        while !is.eof()? {
-            let (field_number, wire_type) = is.read_tag_unpack()?;
-            match field_number {
-                1 => {
-                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
-                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
-                    }
-                    let tmp = is.read_uint32()?;
-                    self.ip = ::std::option::Option::Some(tmp);
-                },
-                2 => {
-                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
-                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
-                    }
-                    let tmp = is.read_uint32()?;
-                    self.port = ::std::option::Option::Some(tmp);
-                },
-                _ => {
-                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u32 {
-        let mut my_size = 0;
-        if let Some(v) = self.ip {
-            my_size += ::protobuf::rt::value_size(1, v, ::protobuf::wire_format::WireTypeVarint);
-        }
-        if let Some(v) = self.port {
-            my_size += ::protobuf::rt::value_size(2, v, ::protobuf::wire_format::WireTypeVarint);
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        self.cached_size.set(my_size);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
-        if let Some(v) = self.ip {
-            os.write_uint32(1, v)?;
-        }
-        if let Some(v) = self.port {
-            os.write_uint32(2, v)?;
-        }
-        os.write_unknown_fields(self.get_unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn get_cached_size(&self) -> u32 {
-        self.cached_size.get()
-    }
-
-    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
-        &self.unknown_fields
-    }
-
-    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
-        &mut self.unknown_fields
-    }
-
-    fn as_any(&self) -> &::std::any::Any {
-        self as &::std::any::Any
-    }
-    fn as_any_mut(&mut self) -> &mut ::std::any::Any {
-        self as &mut ::std::any::Any
-    }
-    fn into_any(self: Box<Self>) -> ::std::boxed::Box<::std::any::Any> {
-        self
-    }
-
-    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
-        Self::descriptor_static()
-    }
-
-    fn new() -> Conn {
-        Conn::new()
-    }
-
-    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
-        static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
-            lock: ::protobuf::lazy::ONCE_INIT,
-            ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
-        };
-        unsafe {
-            descriptor.get(|| {
-                let mut fields = ::std::vec::Vec::new();
-                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
-                    "ip",
-                    |m: &Conn| { &m.ip },
-                    |m: &mut Conn| { &mut m.ip },
-                ));
-                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
-                    "port",
-                    |m: &Conn| { &m.port },
-                    |m: &mut Conn| { &mut m.port },
-                ));
-                ::protobuf::reflect::MessageDescriptor::new::<Conn>(
-                    "Conn",
-                    fields,
-                    file_descriptor_proto()
-                )
-            })
-        }
-    }
-
-    fn default_instance() -> &'static Conn {
-        static mut instance: ::protobuf::lazy::Lazy<Conn> = ::protobuf::lazy::Lazy {
-            lock: ::protobuf::lazy::ONCE_INIT,
-            ptr: 0 as *const Conn,
-        };
-        unsafe {
-            instance.get(Conn::new)
-        }
-    }
-}
-
-impl ::protobuf::Clear for Conn {
-    fn clear(&mut self) {
-        self.ip = ::std::option::Option::None;
-        self.port = ::std::option::Option::None;
-        self.unknown_fields.clear();
-    }
-}
-
-impl ::std::fmt::Debug for Conn {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for Conn {
     fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
         ::protobuf::reflect::ProtobufValueRef::Message(self)
     }
@@ -1850,28 +1983,159 @@ impl ::protobuf::reflect::ProtobufValue for Freq {
     }
 }
 
+#[derive(PartialEq,Clone,Default)]
+pub struct Close {
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a Close {
+    fn default() -> &'a Close {
+        <Close as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl Close {
+    pub fn new() -> Close {
+        ::std::default::Default::default()
+    }
+}
+
+impl ::protobuf::Message for Close {
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &::std::any::Any {
+        self as &::std::any::Any
+    }
+    fn as_any_mut(&mut self) -> &mut ::std::any::Any {
+        self as &mut ::std::any::Any
+    }
+    fn into_any(self: Box<Self>) -> ::std::boxed::Box<::std::any::Any> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> Close {
+        Close::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
+        };
+        unsafe {
+            descriptor.get(|| {
+                let fields = ::std::vec::Vec::new();
+                ::protobuf::reflect::MessageDescriptor::new::<Close>(
+                    "Close",
+                    fields,
+                    file_descriptor_proto()
+                )
+            })
+        }
+    }
+
+    fn default_instance() -> &'static Close {
+        static mut instance: ::protobuf::lazy::Lazy<Close> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const Close,
+        };
+        unsafe {
+            instance.get(Close::new)
+        }
+    }
+}
+
+impl ::protobuf::Clear for Close {
+    fn clear(&mut self) {
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for Close {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for Close {
+    fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
+        ::protobuf::reflect::ProtobufValueRef::Message(self)
+    }
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0eanalysis.proto\x12\x08analysis\":\n\x04Init\x12\x10\n\x08interval\
-    \x18\x01\x20\x02(\r\x12\x10\n\x08duration\x18\x02\x20\x02(\r\x12\x0e\n\
-    \x06netInt\x18\x03\x20\x03(\t\"\x9a\x04\n\x04Data\x12\x0c\n\x04time\x18\
+    \n\x0eanalysis.proto\x12\x08analysis\"\x9c\x01\n\x04Init\x12\x0e\n\x06ne\
+    tInt\x18\x01\x20\x03(\t\x12\x10\n\x08interval\x18\x02\x20\x02(\r\x12\x10\
+    \n\x08duration\x18\x03\x20\x02(\r\x12\x14\n\x0cactiveMetric\x18\x05\x20\
+    \x02(\r\x12\x10\n\x08clientIP\x18\x06\x20\x01(\r\x12\x12\n\nclientPort\
+    \x18\x07\x20\x01(\r\x12\x10\n\x08serverIP\x18\x08\x20\x01(\r\x12\x12\n\n\
+    serverPort\x18\t\x20\x01(\r\"\xd2\x04\n\x04Data\x12\x0c\n\x04time\x18\
     \x01\x20\x02(\x03\x12\x0e\n\x06netInt\x18\x02\x20\x02(\t\x12\x0e\n\x06rs\
     tAvg\x18\x03\x20\x01(\x01\x12\x0e\n\x06rstMin\x18\x04\x20\x01(\x01\x12\
     \x0e\n\x06rstMax\x18\x05\x20\x01(\x01\x12\x11\n\trstClient\x18\x06\x20\
-    \x01(\x01\x12\n\n\x02tp\x18\x07\x20\x01(\x01\x12\x0f\n\x07errRate\x18\
-    \x08\x20\x01(\x01\x12\x12\n\nerrRateMin\x18\t\x20\x01(\x01\x12\x12\n\ner\
-    rRateMax\x18\n\x20\x01(\x01\x12\x15\n\rerrRateClient\x18\x0b\x20\x01(\
-    \x01\x12\x0f\n\x07reqRate\x18\x0c\x20\x01(\x01\x12\x12\n\nreqRateMin\x18\
-    \r\x20\x01(\x01\x12\x12\n\nreqRateMax\x18\x0e\x20\x01(\x01\x12\x15\n\rre\
-    qRateClient\x18\x0f\x20\x01(\x01\x12\x10\n\x08connRate\x18\x10\x20\x01(\
-    \x01\x12\x13\n\x0bconnRateMin\x18\x11\x20\x01(\x01\x12\x13\n\x0bconnRate\
-    Max\x18\x12\x20\x01(\x01\x12\x1d\n\x05conns\x18\x13\x20\x03(\x0b2\x0e.an\
-    alysis.Conn\x12\x1e\n\x06client\x18\x14\x20\x03(\x0b2\x0e.analysis.Freq\
-    \x12\x20\n\x08req_path\x18\x15\x20\x03(\x0b2\x0e.analysis.Freq\x12\"\n\n\
-    req_method\x18\x16\x20\x03(\x0b2\x0e.analysis.Freq\x12\x20\n\x08req_type\
-    \x18\x17\x20\x03(\x0b2\x0e.analysis.Freq\x12\"\n\nrsp_status\x18\x18\x20\
-    \x03(\x0b2\x0e.analysis.Freq\"\x20\n\x04Conn\x12\n\n\x02ip\x18\x01\x20\
-    \x02(\r\x12\x0c\n\x04port\x18\x02\x20\x02(\r\"\"\n\x04Freq\x12\x0c\n\x04\
-    name\x18\x01\x20\x02(\t\x12\x0c\n\x04freq\x18\x02\x20\x02(\x01\
+    \x01(\x01\x12\x0f\n\x07errRate\x18\x07\x20\x01(\x01\x12\x12\n\nerrRateMi\
+    n\x18\x08\x20\x01(\x01\x12\x12\n\nerrRateMax\x18\t\x20\x01(\x01\x12\x15\
+    \n\rerrRateClient\x18\n\x20\x01(\x01\x12\x0f\n\x07reqRate\x18\x0b\x20\
+    \x01(\x01\x12\x12\n\nreqRateMin\x18\x0c\x20\x01(\x01\x12\x12\n\nreqRateM\
+    ax\x18\r\x20\x01(\x01\x12\x15\n\rreqRateClient\x18\x0e\x20\x01(\x01\x12\
+    \x10\n\x08connRate\x18\x0f\x20\x01(\x01\x12\x13\n\x0bconnRateMin\x18\x10\
+    \x20\x01(\x01\x12\x13\n\x0bconnRateMax\x18\x11\x20\x01(\x01\x12\x1e\n\
+    \x06client\x18\x12\x20\x03(\x0b2\x0e.analysis.Freq\x12\x20\n\x08req_path\
+    \x18\x13\x20\x03(\x0b2\x0e.analysis.Freq\x12\"\n\nreq_method\x18\x14\x20\
+    \x03(\x0b2\x0e.analysis.Freq\x12\x20\n\x08req_type\x18\x15\x20\x03(\x0b2\
+    \x0e.analysis.Freq\x12\"\n\nrsp_status\x18\x16\x20\x03(\x0b2\x0e.analysi\
+    s.Freq\x12\r\n\x05tpAvg\x18\x17\x20\x01(\x01\x12\r\n\x05tpMin\x18\x18\
+    \x20\x01(\x01\x12\r\n\x05tpMax\x18\x19\x20\x01(\x01\x12\x10\n\x08tpRevAv\
+    g\x18\x1a\x20\x01(\x01\x12\x10\n\x08tpRevMin\x18\x1b\x20\x01(\x01\x12\
+    \x10\n\x08tpRevMax\x18\x1c\x20\x01(\x01\"\"\n\x04Freq\x12\x0c\n\x04name\
+    \x18\x01\x20\x02(\t\x12\x0c\n\x04freq\x18\x02\x20\x02(\x01\"\x07\n\x05Cl\
+    ose\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {

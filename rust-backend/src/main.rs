@@ -7,7 +7,6 @@ extern crate log;
 mod analysis;
 mod codec;
 
-use chrono::{DateTime, TimeZone, NaiveDateTime, Utc};
 use crate::analysis::{Init, Data};
 use protobuf::{
     CodedOutputStream, Message, RepeatedField
@@ -18,9 +17,8 @@ use tokio_io::AsyncRead;
 use tokio_tcp::TcpStream;
 
 use std::str::FromStr;
-use std::slice;
 use serde::{Deserialize, Serialize};
-use std::time::{Duration, Instant};
+//use std::time::{Duration, Instant};
 use actix::prelude::*;
 use actix_files as fs;
 use actix_web::{
@@ -35,10 +33,10 @@ use std::net::{
 };
 use std::io;
 
-/// How often heartbeat pings are sent
-const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
-/// How long before lack of client response causes a timeout
-const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
+// How often heartbeat pings are sent
+//const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
+// How long before lack of client response causes a timeout
+//const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
 
 /// do websocket handshake and start `MyWebSocket` actor
 fn ws_index(r: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
@@ -50,14 +48,14 @@ fn ws_index(r: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error>
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct c_Freq_item {
+struct CFreqItem {
     name: String,
     freq: f64
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct c_Freq {
-    cfreq: Vec<c_Freq_item>
+struct CFreq {
+    cfreq: Vec<CFreqItem>
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -78,47 +76,54 @@ enum Msg {
     Init { 
         net_int: Vec<String>,
         interval: u32,
-        duration: u32
+        duration: u32,
+        //top_client_cnt: u32,
+        active_metric: u32,
+        client_ip: ::std::option::Option<u32>,
+        client_port: ::std::option::Option<u32>,
+        server_ip: ::std::option::Option<u32>,
+        server_port: ::std::option::Option<u32>
     },
     Data {
         time: i64,
-        netInt: String,
+        net_int: String,
         #[serde(skip_serializing_if = "Option::is_none")]
         rst: ::std::option::Option<Params>,                
         #[serde(skip_serializing_if = "Option::is_none")]
         tp: ::std::option::Option<f64>,
         #[serde(skip_serializing_if = "Option::is_none")]
-        errRate: ::std::option::Option<Params>,
+        err_rate: ::std::option::Option<Params>,
         #[serde(skip_serializing_if = "Option::is_none")]
-        reqRate: ::std::option::Option<Params>,
+        req_rate: ::std::option::Option<Params>,
         #[serde(skip_serializing_if = "Option::is_none")]
-        connRate: ::std::option::Option<Params>,
+        conn_rate: ::std::option::Option<Params>,
         #[serde(skip_serializing_if = "Option::is_none")]
-        client: ::std::option::Option<c_Freq>,
+        client: ::std::option::Option<CFreq>,
         #[serde(skip_serializing_if = "Option::is_none")]
-        req_path: ::std::option::Option<c_Freq>,
+        req_path: ::std::option::Option<CFreq>,
         #[serde(skip_serializing_if = "Option::is_none")]
-        req_method: ::std::option::Option<c_Freq>,
+        req_method: ::std::option::Option<CFreq>,
         #[serde(skip_serializing_if = "Option::is_none")]
-        req_type: ::std::option::Option<c_Freq>,
+        req_type: ::std::option::Option<CFreq>,
         #[serde(skip_serializing_if = "Option::is_none")]
-        rsp_status: ::std::option::Option<c_Freq>
+        rsp_status: ::std::option::Option<CFreq>
     }
 }
 
 struct Ws {
-    /// Client must send ping at least once per 10 seconds, otherwise we drop connection.
-    hb: Instant
+    // Client must send ping at least once per 10 seconds, otherwise we drop connection.
+    //hb: Instant
 }
 
 impl Ws {
     fn new() -> Self {
-        Self { hb: Instant::now() }
+        //Self { hb: Instant::now() }
+        Self {}
     }
 
-    /// helper method that sends ping to client every second.
-    /// also this method checks heartbeats from client
-    fn hb(&self, ctx: &mut <Self as Actor>::Context) {
+    // helper method that sends ping to client every second.
+    // also this method checks heartbeats from client
+    /*fn hb(&self, ctx: &mut <Self as Actor>::Context) {
         ctx.run_interval(HEARTBEAT_INTERVAL, |act, ctx| {
             // check client heartbeats
             if Instant::now().duration_since(act.hb) > CLIENT_TIMEOUT {
@@ -134,7 +139,7 @@ impl Ws {
 
             ctx.ping("");
         });
-    }
+    }*/
 }
 
 
@@ -179,12 +184,43 @@ impl StreamHandler<ws::Message, ws::ProtocolError> for Ws {
                     Result::Err(err) => {panic!("Unable to parse json: {}",err)}
                 };
 
+                println!("{:?}", m);
+
                 match m {
-                    Msg::Init { net_int, interval, duration } => {
+                    Msg::Init { net_int, interval, duration, /*top_client_cnt,*/ active_metric, client_ip, client_port, server_ip, server_port } => {
                         let mut init = Init::new();
                         init.set_interval(interval);
                         init.set_duration(duration);
+                        init.set_activeMetric(active_metric);
+                        
+                        match client_ip {
+                            Some(c_ip) => {
+                                init.set_clientIP(c_ip);
 
+                                match client_port {
+                                    Some(c_port) => {
+                                        init.set_clientPort(c_port);                                        
+                                    },
+                                    _ => {}
+                                }
+                            },
+                            _ => {}
+                        }
+
+                        match server_ip {
+                            Some(s_ip) => {
+                                init.set_serverIP(s_ip);
+
+                                match server_port {
+                                    Some(s_port) => {
+                                        init.set_serverPort(s_port);                                        
+                                    },
+                                    _ => {}
+                                }
+                            },
+                            _ => {}
+                        }
+                        
                         let net_int = RepeatedField::from_vec(net_int);
                         init.set_netInt(net_int);
 
@@ -195,7 +231,7 @@ impl StreamHandler<ws::Message, ws::ProtocolError> for Ws {
                         //let ip = resolve("bmj-cluster.cs.mcgill.ca:15430");
                         SnifferServer::connect("127.0.0.1:3000", init, ws_addr);
                     }
-                    Msg::Data { time, netInt, rst, tp, errRate, reqRate, connRate, client, req_path, req_method, req_type, rsp_status } => println!("Got Data")
+                    Msg::Data { time: _, net_int: _, rst: _, tp: _, err_rate: _, req_rate: _, conn_rate: _, client: _, req_path: _, req_method: _, req_type: _, rsp_status: _ } => println!("Got Data")
                 }
             }
 
@@ -214,7 +250,7 @@ impl Handler<Data> for Ws {
     fn handle(&mut self, data: Data, ctx: &mut Self::Context) {
         let msg = Msg::Data {
             time: data.get_time(),
-            netInt: data.get_netInt().to_string(),
+            net_int: data.get_netInt().to_string(),
             rst: match data.has_rstAvg() {
                 true => Some(Params { 
                     avg: Some(data.get_rstAvg()),
@@ -224,11 +260,11 @@ impl Handler<Data> for Ws {
                 }),
                 _ => None
             },
-            tp: match data.has_tp() {
-                true => Some(data.get_tp()),
+            tp: None/*match data.has_tpAvg() {
+                true => Some(data.get_tpAvg()),
                 _ => None
-            },
-            errRate: match data.has_errRate() {
+            }*/,
+            err_rate: match data.has_errRate() {
                 true => Some(Params { 
                     avg: Some(data.get_errRate()),
                     min: Some(data.get_errRateMin()),
@@ -237,16 +273,16 @@ impl Handler<Data> for Ws {
                 }),
                 _ => None
             },
-            reqRate: match data.has_reqRate() {
+            req_rate: match data.has_reqRate() {
                 true => Some(Params { 
                     avg: Some(data.get_reqRate()),
                     min: Some(data.get_reqRateMin()),
                     max: Some(data.get_reqRateMax()),
-                    client: None
+                    client: None 
                 }),
                 _ => None
             },
-            connRate: match data.has_connRate() {
+            conn_rate: match data.has_connRate() {
                 true => Some(Params { 
                     avg: Some(data.get_connRate()),
                     min: Some(data.get_connRateMin()),
@@ -256,114 +292,84 @@ impl Handler<Data> for Ws {
                 _ => None
             },
             client: {
-                let l = data.get_client().len();
-                match l {
-                    //0 => None,
-                    _ => {
-                        let mut v = Vec::new();
-                        for client in data.get_client() {
-                            let mut cfi = c_Freq_item {
-                                name: client.get_name().to_string(),
-                                freq: client.get_freq()
-                            };
-                            v.push(cfi);
-                        }
-
-                        let mut cf = c_Freq {
-                            cfreq: v
-                        };
-
-                        Some(cf)
-                    }
+                let mut v = Vec::new();
+                for client in data.get_client() {
+                    let cfi = CFreqItem {
+                        name: client.get_name().to_string(),
+                        freq: client.get_freq()
+                    };
+                    v.push(cfi);
                 }
+
+                let cf = CFreq {
+                    cfreq: v
+                };
+
+                Some(cf)
             },
             req_path: {
-                let l = data.get_req_path().len();
-                match l {
-                    //0 => None,
-                    _ => {
-                        let mut v = Vec::new();
-                        for req_path in data.get_req_path() {
-                            let mut cfi = c_Freq_item {
-                                name: req_path.get_name().to_string(),
-                                freq: req_path.get_freq()
-                            };
-                            v.push(cfi);
-                        }    
+                let mut v = Vec::new();
+                for req_path in data.get_req_path() {
+                    let cfi = CFreqItem {
+                        name: req_path.get_name().to_string(),
+                        freq: req_path.get_freq()
+                    };
+                    v.push(cfi);
+                }    
 
-                        let mut cf = c_Freq {
-                            cfreq: v
-                        };
+                let cf = CFreq {
+                    cfreq: v
+                };
 
-                        Some(cf)
-                    }
-                }
+                Some(cf)
             },
             req_method: {
-                let l = data.get_req_method().len();
-                match l {
-                    //0 => None,
-                    _ => {
-                        let mut v = Vec::new();
-                        for req_method in data.get_req_method() {
-                            let mut cfi = c_Freq_item {
-                                name: req_method.get_name().to_string(),
-                                freq: req_method.get_freq()
-                            };
-                            v.push(cfi);
-                        }    
+                let mut v = Vec::new();
+                for req_method in data.get_req_method() {
+                    let cfi = CFreqItem {
+                        name: req_method.get_name().to_string(),
+                        freq: req_method.get_freq()
+                    };
+                    v.push(cfi);
+                }    
 
-                        let mut cf = c_Freq {
-                            cfreq: v
-                        };
+                let cf = CFreq {
+                    cfreq: v
+                };
 
-                        Some(cf)
-                    }
-                }
+                Some(cf)
             },
             req_type: {
-                let l = data.get_req_type().len();
-                match l {
-                    //0 => None,
-                    _ => {
-                        let mut v = Vec::new();
-                        for req_type in data.get_req_type() {
-                            let mut cfi = c_Freq_item {
-                                name: req_type.get_name().to_string(),
-                                freq: req_type.get_freq()
-                            };
-                            v.push(cfi);
-                        }    
-                        
-                        let mut cf = c_Freq {
-                            cfreq: v
-                        };
+                let mut v = Vec::new();
+                for req_type in data.get_req_type() {
+                    let cfi = CFreqItem {
+                        name: req_type.get_name().to_string(),
+                        freq: req_type.get_freq()
+                    };
+                    v.push(cfi);
+                }    
+                
+                let cf = CFreq {
+                    cfreq: v
+                };
 
-                        Some(cf)
-                    }
-                }
+                Some(cf)
             },
             rsp_status: {
-                let l = data.get_rsp_status().len();
-                match l {
-                    //0 => None,
-                    _ => {
-                        let mut v = Vec::new();
-                        for rsp_status in data.get_rsp_status() {
-                            let mut cfi = c_Freq_item {
-                                name: rsp_status.get_name().to_string(),
-                                freq: rsp_status.get_freq()
-                            };
-                            v.push(cfi);
-                        }    
-                        
-                        let mut cf = c_Freq {
-                            cfreq: v
-                        };
+                let mut v = Vec::new();
+                for rsp_status in data.get_rsp_status() {
+                    let cfi = CFreqItem {
+                        name: rsp_status.get_name().to_string(),
+                        freq: rsp_status.get_freq()
+                    };
+                    v.push(cfi);
+                }    
+                
+                let cf = CFreq {
+                    cfreq: v
+                };
 
-                        Some(cf)
-                    }
-                }
+                Some(cf)
             },
         };
 

@@ -3,9 +3,15 @@ syntax = "proto2";
 package analysis;
 
 message Init {
-    required uint32 interval = 1;
-    required uint32 duration = 2;
-    repeated string netInt = 3;    
+    repeated string netInt = 1;
+    required uint32 interval = 2;
+    required uint32 duration = 3;
+    //required uint32 topClientCnt = 4;
+    required uint32 activeMetric = 5;
+    optional uint32 clientIP = 6;
+    optional uint32 clientPort = 7;
+    optional uint32 serverIP = 8;
+    optional uint32 serverPort = 9;
 };
 
 message Data {
@@ -17,37 +23,45 @@ message Data {
     optional double rstMax = 5;
     optional double rstClient = 6;
 
-    optional double tp = 7;
+    optional double errRate = 7;
+    optional double errRateMin = 8;
+    optional double errRateMax = 9;
+    optional double errRateClient = 10;
 
-    optional double errRate = 8;
-    optional double errRateMin = 9;
-    optional double errRateMax = 10;
-    optional double errRateClient = 11;
+    optional double reqRate = 11;
+    optional double reqRateMin = 12;
+    optional double reqRateMax = 13;
+    optional double reqRateClient = 14;
 
-    optional double reqRate = 12;
-    optional double reqRateMin = 13;
-    optional double reqRateMax = 14;
-    optional double reqRateClient = 15;
-
-    optional double connRate = 16;
-    optional double connRateMin = 17;
-    optional double connRateMax = 18;
+    optional double connRate = 15;
+    optional double connRateMin = 16;
+    optional double connRateMax = 17;
     
-    repeated Conn conns = 19;
+    //repeated Conn conns = 19;
 
-    repeated Freq client = 20;
-    repeated Freq req_path = 21;
-    repeated Freq req_method = 22;
-    repeated Freq req_type = 23;
-    repeated Freq rsp_status = 24;
+    repeated Freq client = 18;
+    repeated Freq req_path = 19;
+    repeated Freq req_method = 20;
+    repeated Freq req_type = 21;
+    repeated Freq rsp_status = 22;
+
+    optional double tpAvg = 23;
+    optional double tpMin = 24;
+    optional double tpMax = 25;
+
+    optional double tpRevAvg = 26;
+    optional double tpRevMin = 27;
+    optional double tpRevMax = 28;
 };
 
-message Conn {
+/*message Conn {
     required uint32 ip = 1;
     required uint32 port = 2; 
-}
+}*/
 
 message Freq {
     required string name = 1;
     required double freq = 2; 
 }
+
+message Close {}

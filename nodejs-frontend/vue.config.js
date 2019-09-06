@@ -1,6 +1,5 @@
 const path = require("path");
-const webpack = require('webpack');
-
+const webpack = require("webpack");
 module.exports = {
   devServer: {
     disableHostCheck: true
@@ -12,14 +11,13 @@ module.exports = {
       .clear()
       .add("./src/main.js")
       .end();
-    config.resolve.alias
-      .set("@", path.join(__dirname, "./src"))
+    config.resolve.alias.set("@", path.join(__dirname, "./src"));
   },
   configureWebpack: config => {
-    if(process.env.NODE_ENV === 'production') {
-        config.optimization.minimizer[0].options.terserOptions.mangle = {
-          reserved: ['$super'],
-        }
-     }
+    if (process.env.NODE_ENV === "production") {
+      config.optimization.minimizer[0].options.terserOptions.mangle = {
+        reserved: ["$super"]
+      };
+    }
   }
-}
+};

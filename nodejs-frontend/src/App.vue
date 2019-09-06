@@ -2,102 +2,105 @@
   <v-app>
     <v-content class="blue-grey lighten-5">
       <v-container fluid grid-list-lg>
-          <v-layout row wrap>
-            <SystemForm v-bind:statistics="statistics" />
-            <v-flex xs12 v-for="i in 1">
-              <span> Analysis {{ status }} </span>
-              <v-layout class="pa-2" row wrap>
-                <SystemResultGraph v-bind:graph="{
+        <v-layout row wrap>
+          <SystemForm v-bind:statistics="statistics" />
+          <v-flex xs12>
+            <span> Analysis {{ status }} </span>
+            <v-layout class="pa-2" row wrap>
+              <SystemResultGraph
+                v-bind:graph="{
                   stat: stat,
                   id: id,
                   netInt: netInt,
                   interval: interval
-                }" v-for="(stat, id) in activeStats" />
-              </v-layout>
-            </v-flex>
-          </v-layout>
+                }"
+                v-for="(stat, id) in statistics"
+              />
+            </v-layout>
+          </v-flex>
+        </v-layout>
       </v-container>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import SystemForm from './components/SystemForm'
-import SystemResultGraph from './components/SystemResultGraph'
-import { configBus } from './main'
+import SystemForm from "./components/SystemForm";
+import SystemResultGraph from "./components/SystemResultGraph";
+import { configBus } from "./main";
 
 require("./assets/main.scss");
-var accurateInterval = require('accurate-interval');
+//var accurateInterval = require('accurate-interval');
+
+//console.log(process.env);
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     SystemForm,
     SystemResultGraph
   },
-  props: { 
+  props: {
     statistics: {
       type: Object,
-      default: function () {
+      default: function() {
         var stats = {};
-        stats["rst"] = { 
+        stats["rst"] = {
           label: "Request service time",
           type: "line",
           active: true,
-          max: 0.8
+          max: 0.3
         };
-        stats["req_rate"] = { 
+        stats["req_rate"] = {
           label: "Request rate",
           type: "line",
           active: true,
-          max: 40,
-          from: { ip: null, port: null } 
+          max: 5
         };
-        stats["err_rate"] = { 
+        stats["err_rate"] = {
           label: "Error rate",
           type: "line",
           active: true,
           max: 1.1
         };
-        stats["tp"] = { 
+        stats["tp"] = {
           label: "Throughput",
           type: "line",
           active: true,
           max: 5,
-          from: { ip: null, port: null },
           to: { ip: null, port: null }
         };
-        stats["conn_rate"] = { 
+        stats["conn_rate"] = {
           label: "Connection rate",
           type: "line",
           active: true,
           max: 2
         };
-        stats["client"] = { 
+        stats["client"] = {
           label: "Clients",
           type: "area",
           active: true,
           max: 1.1
-        };        
-        stats["req_path"] = { 
+        };
+        stats["req_path"] = {
           label: "Request paths",
           type: "area",
           active: true,
           max: 1.1
         };
-        stats["req_method"] = { 
+        stats["req_method"] = {
           label: "Request methods",
           type: "area",
           active: true,
           max: 1.1
         };
-        stats["req_type"] = { 
+        stats["req_type"] = {
           label: "Request type",
           type: "area",
           active: true,
           max: 1.1
         };
-        stats["rsp_status"] = { 
+        stats["rsp_status"] = {
           label: "Response status",
           type: "area",
           active: true,
@@ -111,107 +114,132 @@ export default {
   data() {
     return {
       ws: null,
-      status: 'not started',
+      status: "not started",
       netInt: [],
-      interval: -1
-    }
-  },
-  computed: {
-    activeStats() {
-      var activeStats = {};
-      for (var id in this.statistics) {
-        if(this.statistics[id].active) {
-          activeStats[id] = this.statistics[id];
-        }
+      interval: -1,
+      client: {
+        ip: null,
+        port: null
+      },
+      server: {
+        ip: null,
+        port: null
       }
-      return activeStats;
-    }
+    };
   },
   methods: {
+    ip2int(ip) {
+      if (!ip) return null;
+      return (
+        ip.split(".").reduce(function(ipInt, octet) {
+          return (ipInt << 8) + parseInt(octet, 10);
+        }, 0) >>> 0
+      );
+    },
     openSocketListeners() {
-      //this.ws = new WebSocket('ws://bmj-cluster.cs.mcgill.ca:15480/ws/');
-      this.ws = new WebSocket('ws://127.0.0.1:8081/ws/');
+      if(typeof process.env.VUE_APP_WS_URL !== 'string') return;
+      
+      this.ws = new WebSocket(process.env.VUE_APP_WS_URL);
       var el = this;
 
       // event emmited when connected
-      this.ws.onopen = function () {
-        console.log('websocket is connected ...')
+      this.ws.onopen = function() {
+        console.log("websocket is connected ...");
 
         // sending a send event to websocket server
         //el.ws.send('connected')
-      }
- 
+      };
+
       // event emmited when connected
-      this.ws.onclose = function () {
-        console.log('websocket is closed ...')
-        el.status = 'is stopped';
-      }
-      
-      // event emmited when receiving message 
-      this.ws.onmessage = function (message) {
+      this.ws.onclose = function() {
+        console.log("websocket is closed ...");
+        el.status = "is stopped";
+      };
+
+      // event emmited when receiving message
+      this.ws.onmessage = function(message) {
         try {
           var data = JSON.parse(message.data);
-          
-          console.log(data);
 
-          for (var id in el.activeStats) {
-            console.log(id);
-            console.log(data[id]);
+          //console.log(data);
 
-            if(typeof data[id] !== 'undefined') {
-              configBus.$emit(id, {
-                netInt: data.netInt, 
-                data: data[id]
-              });
-            }
+          for (var id in data) {
+            //console.log(id);
+            //console.log(data[id]);
+
+            //if(typeof statistics[id] !== 'undefined') {
+            configBus.$emit(id, {
+              netInt: data.netInt,
+              data: data[id]
+            });
+            //}
           }
-        } catch(e) {
-            alert(e); // error in the above string (in this case, yes)!
+        } catch (e) {
+          alert(e); // error in the above string (in this case, yes)!
         }
-      }
+      };
     },
     closeSocketListeners() {
-      if(this.ws != null)
-        this.ws.close();
+      if (this.ws != null) this.ws.close();
     }
   },
   created() {
     // Using the server bus
-    configBus.$on('configSelected', (id, status) => {
+    configBus.$on("configSelected", (id, status) => {
       this.statistics[id].active = status;
     });
 
-    configBus.$on('run', (params) => {
+    configBus.$on("run", params => {
       var el = this;
       this.netInt = params.netInt;
       this.interval = params.interval;
-      this.status = 'is running';
-      var duration = parseInt(params.duration, 10) * 1000;
+      this.status = "is running";
+      //var duration = parseInt(params.duration, 10) * 1000;
 
       /*var timer = accurateInterval(function(scheduledTime) {        
         el.closeSocketListeners();
         el.status = 'is stopped';
         timer.clear();
       }, duration);*/
-      
+
       this.openSocketListeners();
 
-      this.ws.addEventListener('open', function (event) {
+      this.ws.addEventListener("open", function() {
         //console.log("opened");
-        el.ws.send(JSON.stringify({
-          type: "Init",
-          net_int: params.netInt,
-          interval: parseInt(params.interval),
-          duration: parseInt(params.duration),
-          clientCnt: parseInt(params.clientCnt)
-        }));
+
+        let active_metric = 0;
+        let stats = Object.keys(el.statistics);
+
+        for (let id in el.statistics) {
+          if (el.statistics[id].active) {
+            let index = stats.indexOf(id);
+            active_metric |= 1 << index;
+          }
+        }
+
+        console.log(params);
+
+        el.ws.send(
+          JSON.stringify({
+            type: "Init",
+            net_int: params.netInt,
+            interval: parseInt(params.interval),
+            duration: parseInt(params.duration),
+            top_client_cnt: parseInt(params.clientCnt),
+            active_metric: active_metric,
+            client_ip: el.ip2int(params.client.ip),
+            client_port: parseInt(params.client.port),
+            server_ip: el.ip2int(params.server.ip),
+            server_port: parseInt(params.server.port)
+          })
+        );
       });
     });
 
-    configBus.$on('stop', () => {
+    configBus.$on("stop", () => {
       console.log("stop");
       this.closeSocketListeners();
     });
   }
-}
+};
 </script>
