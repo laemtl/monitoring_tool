@@ -1,6 +1,6 @@
-#include "attr.h";
-#include "conn.h";
-#include "data.h";
+#include "attr.h"
+#include "conn.h"
+#include "data.h"
 #include <inttypes.h>
 
 u_int32_t conn_hash_fn(Attr* c) {
@@ -30,16 +30,3 @@ BOOL is_conn_ht(hash_t* ht) {
 	if(ht == &(data->conn_ht)) return TRUE;
 	return FALSE;
 }
-
-/*char* addr_to_str(u_int32_t ip) {
-	char* saddr = ip_ntos(ip);
-
-	printf("s is : %s \n", saddr);
-	printf("pointer is : %p \n", saddr);
-	
-	//char *saddr = CALLOC(char, sizeof(s));
-	//strcpy(saddr, s);
-	//printf("saddr is : %s \n", saddr);
-
-	return saddr;
-}*/

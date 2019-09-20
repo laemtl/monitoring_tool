@@ -50,8 +50,7 @@ void add_attr(void* e, hash_t* ht) {
 
 int req_compare(Attr* a1, Attr* a2) {
     if(a1 == NULL || a2 == NULL) {
-        printf("Uninitilized value \n");
-        return;
+        error("Uninitilized value \n");
     }
 
     if(a1->cnt == a2->cnt) return 0;

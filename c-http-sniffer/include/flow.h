@@ -80,7 +80,7 @@ struct _flow_t
 	BOOL		http;		    /* carrying www ? */
 	http_pair_t		*http_f;	/* front of HTTP pair queue */
 	http_pair_t		*http_e;	/* end of HTTP pair queue */
-	u_int32_t	http_cnt;	    /* count of HTTP pairs */
+	//u_int32_t	http_cnt;	    /* count of HTTP pairs */
 /* Control */
 	time_t		last_action_sec;	/* latest modified time to the flow in seconds */
 	time_t		last_action_usec;	/* latest modified time to the flow in microseconds */

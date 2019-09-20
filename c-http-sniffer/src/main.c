@@ -13,6 +13,7 @@
 #include "flow.h"
 #include "util.h"
 #include "server.h"
+#include "flow_hash_table.h"
 
 int pak = 0;
 int req_n = 0;
@@ -23,6 +24,8 @@ int raw_req = 0;
 int raw_rsp = 0;
 int flow_req = 0;
 int flow_rsp = 0;
+
+BOOL debug = FALSE;
 
 //int GP_CAP_FIN = 0; /* Flag for offline PCAP sniffing */
 
@@ -55,7 +58,7 @@ print_usage(const char* pro_name){
  * Parse packets' header information and return a packet_t object
  */
 packet_t*
-packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
+packet_preprocess(char *raw_data, const struct pcap_pkthdr *pkthdr)
 {
 	packet_t	*pkt = NULL;	/* new packet */
 	char 	*cp = raw_data;
@@ -109,12 +112,6 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 	tcp_hdr = packet_parse_tcphdr(cp);
 	pkt->sport = tcp_hdr->th_sport;
 	pkt->dport = tcp_hdr->th_dport;
-	/* char sport[12];
-	char dport[12];
-	setbuf(stdout,NULL);
-	sprintf(sport,"%d",pkt->sport);
-	sprintf(dport,"%d",pkt->dport);
-	printf("%s||%s\n",sport,dport);*/
 	pkt->tcp_seq = tcp_hdr->th_seq;
 	pkt->tcp_ack = tcp_hdr->th_ack;
 	pkt->tcp_flags = tcp_hdr->th_flags;
@@ -157,16 +154,10 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 			 *  does its own size calculation.
 			**/
 
-			/*pkt->tcp_dl=pkt->raw_len-(pkt->ip_hl+pkt->tcp_hl+sizeof(ethhdr));
-			pkt->tcp_odata = MALLOC(char, pkt->tcp_dl + 1);
-			pkt->tcp_data = pkt->tcp_odata;
-			memset(pkt->tcp_odata, 0, pkt->tcp_dl + 1);
-			memcpy(pkt->tcp_odata, cp, pkt->tcp_dl);*/
-
 		}else{
 			/* Yes, it's HTTP packet */
 			char *head_end = NULL;
-			int hdl = 0;
+			//int hdl = 0;
 			head_end = IsRequest(cp, pkt->tcp_dl);
 			
 			Data* data = {0};
@@ -174,16 +165,10 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 			
 			if( head_end != NULL ){
 				/* First packet of request. */
-				//total++;
 				req_n++;
-				// printf("Request count is: %d \n", data->reqn);
-				//printf("source infos: %s %" PRIu16 "\n", saddr, pkt->sport);
-				//printf("%d\n",total);
-				hdl = head_end - cp + 1;
+				//hdl = head_end - cp + 1;
 				pkt->http = HTTP_REQ;
-				/* Fake TCP data length with only HTTP header. */
-				//pkt->tcp_dl = hdl;
-
+		
 				/** Added functionality: Real TCP data length
 				 *  needed for logger that does own size calc
 				 *  or for individual packet size
@@ -193,21 +178,11 @@ packet_preprocess(const char *raw_data, const struct pcap_pkthdr *pkthdr)
 			head_end = IsResponse(cp, pkt->tcp_dl);
 			if( head_end != NULL ){
 				/* First packet of response. */
-				hdl = head_end - cp + 1;
+				//hdl = head_end - cp + 1;
 				pkt->http = HTTP_RSP;
 
 				rsp_n++;
-				//printf("Req/Rsp diff is: %d \n", data->reqn - data->rspn);
-                //printf("Rsp is: %d \n", data->rspn);
-
-				/* Fake TCP data length with only HTTP header. */
-				//pkt->tcp_dl = hdl;
-				
-				/** Added functionality: Real TCP data length
-				 *  needed for logger that does own size calc
-				 *  or for individual packet size
-				**/
-
+		
 				pkt->tcp_dl=pkt->raw_len-(pkt->ip_hl+pkt->tcp_hl+sizeof(ethhdr));
 			}
 			/* Allocate memory to store HTTP header. */
@@ -251,7 +226,6 @@ void process_packet(Data* data) {
 		}
 	}
 	pthread_exit("Packet raw processing finished.\n");
-	return 0;
 }
 
 /**
@@ -310,15 +284,17 @@ process_flow_queue(Data* data){
  */
 void
 scrubbing_flow_htbl(Data* data){
-	int num = 0;
+	int num;
 	thread_init(data);
 
 	while(1){
 		sleep(10);
 		if (data->status == 1){
 			num = flow_scrubber(60*10);	// flow timeout in seconds
+			printf("Cleaned: %d flows \n", num);
 		} else if (data->status == -1){
 			num = flow_scrubber(-1); // cleanse all flows
+			printf("Cleaned: %d flows \n", num);
 			break;
 		}
 	}
@@ -337,14 +313,12 @@ capture_main(void* p){
 	Capture* param = (Capture*) p;
 	Data* data = param->data;
 	const char* interface = data->interface;
-	int fd = param->fd;
-	//void (*pkt_handler)(void*) = param->pkt_handler;
 	int livemode = param->livemode;
 	
 	thread_init(data);
 	raw_pkt_queue_init();
 
-	const char *raw = NULL;
+	const u_char *raw = NULL;
 	struct pcap_pkthdr pkthdr;
 	//packet_t *packet = NULL;
 	//extern int GP_CAP_FIN;
@@ -407,8 +381,7 @@ void start_analysis(char* ipaddress, Data* data) {
 #endif
 
 	Capture* param = CALLOC(Capture, 1);
-	param->fd = ipaddress;
-	//param->pkt_handler = packet_queue_enq;
+	//param->fd = ipaddress;
 	param->livemode = 1;
 	param->data = data;
 
@@ -432,7 +405,7 @@ void start_analysis(char* ipaddress, Data* data) {
 	/* Start flow processing thread */
 	pthread_create(&job_flow_q, NULL, (void*)process_flow_queue, data);
 
-	pthread_create(&timer, NULL, start_timer, data);
+	pthread_create(&timer, NULL, (void*)start_timer, data);
 
 #if DEBUGGING == 1
 	pthread_create(&job_debug_p, NULL, (void*)debugging_print, data);
@@ -482,9 +455,6 @@ void sigintHandler(int sig_num) {
 	printf("flow_req: %d \n", flow_req);
 	printf("flow_rsp: %d \n", flow_rsp);
 
-	//print_conn_tl(&(data->conn_ht.tl));
-	//print_client_tl(&(data->client_ht.tl));
-	//print_path_tl(&(data->path_ht.tl));
 	exit(0);
 } 
 
@@ -500,14 +470,16 @@ int main(int argc, char *argv[]){
 	printf("My process ID : %d\n", getpid());
 
    	// Parse arguments
-	while((opt = getopt(argc, argv, ":i:f:o:p:h")) != -1){
+	while((opt = getopt(argc, argv, ":i:f:o:p:h:d")) != -1){
 		switch(opt){
-		case 'h':
-			print_usage(argv[0]); return (1);
-		case 'i':
-			interface = optarg; break;
-		case 'p':
-			ipaddress = optarg; break;
+			case 'h':
+				print_usage(argv[0]); return (1);
+			case 'i':
+				interface = optarg; break;
+			case 'p':
+				ipaddress = optarg; break;
+			case 'd':
+				debug = TRUE; break;
 		}
 	}
     

@@ -10,6 +10,6 @@ void raw_pkt_queue_init() {
     Data* data = {0};
 	get_data(&data);
 
-    data->raw_pkt_queue.free = raw_packet_free;
+    data->raw_pkt_queue.free = (void*)raw_packet_free;
     queue_init(&(data->raw_pkt_queue));
 }

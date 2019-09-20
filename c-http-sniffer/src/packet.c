@@ -56,7 +56,7 @@ packet_parse_ethhdr(const char *p)
 {
 	ethhdr *hdr, *tmp;
 
-	tmp = p;
+	tmp = (ethhdr *)p;
 	hdr = MALLOC(ethhdr, 1);
 
 	memset(hdr, 0, sizeof(ethhdr));

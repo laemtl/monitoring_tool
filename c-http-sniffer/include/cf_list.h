@@ -19,4 +19,9 @@ struct _cf_list {
     int count;
 };
 
+void cfl_init(cf_list* cfl);
+void cfl_add(char* name, double c_freq, cf_list* cfl);
+void cfl_delete(cf_list* cfl);
+void print_cfl(cf_list* cfl);
+
 #endif

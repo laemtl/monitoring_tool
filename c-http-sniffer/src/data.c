@@ -3,11 +3,15 @@
 #include <sys/syscall.h>
 #include <inttypes.h>
 #include <float.h>
+#include <string.h>
+#include <unistd.h>
 #include "data.h"
 #include "req_path.h"
 #include "conn.h"
 #include "req_type.h"
 #include "rsp_status.h"
+#include "client.h"
+#include "server.h"
 
 extern int flow_req;
 extern int flow_rsp;
@@ -16,7 +20,9 @@ extern int pak_deq;
 extern int rsp_n;
 extern int req_n;
 
-int d = 0;
+extern BOOL debug;
+
+//int d = 0;
 
 /* Output flow's brief to stdout */
 /** Added Functionality: Function now takes file descriptor as arguement
@@ -28,8 +34,6 @@ static pthread_key_t data;
 static pthread_once_t init_done = PTHREAD_ONCE_INIT;
 
 void destr_fn(void *param) {
-   //printf("Destructor function invoked\n");
-   //free(param);
 }
 
 void init_once_metric(Metric* metric) {
@@ -42,6 +46,7 @@ void init_once_metric(Metric* metric) {
 
 void reset_metric(Metric* metric) {
 	metric->total.value = 0;
+	metric->subtotal.value = 0;
 	metric->sum.value = 0;
 	metric->min.value = DBL_MAX;
 	metric->max.value = 0;
@@ -52,6 +57,7 @@ void reset(Data* data) {
 	reset_metric(&(data->err_rate));
 	reset_metric(&(data->req_rate));
 	reset_metric(&(data->tp));
+	reset_metric(&(data->tp_rev));
 	reset_metric(&(data->conn_rate));
 
 	data->int_step = 0;
@@ -69,6 +75,7 @@ Data* init_data() {
 	init_once_metric(&(data->err_rate));
 	init_once_metric(&(data->req_rate));
 	init_once_metric(&(data->tp));
+	init_once_metric(&(data->tp_rev));
 
 	reset(data);	
 	data->status = 0;
@@ -95,11 +102,10 @@ void delete_data(Data* data) {
 	free(data);
 }
 
-static void thread_key_setup() {
+void thread_key_setup() {
 	int status;
     if ((status = pthread_key_create(&data, destr_fn )) < 0) {
-        printf("pthread_key_create failed, errno=%d", errno);
-    	return EXIT_FAILURE;
+        error("pthread_key_create failed");
     }
 }
 
@@ -107,8 +113,7 @@ void thread_init(Data* d) {
     pthread_once(&init_done, thread_key_setup);
 
 	if (pthread_setspecific(data, d) <  0) {
-		printf("pthread_setspecific failed, errno %d", errno);
-		pthread_exit((void *)12);
+		error("pthread_setspecific failed\n");
 	}
 }
 
@@ -120,8 +125,7 @@ void print_tid() {
 void get_data(Data** d) {	
 	*d = (Data *)pthread_getspecific(data);
     if(d == NULL) {
-        printf("pthread_getspecific failed, errno %d\n", errno);
-        return EXIT_FAILURE;
+        error("pthread_getspecific failed\n");
 	}
 }
 
@@ -152,15 +156,13 @@ double get_err_rate() {
 	return result;
 }
 
-// Get error rate with subtotals
-double get_err_rate_subtotals() {
+// Get error rate with subtotal
+double get_err_rate_subtotal() {
 	Data* data = {0};
 	get_data(&data);
 
 	double result = 0;
 	if (data->rsp_sec_tot > 0) {
-		//printf("err subtot: %d \n", data->err_rate.subtotal.value);
-		//printf("rsp_subtot: %d \n", data->rsp_sec_tot);
 		result = (double)data->err_rate.subtotal.value/data->rsp_sec_tot;
 	}
 	return result;
@@ -178,6 +180,29 @@ double get_req_rate() {
 	return result;
 }
 
+double get_tp_avg() {
+	Data* data = {0};
+	get_data(&data);
+
+	if(data->tp.total.value <= 0) return 0;
+
+	double result = (double)(data->tp.total.value - data->int_ref_value)/data->interval;
+	data->int_ref_value = data->tp.total.value;
+	return result;
+}
+
+double get_tp_rev_avg() {
+	Data* data = {0};
+	get_data(&data);
+
+	if(data->tp_rev.total.value <= 0) return 0;
+
+	double result = (double)(data->tp_rev.total.value - data->int_rev_ref_value)/data->interval;
+	data->int_rev_ref_value = data->tp_rev.total.value;
+
+	return result;
+}
+
 double get_conn_rate() {
 	Data* data = {0};
 	get_data(&data);
@@ -191,15 +216,15 @@ void add_metric_sum(Metric* metric, double amt) {
 	pthread_mutex_unlock(&(metric->sum.mutex));
 }
 
-void inc_metric_total(Metric* metric) {
+void add_metric_total(Metric* metric, int amt) {
     pthread_mutex_lock(&(metric->total.mutex));
-	metric->total.value++;
+	metric->total.value += amt;
 	pthread_mutex_unlock(&(metric->total.mutex));
 }
 
-void inc_metric_subtotal(Metric* metric) {
+void add_metric_subtotal(Metric* metric, int amt) {
 	pthread_mutex_lock(&(metric->subtotal.mutex));
-	metric->subtotal.value++;
+	metric->subtotal.value += amt;
 	pthread_mutex_unlock(&(metric->subtotal.mutex)); 
 }
 
@@ -233,7 +258,6 @@ void extract_data(flow_t *flow){
 	pthread_mutex_lock(&(data->lock));
 
 	if(data->has_client_ip) {
-		printf("has client \n");
 		if(data->client.ip != flow->socket.saddr) {
 			pthread_mutex_unlock(&(data->lock));
 			return;
@@ -245,6 +269,24 @@ void extract_data(flow_t *flow){
 				return;
 			}
 		}
+
+		// Throughput
+		if(data->has_server_ip) {
+			if(data->server.ip != flow->socket.daddr) {
+				pthread_mutex_unlock(&(data->lock));
+				return;
+			}
+			
+			if(data->has_server_port) {
+				if(data->server.port != flow->socket.dport) {
+					pthread_mutex_unlock(&(data->lock));
+					return;
+				}
+			}
+		}
+
+		compute_tp(flow->payload_src, data);
+		compute_tp_rev(flow->payload_dst, data);
 	}
 
 	if(!flow->processed) {
@@ -252,7 +294,7 @@ void extract_data(flow_t *flow){
 		data->flow_tot++;
 		flow->processed = TRUE;				
 	}
-
+	
 	if (flow->http_f != NULL){        	
 		http_pair_t *h = flow->http_f;
 		while(h != NULL) {
@@ -269,7 +311,18 @@ void extract_data(flow_t *flow){
 					compute_req_rate(data);
 				}
 				
-				if(h->response_header != NULL && !h->rsp_processed) {
+				if(h->rsp_processed) {
+					http_pair_t* next = h->next;
+
+					if(next != NULL) {
+						flow->http_f = next;
+						http_free(h);
+					}
+					h = next;
+					continue;
+				}
+
+				if(h->response_header != NULL) {
 					h->rsp_processed = TRUE;
 					flow_rsp++;
 					data->rsp_tot++;
@@ -281,8 +334,7 @@ void extract_data(flow_t *flow){
 					compute_err_rate(rsp->status, data);
 					add_rsp_status(rsp->status, data);
 				}
-				
-				if(h->response_header == NULL) d++;
+				//if(h->response_header == NULL) d++;
 			}	   
 			h = h->next;
 		}
@@ -290,11 +342,22 @@ void extract_data(flow_t *flow){
 	pthread_mutex_unlock(&(data->lock));
 }
 
+void compute_tp(u_int32_t payload, Data* data) {
+	if(!data->tp.active) return;
+
+	data->tp.total.value = payload;
+}
+
+void compute_tp_rev(u_int32_t payload, Data* data) {
+	if(!data->tp_rev.active) return;
+
+	data->tp_rev.total.value = payload;
+}
+
 void compute_req_rate(Data* data) {
 	if(!data->req_rate.active) return;
 
-	inc_metric_subtotal(&(data->req_rate));
-	inc_metric_total(&(data->req_rate));
+	add_metric_subtotal(&(data->req_rate), 1);
 }
 
 void compute_rst(http_pair_t *h, Data* data) {
@@ -307,18 +370,11 @@ void compute_rst(http_pair_t *h, Data* data) {
 	request_t *req = h->request_header;
 
 	if(rst < 0 ) {
-		//printf("req_seq: %" PRIu32"\n", req->seq);
 		printf("req nxt seq: %" PRIu32 "\n", req->nxt_seq);
 		printf("aknowledgment: %ld \n", rsp->acknowledgement);
-
-		//printf("req %lld %lld \n", (long long)h->req_fb_sec, (long long)h->req_fb_usec);
-		//printf("rsp %lld %lld \n", (long long)h->rsp_fb_sec, (long long)h->rsp_fb_usec);
 	}
-
-	//int res = tcp_order_check(f->order);
-	//if(res == 0) printf("Unordered flow \n");
 	
-	inc_metric_total(&(data->rst));
+	add_metric_total(&(data->rst), 1);
 	add_metric_sum(&(data->rst), rst);
 	update_metric_min(&(data->rst), rst);
 	update_metric_max(&(data->rst), rst);
@@ -331,15 +387,14 @@ void compute_err_rate(int status, Data* data) {
 	int i = status;
 	while (i>=10) i=i/10;  
 	if (i>3) {
-		inc_metric_subtotal(&(data->err_rate));
-		inc_metric_total(&(data->err_rate));
+		add_metric_subtotal(&(data->err_rate), 1);
 	}
 }
 
-void extract_freq_ht(hash_t* ht, Result* r, int (*cfl_add_fn)(void*, int, Result*)) {
+void extract_freq_ht(hash_t* ht, Result* r, void (*cfl_add_fn)(void*, int, Result*)) {
 	int i;
-	hash_mb_t *hm = NULL;
-	node	*e = NULL;
+	//hash_mb_t *hm = NULL;
+	//node	*e = NULL;
 
 	for(i=0; i<ht->size; i++){
 		pthread_mutex_lock(&(ht->buckets[i]->mutex));
@@ -359,7 +414,7 @@ void extract_freq_ht(hash_t* ht, Result* r, int (*cfl_add_fn)(void*, int, Result
 	}
 }
 
-void extract_freq_ar(int* ar, int size, Result* r, int (*cfl_add_fn)(int, int, Result*)) {
+void extract_freq_ar(int* ar, int size, Result* r, void (*cfl_add_fn)(int, int, Result*)) {
 	Data* data = {0};
 	get_data(&data);
 
@@ -374,13 +429,10 @@ Result* get_result() {
     Data* data = {0};
 	get_data(&data);
 
-	//Data* d = {0};
 	Result* result = CALLOC(Result, 1);
 
 	// TODO: We need a lock
-	//memcpy(d, data, sizeof(data));
-
-	result->interface = data->interface;	
+	result->interface = (char*)data->interface;	
 	result->client_sock = data->client_sock;
 
 	if(data->rst.active) {
@@ -399,6 +451,18 @@ Result* get_result() {
 		result->req_rate = get_req_rate(); 
 		result->req_rate_min = get_metric_min(data->req_rate);
 		result->req_rate_max = data->req_rate.max.value;
+	}
+
+	if(data->tp.active) {
+		result->tp_avg = get_tp_avg();
+		result->tp_min = get_metric_min(data->tp);
+		result->tp_max = data->tp.max.value;
+	}
+
+	if(data->tp_rev.active) {
+		result->tp_rev_avg = get_tp_rev_avg();
+		result->tp_rev_min = get_metric_min(data->tp_rev);
+		result->tp_rev_max = data->tp_rev.max.value;
 	}
 
 	if(data->conn_rate.active) {
@@ -424,31 +488,32 @@ Result* get_result() {
 	if(data->req_type_active) {
 		cfl_init(&(result->req_type));
 		int size_rt = sizeof(data->req_type)/sizeof(data->req_type[0]);
-		extract_freq_ar(&(data->req_type), size_rt, result, req_type_cfl_add);
+		extract_freq_ar(&(data->req_type[0]), size_rt, result, req_type_cfl_add);
 	}
 
 	if(data->rsp_status_active) {
 		cfl_init(&(result->rsp_status));
 		int size_rs = sizeof(data->rsp_status)/sizeof(data->rsp_status[0]);
-		extract_freq_ar(&(data->rsp_status), size_rs, result, rsp_status_cfl_add);
+		extract_freq_ar(&(data->rsp_status[0]), size_rs, result, rsp_status_cfl_add);
 	}
 
 	return result;
 }
 
-// TODO: check if status active
 void process_rate(Data* data) {
 	if(data->req_rate.active) {
 		int req_subtotal = data->req_rate.subtotal.value;
 		update_metric_min(&(data->req_rate), req_subtotal);
 		update_metric_max(&(data->req_rate), req_subtotal);
+		add_metric_total(&(data->req_rate), req_subtotal);
 		reset_metric_subtotal(&(data->req_rate));
 	}
 
 	if(data->err_rate.active) {
-		double err_rate_subtotals = get_err_rate_subtotals();
-		update_metric_min(&(data->err_rate), err_rate_subtotals);
-		update_metric_max(&(data->err_rate), err_rate_subtotals);
+		double err_rate_subtotal = get_err_rate_subtotal();
+		update_metric_min(&(data->err_rate), err_rate_subtotal);
+		update_metric_max(&(data->err_rate), err_rate_subtotal);
+		add_metric_total(&(data->err_rate), data->err_rate.subtotal.value);
 		reset_metric_subtotal(&(data->err_rate));
 	}
 
@@ -457,7 +522,35 @@ void process_rate(Data* data) {
 		add_metric_sum(&(data->conn_rate), conn_int_cnt);
 		update_metric_min(&(data->conn_rate), conn_int_cnt);
 		update_metric_max(&(data->conn_rate), conn_int_cnt);
-		reset_metric_subtotal(&(data->conn_rate));
+		
+		// reset interval (1 sec) counter
+		reset_int_cnt(&(data->conn_ht));
+	}
+
+	// TODO: For each loop for all hashtable
+	reset_int_cnt(&(data->client_ht));
+	reset_int_cnt(&(data->req_path_ht));
+
+	if(data->tp.active) {
+		if(data->tp.total.value > 0) {
+			u_int32_t new_sec_ref_value = data->tp.total.value;
+			u_int32_t tp_subtotal = new_sec_ref_value - data->sec_ref_value;
+			data->sec_ref_value = new_sec_ref_value;
+			
+			update_metric_min(&(data->tp), tp_subtotal);
+			update_metric_max(&(data->tp), tp_subtotal);	
+		}
+	}
+
+	if(data->tp_rev.active) {
+		if(data->tp_rev.total.value > 0) {
+			u_int32_t new_sec_rev_ref_value = data->tp_rev.total.value;
+			u_int32_t tp_rev_subtotal = new_sec_rev_ref_value - data->sec_rev_ref_value;
+			data->sec_rev_ref_value = new_sec_rev_ref_value;
+			
+			update_metric_min(&(data->tp_rev), tp_rev_subtotal);
+			update_metric_max(&(data->tp_rev), tp_rev_subtotal);	
+		}	
 	}
 }
 
@@ -480,8 +573,6 @@ void flow_hash_process() {
 		
 		pthread_mutex_unlock(&(data->flow_hash_table[i]->mutex));
 	}
-
-	return 0;
 }
 
 void free_result(Result* result) {
@@ -511,13 +602,13 @@ void free_result(Result* result) {
 	free(result);
 }
 
-void process_data(int tid) {
+void process_data(int sig) {
 	Data* data = {0};
 	get_data(&data);
 
 	data->int_step++;
 
-	// The completed flow are processed by extract_data
+	// The completed flow are processed by extract_data every seconds
 	// We process the ones in the hash table using the following function 	
 	flow_hash_process();
 	
@@ -526,11 +617,6 @@ void process_data(int tid) {
 	data->stamp++;	
 
 	data->rsp_sec_tot = 0;
-
-	// reset interval (1 sec) counter
-	reset_int_cnt(&(data->conn_ht));
-	reset_int_cnt(&(data->client_ht));
-	reset_int_cnt(&(data->req_path_ht));
 
 	if(data->int_step < data->interval) {
 		pthread_mutex_unlock(&(data->lock));
@@ -542,20 +628,21 @@ void process_data(int tid) {
 	data->rsp_int_tot = 0;
 	pthread_mutex_unlock(&(data->lock));
 
-#if DEBUGGING == 2
-	print_data(result);
-	fflush(stdout);
-#endif
+	if(debug) {
+		print_data(result);
+		fflush(stdout);
+	}
 
 	if(data->status == -1) {
 		//timer_delete(tid);
-
 		//print_conn_tl(&(data->conn_ht.tl));
 
-		printf("pak: %d \n", pak);
-    	printf("dpak: %d \n", pak_deq);
-		printf("reqn: %d \n", req_n);
-		printf("rspn: %d \n", rsp_n);
+		if(debug) {
+			printf("pak: %d \n", pak);
+			printf("dpak: %d \n", pak_deq);
+			printf("reqn: %d \n", req_n);
+			printf("rspn: %d \n", rsp_n);
+		}
 	}
 
 	// Struct are passed by value so the code below will execute correctly in an MT env
@@ -571,6 +658,9 @@ void process_data(int tid) {
 }
 
 void print_data(Result* result) {
+	Data* data = {0};
+	get_data(&data);
+
 	time_t raw_time;
 	struct tm *timeinfo = NULL;
 	char time_buf[20];
@@ -581,26 +671,51 @@ void print_data(Result* result) {
 	memset(time_buf, 0, sizeof(time_buf));
 	strftime(time_buf, sizeof(time_buf), "%Y%m%d %H:%M:%S", timeinfo);
 
-	/*printf("%s - %f %f %f %f %f %f %f %f %f %f %f %f \n", 
-		time_buf, 
-		result->rst_avg, result->rst_min, result->rst_max, 
-    	result->req_rate, result->req_rate_min, result->req_rate_max,
-        result->err_rate, result->err_rate_min, result->err_rate_max,
-		result->conn_rate, result->conn_rate_min, result->conn_rate_max
-    );*/
+	printf("Time: %s \n", time_buf);
 	
-	/*printf("Client cumulated freq list \n");
-	print_cfl(&(result->client));
+	if(data->rst.active) {
+		printf("RST (avg, min, max): %f %f %f \n", result->rst_avg, result->rst_min, result->rst_max);
+	}
 
-	printf("Path cumulated freq list \n");
-	print_cfl(&(result->req_path));
+	if(data->req_rate.active) {
+		printf("REQ RATE (avg, min, max): %f %f %f \n", result->req_rate, result->req_rate_min, result->req_rate_max);
+	}
 
-	printf("Method cumulated freq list \n");
-	print_cfl(&(result->req_method));
+	if(data->err_rate.active) {
+		printf("ERR RATE (avg, min, max): %f %f %f \n", result->err_rate, result->err_rate_min, result->err_rate_max);
+	}
 
-	printf("Req Type cumulated freq list \n");
-	print_cfl(&(result->req_type));
+	if(data->conn_rate.active) {
+		printf("CONN RATE (avg, min, max): %f %f %f \n", result->conn_rate, result->conn_rate_min, result->conn_rate_max);
+	}
 
-	printf("Rsp Status cumulated freq list \n");
-	print_cfl(&(result->rsp_status));*/
+	if(data->client_active) {
+		printf("Client cumulated freq list \n");
+		print_cfl(&(result->client));
+		printf("\n");
+	}
+
+	if(data->req_path_active) {
+		printf("Path cumulated freq list \n");
+		print_cfl(&(result->req_path));
+		printf("\n");
+	}
+
+	if(data->req_method_active) {
+		printf("Method cumulated freq list \n");
+		print_cfl(&(result->req_method));
+		printf("\n");
+	}
+
+	if(data->req_type_active) {
+		printf("Req Type cumulated freq list \n");
+		print_cfl(&(result->req_type));
+		printf("\n");
+	}
+
+	if(data->rsp_status_active) {
+		printf("Rsp Status cumulated freq list \n");
+		print_cfl(&(result->rsp_status));
+		printf("\n");
+	}
 }

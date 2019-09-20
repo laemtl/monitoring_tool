@@ -160,7 +160,7 @@ struct _request_t
 	http_ver 	version;
 	http_mthd	method;
 	char*		host;
-	const char*		uri;
+	char*		uri;
 	char*		user_agent;
 	char*		referer;
 	char*		connection;

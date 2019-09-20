@@ -34,15 +34,15 @@ http_response_status(const char *line, int len);
 /*
  * HTTP status code.
  */
-extern int totalGet=0;
-extern int totalPost=0;
-extern int totalHead=0;
-extern int totalPut=0;
-extern int totalDelete=0;
-extern int totalConnect=0;
-extern int totalTrace=0;
-extern int totalOptions=0;
-extern http_st_code HTTP_STATUS_CODE_ARRAY[] = {
+int totalGet=0;
+int totalPost=0;
+int totalHead=0;
+int totalPut=0;
+int totalDelete=0;
+int totalConnect=0;
+int totalTrace=0;
+int totalOptions=0;
+http_st_code HTTP_STATUS_CODE_ARRAY[] = {
     {100, HTTP_ST_100},
     {101, HTTP_ST_101},
     {102, HTTP_ST_102},
@@ -100,7 +100,7 @@ extern http_st_code HTTP_STATUS_CODE_ARRAY[] = {
     {599, HTTP_ST_599}
 };
 
-extern char *HTTP_METHOD_STRING_ARRAY[] = {
+char *HTTP_METHOD_STRING_ARRAY[] = {
     "OPTIONS",
     "GET",
     "HEAD",
@@ -208,8 +208,8 @@ http_pair_t*
 http_new(void)
 {
 	http_pair_t	*h = NULL;
-	h = MALLOC(http_pair_t, 1);
-	memset(h, 0, sizeof(http_pair_t));
+	h = CALLOC(http_pair_t, 1);
+	//memset(h, 0, sizeof(http_pair_t));
 	
 	return h;
 }
@@ -218,8 +218,8 @@ request_t*
 http_request_new(void)
 {
 	request_t *r = NULL;
-	r = MALLOC(request_t, 1);
-	memset(r, 0, sizeof(request_t));
+	r = CALLOC(request_t, 1);
+	//memset(r, 0, sizeof(request_t));
 	return r;
 }
 
@@ -227,8 +227,8 @@ response_t*
 http_response_new(void)
 {
 	response_t *r = NULL;
-	r = MALLOC(response_t, 1);
-	memset(r, 0, sizeof(response_t));
+	r = CALLOC(response_t, 1);
+	//memset(r, 0, sizeof(response_t));
 	return r;
 }
 
@@ -467,8 +467,8 @@ http_request_method(const char *data, int linelen)
 {
     const char *ptr;
     int	index = 0;
-    int prefix_len = 0;
-    char *unkn;
+    //int prefix_len = 0;
+    //char *unkn;
 
     /*
      * From RFC 2774 - An HTTP Extension Framework
@@ -480,7 +480,7 @@ http_request_method(const char *data, int linelen)
         if (strncmp(data, "M-", 2) == 0 || strncmp(data, "\r\n", 2) == 0) { /* \r\n necesary for bug in client POST */
             data += 2;
             linelen -= 2;
-            prefix_len = 2;
+            //prefix_len = 2;
         }
     }
 
@@ -918,8 +918,8 @@ int
 http_parse_response(response_t *response, const char *data, const char *dataend, long ack)
 {
 	char *eoh, *eol, *linesp, *lineep;
-	int line_cnt = 0, i = 0, dim = sizeof(HTTP_STATUS_CODE_ARRAY), lnl = 0, hdl = 0;
-	http_status status;
+	int line_cnt = 0, /* i = 0, dim = sizeof(HTTP_STATUS_CODE_ARRAY),*/ lnl = 0, hdl = 0;
+	//http_status status;
 
 	eoh = find_header_end(data, dataend, &line_cnt);
 	hdl = eoh -data + 1;

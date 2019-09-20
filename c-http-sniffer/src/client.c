@@ -1,8 +1,9 @@
-#include "client.h";
+#include "client.h"
+#include "cf_list.h"
 #include <inttypes.h>
 
 u_int32_t client_hash_fn(Attr* a) {
-    if(a == NULL) return;
+    if(a == NULL) error("Element cannot be NULL");
 
     Data* data = {0};
 	get_data(&data);
@@ -15,16 +16,18 @@ int ip_compare(Attr* c1, Attr* c2) {
     return 1;
 }
 
-void client_cfl_add(u_int32_t* addr, int cnt, Result* r) {
+void client_cfl_add(void* addr, int cnt, Result* r) {
 	Data* data = {0};
 	get_data(&data);
+
+	u_int32_t add = *(u_int32_t*)addr;
 
 	if(data->flow_tot <= 0) return;
 	
 	double freq = (double) cnt / data->req_tot;
 	//double freq = (double) cnt / data->flow_tot;
     if(freq > MIN_FREQ) {
-	    cfl_add(ip_ntos(*addr), freq, &(r->client));
+	    cfl_add(ip_ntos(add), freq, &(r->client));
 	}
 }
 

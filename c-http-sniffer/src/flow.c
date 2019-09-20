@@ -198,8 +198,8 @@ flow_init(void* data){
 flow_t*
 flow_new(void){
 	flow_t *f;
-	f = MALLOC(flow_t, 1);
-	memset(f, 0, sizeof(flow_t));
+	f = CALLOC(flow_t, 1);
+	//memset(f, 0, sizeof(flow_t));
 	f->order = order_new();
 	return f;
 }
@@ -208,8 +208,7 @@ flow_new(void){
 /* Free a flow_t object */
 int 
 flow_free(flow_t *f){
-    //FILE *file = fopen("log.txt","a");
-	packet_t *cp;
+    packet_t *cp;
 	http_pair_t	*h;
 	while(f->pkt_dst_f != NULL){
 		cp = f->pkt_dst_f;
@@ -229,8 +228,7 @@ flow_free(flow_t *f){
 
 	while(f->http_f != NULL){
 		h = f->http_f;
-        //fprintf(file,"%s %s %d\n", (h->request_header)->uri, (h->response_header)->date, h->rsp_total_len); 
-		f->http_f = f->http_f->next;
+        f->http_f = f->http_f->next;
 		http_free(h);
 	}
 
@@ -247,14 +245,14 @@ flow_socket_cmp(flow_s *a, flow_s *b){
 /* Add a http_pair_t object to flow's http_pair_t chain */
 int 
 flow_add_http(flow_t *f, http_pair_t *h){
-	if(f->http_cnt == 0){
+	if(f->http_f == NULL){
 		f->http_f = h;
 	}else{
 		f->http_e->next = h;
 	}
 	f->http_e = h;
 	f->http_e->next = NULL;
-	f->http_cnt++;
+	//f->http_cnt++;
 	return 0;
 }
 
@@ -435,7 +433,8 @@ flow_extract_http(flow_t *f, BOOL closed){
 	 * Set the client and server FIN sequences.
 	 */
 	seq_t	*fin_seq = NULL;	/* The actual FIN sequence. */
-	u_int8_t	fin_dir = 0;	/* fin_dir:
+	//u_int8_t	fin_dir = 0;	
+	/* fin_dir:
 	 * 0: Not set;
 	 * 1: src_fin_seq is used;
 	 * 2: dst_fin_seq is used;
@@ -443,20 +442,20 @@ flow_extract_http(flow_t *f, BOOL closed){
 	
 	if (src_fin_seq != NULL && dst_fin_seq == NULL){
 		fin_seq = src_fin_seq;
-		fin_dir = 1;
+		//fin_dir = 1;
 	}else if (src_fin_seq == NULL && dst_fin_seq != NULL){
 		fin_seq = dst_fin_seq;
-		fin_dir = 2;
+		//fin_dir = 2;
 	}else if (src_fin_seq != NULL && dst_fin_seq != NULL){
 		fin_seq = src_fin_seq;
-		fin_dir = 1;
+		//fin_dir = 1;
 		if(compare_sequence_time(src_fin_seq, dst_fin_seq) == 1){
 			fin_seq = dst_fin_seq;
-			fin_dir = 2;
+			//fin_dir = 2;
 		}
 	}else{
 		fin_seq = NULL;
-		fin_dir = 0;
+		//fin_dir = 0;
 	}
 	
 	/* 
@@ -779,18 +778,13 @@ flow_extract_http(flow_t *f, BOOL closed){
 				 */
 				rspn++;
 
-				u_int32_t ack = pkt->tcp_ack;
+				//u_int32_t ack = pkt->tcp_ack;
 				raw_rsp++;
 				
 				/* Try to find the first pair without response */
 				while(tmp != NULL){
-					/*if(tmp->request_header->nxt_seq > ack) {
-						tmp = NULL;
-						break;
-					}*/
 					
 					if(tmp->response_header == NULL /*&& tmp->request_header->nxt_seq == ack*/) {
-						//printf("ns: %" PRIu32 " ack: %" PRIu32" \n", tmp->request_header->nxt_seq, ack);
 						break;
 					}
 					tmp = tmp->next;
@@ -810,9 +804,9 @@ flow_extract_http(flow_t *f, BOOL closed){
 
 
 					/** Added functionality: store
-                                         *  acknowledgement number in 
-                                         *  response_header information.
-                                        **/
+					 *  acknowledgement number in 
+					 *  response_header information.
+					**/
 
 					http_parse_response(rsp, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl, pkt->tcp_ack);
 				}

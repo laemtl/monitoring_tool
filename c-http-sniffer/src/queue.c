@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <pthread.h>
 #include "queue.h"
 
 BOOL queue_init(Queue* q) {

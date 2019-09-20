@@ -2,6 +2,9 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include <ctype.h>
 
 #include "util.h"
 
@@ -131,4 +134,11 @@ u_int32_t ip_ston(char *cp){
 	}
 	return val;
 
+}
+
+void error(char* s) {
+    perror(s);
+	
+	int v = 1;
+	pthread_exit(&v);
 }

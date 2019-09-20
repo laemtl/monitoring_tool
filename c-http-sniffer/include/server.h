@@ -18,6 +18,8 @@
 
 void start_log(char* ipaddress);
 void start_server();
+void start_analysis(char* ipaddress, Data* data);
+int send_data(Result* result);
   
 /*typedef struct analysis_conn_ {
     uint32_t socket;

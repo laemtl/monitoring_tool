@@ -7,7 +7,7 @@
 #include <sys/syscall.h>
 #include <stdlib.h>
 #include <errno.h>
-
+#include <string.h>
 #include "data.h" 
 
 // These defines come from asm-generic/siginfo.h, are necessary, but are not included by signal.h.
@@ -19,7 +19,7 @@
 #define CLOCKID CLOCK_REALTIME
 #define SIG SIGRTMIN
 
-void stop_analysis(int tid) {
+void stop_analysis(int sig) {
 	Data* data = {0};
 	get_data(&data);
 
@@ -27,12 +27,6 @@ void stop_analysis(int tid) {
 
 	//timer_delete(tid);
 	pthread_exit(NULL);
-}
-
-static void errExit(msg) {
-	do { 
-		perror(msg); exit(EXIT_FAILURE); 
-	} while (0);
 }
 
 static pid_t gettid(void) {
@@ -52,7 +46,7 @@ void create_timer(long start, long interval, int* status, void (*callback) (int)
 	its.it_interval.tv_sec = interval;
 	its.it_interval.tv_nsec = 0;
 
-	while(status < 1) 
+	while(*status < 1) 
 		nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
 
 	// by default, SIGCHLD is set to be ignored so unless we happen
@@ -80,33 +74,35 @@ void create_timer(long start, long interval, int* status, void (*callback) (int)
 		pthread_exit((void *) 10);
 
 	if (timer_create(CLOCK_REALTIME, &se, &timerid)) {
-		printf("Error with timer_create\n");
-		pthread_exit((void *) 11);
+		error("Error with timer_create\n");
 	}
 	
 	if (timer_settime(timerid, 0, &its, NULL)) {
-		printf("Error with timer_settime\n");
-		pthread_exit((void *) 12);
+		error("Error with timer_settime\n");
 	}
 
 	while (1) {
 		if ((sig = sigwaitinfo(&mask, &si)) < 0) {
-			printf("Error with sigwaitinfo, errno %d\n", errno);
-			pthread_exit((void *) 13);
+			error("Error with sigwaitinfo\n");
 		}
 			
 		if (sig != PERIOD_SIG) {
 			// printf("signal: %d", sig);
 			continue;
 		}
-		
-		callback(timerid);
+
+		callback(0);
+		//callback(timerid);
 	}
 }
 
 void start_duration_timer(Data* data) {
 	thread_init(data);
 	create_timer(data->duration, 0, &(data->status), stop_analysis);
+}
+
+void start_interval_timer(uint32_t interval, int* status) {
+	create_timer(interval, interval, status, process_data);
 }
 
 void start_timer(Data* data) {
@@ -120,8 +116,4 @@ void start_timer(Data* data) {
 
 	// start an interval timer wich fires every seconds to compute rates
 	start_interval_timer(1, &(data->status));
-}
-
-void start_interval_timer(uint32_t interval, int* status) {
-	create_timer(interval, interval, status, process_data);
 }

@@ -18,7 +18,7 @@
 #include "hash_table.h"
 
 /* Initiate the hash table with no elems */
-int hash_init(hash_t* ht, int (*hash_fn)(void*, void*), int (*compare_fn)(void*, void*), void (*update_fn)(void*, void*), void (*free_fn)(void*)) {
+int hash_init(hash_t* ht, u_int32_t(*hash_fn)(Attr*), int(*compare_fn)(Attr*, Attr*), void (*update_fn)(Attr*, hash_t*), void (*free_fn)(Attr*)) {
 	int ret, i;
 	if(ht == NULL) return 1;
 
@@ -47,7 +47,7 @@ int hash_init(hash_t* ht, int (*hash_fn)(void*, void*), int (*compare_fn)(void*,
 
 /* Create a new record in hash table */
 node* hash_new(void *value, hash_t* ht) {
-	if(ht == NULL || value == NULL) return 1;
+	if(ht == NULL || value == NULL) error("ht or value is NULL \n");
 	
 	node* n = MALLOC(node, 1);
 	n->value = value;
@@ -77,9 +77,9 @@ node* hash_new(void *value, hash_t* ht) {
 
 /* Try to find a record in hash table */
 node* hash_find(void *value, hash_t* ht) {
-	if(ht == NULL || value == NULL) return 1;
+	if(ht == NULL || value == NULL) error("ht or value is NULL \n");
 	
-	hash_mb_t *hm = NULL;
+	hash_mb_t2 *hm = NULL;
 	node	*e = NULL;
 
 	u_int32_t key = ht->hash_fn(value);
@@ -105,12 +105,12 @@ node* hash_find(void *value, hash_t* ht) {
 
 /* Delete a record in hash table */
 node* hash_delete(void *value, hash_t* ht) {
-    if(ht == NULL || value == NULL) return 1;
+    if(ht == NULL || value == NULL) error("ht or value is NULL \n");
 		
 	node* n = hash_find(value, ht);
 	if(n == NULL) return NULL;
 
-	hash_mb_t *hm = n->hmb;
+	hash_mb_t2 *hm = n->hmb;
 
 	if( hm->elm_cnt == 1 && n == hm->first){
 		hm->first = NULL;
@@ -141,7 +141,7 @@ node* hash_delete(void *value, hash_t* ht) {
  */
 
 int hash_add(void* value, hash_t* ht) {
-	if(ht == NULL || value == NULL) return 1;
+	if(ht == NULL || value == NULL) error("ht or value is NULL \n");
 		
 	node *e = NULL;
 	e = hash_find(value, ht);
@@ -238,7 +238,7 @@ int hash_scnt(hash_t* ht) {
 
 /* Print hash table details for debugging */
 void hash_print(hash_t* ht) {
-	if(ht == NULL) return 1;
+	if(ht == NULL) error("ht is NULL \n");
 	printf("(Hash size)%d : (Consumed)%d : (Flows)%d\n", hash_size(ht), hash_scnt(ht), hash_cnt(ht) );
 }
 

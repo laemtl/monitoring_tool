@@ -28,5 +28,6 @@ void *check_malloc(unsigned long size);
 void *check_calloc(unsigned long size);
 char *ip_ntos(u_int32_t n);
 u_int32_t ip_ston(char *s);
+void error(char* s);
 
 #endif	/* __UTIL_H__ */

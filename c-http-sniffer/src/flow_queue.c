@@ -80,8 +80,6 @@ flow_queue_deq(void)
 	if(data->flow_queue_first != NULL) {
 		data->flow_queue_first = data->flow_queue_first->next;
 		data->flow_qlen--;
-	} else {
-		printf("Flow queue first was null");
 	}
 
 	pthread_mutex_unlock(&data->mutex_queue);

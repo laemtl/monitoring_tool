@@ -17,7 +17,7 @@ def printCheck(lib_path, libname):
 
 
 # Set compiling environment
-env = Environment(CCFLAGS="-w -Wall -g `pkg-config --cflags 'libprotobuf-c >= 1.0.0'`")
+env = Environment(CCFLAGS="-Wall -g `pkg-config --cflags 'libprotobuf-c >= 1.0.0'`")
 env.Append(LINKFLAGS=["`pkg-config --libs 'libprotobuf-c >= 1.0.0'`"])
 lib_path = ['.', '/usr/local/lib', '/usr/lib', '/usr/lib/x86_64-linux-gnu/','home/2017/yhe54/json-c/.libc']
 printCheck(lib_path, 'pthread')

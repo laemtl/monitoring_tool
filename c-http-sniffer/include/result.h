@@ -1,12 +1,11 @@
 #ifndef RESULT_H
 #define RESULT_H
 
-#include "top_list.h"
 #include "cf_list.h"
 
 typedef struct _result Result;
 struct _result {
-    const char* interface;
+    char* interface;
     int client_sock;
 
 	double rst_avg;
@@ -21,13 +20,17 @@ struct _result {
     double req_rate_min;
     double req_rate_max;
     
-    double tp;
+    double tp_avg;
+    u_int32_t tp_min;
+    u_int32_t tp_max;
+
+    double tp_rev_avg;
+    u_int32_t tp_rev_min;
+    u_int32_t tp_rev_max;
 
     double conn_rate;
     double conn_rate_min;
     double conn_rate_max;
-    
-    //top_list conn_tl;
 
     cf_list client;
     cf_list req_path;

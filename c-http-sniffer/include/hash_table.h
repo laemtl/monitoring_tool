@@ -1,7 +1,6 @@
-
-
 #include <pthread.h>
-#include "top_list.h"
+#include <sys/types.h>
+#include "attr.h"
 
 #ifndef HTABLE_H
 #define HTABLE_H
@@ -42,23 +41,24 @@ struct _hash_t {
     int int_cnt;
 
     hash_mb_t2** buckets;
-    top_list tl;
 
-    int (*hash_fn)(void*);
-    int (*compare_fn)(void*, void*);
-    void (*update_fn)(void*, void*);
-    void (*free_fn)(void*);
+    u_int32_t (*hash_fn)(Attr*);
+    int (*compare_fn)(Attr*, Attr*);
+    void (*update_fn)(Attr*, hash_t*);
+    void (*free_fn)(Attr*);
 };
 
-int hash_init(hash_t* ht, int (*hash_fn)(void*, void*), int (*compare_fn)(void*, void*), void (*update_fn)(void*, void*), void (*free_fn)(void*));
+int hash_init(hash_t* ht, u_int32_t(*hash_fn)(Attr*), int (*compare_fn)(Attr*, Attr*), void (*update_fn)(Attr*, hash_t*), void (*free_fn)(Attr*));
 node* hash_new(void *value, hash_t* ht);
 node* hash_find(void *value, hash_t* ht);
 node* hash_delete(void *value, hash_t* ht);
-int hash_add(void *value, hash_t* ht);
+int hash_add(void* value, hash_t* ht);
 int hash_clear(hash_t* ht);
+void hash_reset(hash_t* ht);
 int hash_size(hash_t* ht);
 int hash_cnt(hash_t* ht);
 int hash_scnt(hash_t* ht);
 void hash_print(hash_t* ht);
+void reset_int_cnt(hash_t* ht);
 
 #endif

@@ -5,7 +5,7 @@
  *      Author: chenxm
  */
 #include <assert.h>
-
+#include <inttypes.h>
 #include "order.h"
 
 /*
@@ -47,7 +47,7 @@ int tcp_order(order_t *ord, seq_t *new_seq, BOOL src){
 			pre = (*plist_last);
 			cp = tcp_cont_seq((*plist_last));
 			aft = cp->next;
-			bk = bk = cp->nxt_seq - 1;
+			bk = cp->nxt_seq - 1;
 		}
 		else{
 			cp = (*plist);
@@ -142,7 +142,7 @@ int tcp_order(order_t *ord, seq_t *new_seq, BOOL src){
 /* for debugging */
 /* check the if TCP is ordered correctly */
 int tcp_order_check(order_t *order){
-	u_int32_t seq, next_seq;
+	//u_int32_t seq, next_seq;
 	int src_check = 0, dst_check = 0;
 	seq_t	*ps;
 
@@ -158,7 +158,7 @@ int tcp_order_check(order_t *order){
 			if(ps->nxt_seq == ps->next->seq){
 				ps = ps->next;
 			}else{
-				printf("%lu\t%lu\n", ps->nxt_seq, ps->next->seq);
+				printf("%"PRIu32"\t%"PRIu32"\n", ps->nxt_seq, ps->next->seq);
 				src_check = 0;
 				break;
 			}
@@ -176,7 +176,7 @@ int tcp_order_check(order_t *order){
 			if(ps->nxt_seq == ps->next->seq){
 				ps = ps->next;
 			}else{
-				printf("%lu\t%lu\n", ps->nxt_seq, ps->next->seq);
+				printf("%"PRIu32"\t%"PRIu32"\n", ps->nxt_seq, ps->next->seq);
 				dst_check = 0;
 				break;
 			}

@@ -1,11 +1,11 @@
-#include "data.h";
+#include "data.h"
 #include <inttypes.h>
 #include <libgen.h>
 
 void rsp_status_cfl_add(int i, int cnt, Result* r) {
     Data* data = {0};
 	get_data(&data);
-    char* rsp_status;
+    //char* rsp_status;
 
 	if(data->req_tot <= 0) return;
 		

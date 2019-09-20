@@ -1,5 +1,8 @@
 #include "server.h"
 #include "data.h"
+#include <string.h>
+#include <inttypes.h>
+#include <unistd.h>
 
 int sfd = 0;
 extern int pak;
@@ -12,8 +15,8 @@ extern int req_n;
 }*/
 
 /* decode a varint and stick results in value */
-uint64_t decode_varint(int sock) {
-	uint64_t value = 0, shifter = 0;   
+size_t decode_varint(int sock) {
+	size_t value = 0, shifter = 0;   
 	uint8_t i = 0;
 	int n = 0;
 
@@ -61,12 +64,11 @@ int send_data(Result* result) {
 	Analysis__Freq **req_type;
 	Analysis__Freq **rsp_status;
 
-	int i, j, k, l, m, n, 
-	c1, c2, c3, c4, c5, c6; 
+	int j, k, l, m, n, 
+	c2, c3, c4, c5, c6; 
 	
-	if(result->client_sock == NULL) {
-		printf("Socket is not defined\n");
-		return EXIT_FAILURE;
+	if(result->client_sock < 0) {
+		error("Socket is not defined\n");
 	}
 
 	int varint_len_len;
@@ -115,6 +117,34 @@ int send_data(Result* result) {
 		msg.reqratemax = result->req_rate_max;
 	}
 
+	msg.has_tpavg = 0;
+	msg.has_tpmin = 0;
+	msg.has_tpmax = 0;
+	if(data->tp.active) {
+		msg.has_tpavg = 1;
+		msg.tpavg = result->tp_avg;
+
+		msg.has_tpmin = 1;
+		msg.tpmin = result->tp_min;
+
+		msg.has_tpmax = 1;
+		msg.tpmax = result->tp_max;
+	}
+
+	msg.has_tprevavg = 0;
+	msg.has_tprevmin = 0;
+	msg.has_tprevmax = 0;
+	if(data->tp_rev.active) {
+		msg.has_tprevavg = 1;
+		msg.tprevavg = result->tp_rev_avg;
+
+		msg.has_tprevmin = 1;
+		msg.tprevmin = result->tp_rev_min;
+
+		msg.has_tprevmax = 1;
+		msg.tprevmax = result->tp_rev_max;
+	}
+
 	msg.has_connrate = 0;
 	msg.has_connratemin = 0;
 	msg.has_connratemax = 0;
@@ -127,19 +157,6 @@ int send_data(Result* result) {
 
 		msg.has_connratemax = 1;
 		msg.connratemax = result->conn_rate_max;
-
-		/* */
-		/*c1 = result->conn_tl.count;
-		conns = MALLOC(Analysis__Conn*, c1);
-
-		for(i = 0; i < c1; i++) {
-			conns[i] = MALLOC(Analysis__Conn, 1);
-			analysis__conn__init(conns[i]);
-			conns[i]->ip = ((Addr*)result->conn_tl.list[i])->ip;
-			conns[i]->port = ((Addr*)result->conn_tl.list[i])->port;
-		} 
-		msg.n_conns = c1;
-		msg.conns = conns;*/
 	}
 
 	if(data->client_active) {
@@ -230,9 +247,7 @@ int send_data(Result* result) {
 	
 	//fprintf(stderr, "Writing %d serialized bytes\n", varint_len_len + msg_len); // See the length of message
 	if(send(result->client_sock, buf, varint_len_len + msg_len, MSG_NOSIGNAL) < 0) {
-		fprintf(stderr, "Error sending response\n");
-		fprintf(stderr, "Errno %d\n", errno);
-		pthread_exit(NULL);
+		error("Error sending response\n");
 	} 
 
 	free(buf); // Free the allocated serialized buffer
@@ -273,31 +288,30 @@ int send_data(Result* result) {
 /*
  * This will handle connection for each client
  * */
-void* connection_handler(int *socket) {
-	int status;
-	uint64_t msg_len;
+void connection_handler(int *socket) {
+	size_t msg_len;
 	Analysis__Init *init;
 	
 	//Receive a message from client
 	//do {
 		// Read the prefix length (varint)
 		msg_len = decode_varint(*socket);
-		printf("msg_len: %d\n", msg_len);
+		printf("msg_len: %"PRIu64"\n", msg_len);
 
 		if (msg_len > 0) {
-			char *msg = (char*) calloc(msg_len+1, sizeof(char));
+			uint8_t *msg = (uint8_t*) calloc(msg_len+1, sizeof(char));
 			
 			// Read the message
 			if (recv(*socket, msg, msg_len, 0) != msg_len) {
-				fprintf(stderr, "Framing error: expected %d, read less\n", msg_len);
-				return EXIT_FAILURE;
+				char m[100];
+				snprintf(m, 100, "Framing error: expected %"PRIu64", read less\n", msg_len);
+				error(m);
 			}
 
 			// Unpack the message using protobuf-c.
 			init = analysis__init__unpack(NULL, msg_len, msg);	
 			if (init == NULL) {
-				fprintf(stderr, "error unpacking incoming message\n");
-				return EXIT_FAILURE;
+				error("error unpacking incoming message\n");
 			}
 			
 			// display the message's fields.
@@ -308,16 +322,20 @@ void* connection_handler(int *socket) {
 			printf("Received: client IP: %s\n", ip_ntos(init->clientip));
 			printf("Received: client port: %d\n", init->clientport);
 
+			printf("Received: server IP: %s\n", ip_ntos(init->serverip));
+			printf("Received: server port: %d\n", init->serverport);
+
 			BOOL rst_active = (init->activemetric & (1<<0));
 			BOOL req_rate_active = (init->activemetric & (1<<1));
 			BOOL err_rate_active = (init->activemetric & (1<<2));
 			BOOL tp_active = (init->activemetric & (1<<3));
-			BOOL conn_rate_active = (init->activemetric & (1<<4));
-			BOOL client_active = (init->activemetric & (1<<5));
-			BOOL req_path_active = (init->activemetric & (1<<6));
-			BOOL req_method_active = (init->activemetric & (1<<7));
-			BOOL req_type_active = (init->activemetric & (1<<8));
-			BOOL rsp_status_active = (init->activemetric & (1<<9));
+			BOOL tp_rev_active = (init->activemetric & (1<<4));
+			BOOL conn_rate_active = (init->activemetric & (1<<5));
+			BOOL client_active = (init->activemetric & (1<<6));
+			BOOL req_path_active = (init->activemetric & (1<<7));
+			BOOL req_method_active = (init->activemetric & (1<<8));
+			BOOL req_type_active = (init->activemetric & (1<<9));
+			BOOL rsp_status_active = (init->activemetric & (1<<10));
 
 			for (unsigned i = 0; i < init->n_netint; i++) { // Iterate through all repeated string
 				printf ("netInt: %s\n\n", init->netint[i]);
@@ -339,12 +357,23 @@ void* connection_handler(int *socket) {
 					}
 				}
 
+				if(init->has_serverip) {
+					data->has_server_ip = TRUE;
+					data->server.ip = init->serverip;
+				
+					if(init->has_serverport) {
+						data->has_server_port = TRUE;
+						data->server.port = init->serverport;
+					}
+				}
+
 				//data->conn_ht.tl.size = init->topclientcnt;
 
 				data->rst.active = rst_active;
 				data->req_rate.active = req_rate_active;
 				data->err_rate.active = err_rate_active;
 				data->tp.active = tp_active;
+				data->tp_rev.active = tp_rev_active;
 				data->conn_rate.active = conn_rate_active;
 
 				data->client_active = client_active;
@@ -367,7 +396,7 @@ void* connection_handler(int *socket) {
         puts("Client disconnected\n");
         fflush(stdout);
     } else if(msg_len == -1) {
-        perror("recv failed\n");
+        error("recv failed\n");
     }
 
 	//Free the socket pointer    
@@ -386,6 +415,10 @@ void* connection_handler(int *socket) {
 	//signal(SIG_IGN);
 }*/
 
+void stop_server() {
+	close(sfd);
+}
+
 void onExit(int signum) {
 	stop_server();
 
@@ -395,10 +428,6 @@ void onExit(int signum) {
 	printf("rspn: %d \n", rsp_n);
 
 	exit(signum);
-}
-
-void stop_server() {
-	close(sfd);
 }
 
 void start_server() {
@@ -431,12 +460,12 @@ void start_server() {
 	for (rp = result; rp != NULL; rp = rp->ai_next) {
 		sfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
 		if (sfd < 0) {
-			error("ERROR opening socket");
+			perror("ERROR opening socket");
 			continue;
 		}
 		
 		if (setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int)) < 0) {
-			error("setsockopt(SO_REUSEADDR) failed");	
+			perror("setsockopt(SO_REUSEADDR) failed");	
 		}
     		
 		#ifdef SO_REUSEPORT
@@ -454,8 +483,7 @@ void start_server() {
 	}
 
 	if (rp == NULL) {	/* No address succeeded */
-        fprintf(stderr, "Could not bind\n");
-        exit(EXIT_FAILURE);
+        error("Could not bind\n");
     }
 	
 	freeaddrinfo(result);	/* No longer needed */
@@ -463,25 +491,11 @@ void start_server() {
 	signal(SIGINT, onExit);
   	signal(SIGTERM, onExit);
 
-	/*struct sigaction act;
-	memset (&act, '\0', sizeof(act));
- 	/* Use the sa_sigaction field because the handles has two additional parameters */
-	/*act.sa_sigaction = &sigpipe_handler;
- 
-	/* The SA_SIGINFO flag tells sigaction() to use the sa_sigaction field, not sa_handler. */
-	/*act.sa_flags = SA_SIGINFO;
- 
-	if (sigaction(SIGPIPE, &act, NULL) < 0) {
-		perror ("sigaction");
-		return 1;
-	}*/
-
-
 	listen(sfd, 5);
     printf("Server started: %s:%s\n",hostname,portname);
 	client_len = sizeof(struct sockaddr_in);
 
-	while(client_sock = accept(sfd, (struct sockaddr *) &client_addr, (socklen_t*)&client_len)) {
+	while(client_sock = accept(sfd, (struct sockaddr*)&client_addr, (socklen_t*)&client_len)) {
 		printf("Connection accepted\n");
 		printf("Client address: %d \n", client_sock);
 		
@@ -489,9 +503,8 @@ void start_server() {
 		*new_sock = client_sock;
 		
 		printf("New connection from client %d \n", *new_sock );
-        if( pthread_create( &sniffer_thread, NULL, connection_handler, new_sock) < 0) {
-            perror("Could not create thread\n");
-            return EXIT_FAILURE;
+        if( pthread_create( &sniffer_thread, NULL, (void*)connection_handler, new_sock) < 0) {
+            error("Could not create thread\n");
         }
 
         //Now join the thread , so that we dont terminate before the thread
@@ -504,8 +517,6 @@ void start_server() {
 		if (errno != EINTR)
 			syslog(LOG_ERR, "accept failed with errno = %d\n", errno);
     }
-
-	return EXIT_SUCCESS;
 }
 
 
@@ -551,8 +562,7 @@ void start_log(char* ipaddress) {
 
     int err=getaddrinfo(hostname,portname,&hints,&res);
 	if (err != 0 ){
-			printf("Error creating socket \n");
-			exit(1);
+		error("Error creating socket \n");
 	}
 	int fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (connect(fd,res->ai_addr,res->ai_addrlen) != 0){

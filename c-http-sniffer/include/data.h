@@ -5,17 +5,25 @@
 #include <errno.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include <math.h>
 #include "flow.h"
 #include "hash_table.h"
 #include "queue.h"
-#include "client.h"
+#include "result.h"
+
 
 #ifndef DEBUGGING
-#define DEBUGGING 2 
+#define DEBUGGING 0 
 #endif
 
 #define EPSILON	1e-7
 #define CLOSE(a,b) (fabs(a - b)<EPSILON)
+
+typedef struct _addr Addr;
+struct _addr {
+	u_int32_t	ip;
+	u_int16_t	port;
+};
 
 typedef struct _int_metric int_metric;
 struct _int_metric {
@@ -59,6 +67,10 @@ struct _data {
     BOOL has_client_port;
     Addr client;
 
+    BOOL has_server_ip;
+    BOOL has_server_port;
+    Addr server;
+
     uint32_t stamp;
     
     Addr destination;
@@ -72,8 +84,14 @@ struct _data {
     Metric err_rate;
     Metric req_rate;
     
+    u_int32_t sec_ref_value;
+    u_int32_t sec_rev_ref_value;
+
+    u_int32_t int_ref_value;
+    u_int32_t int_rev_ref_value;
+    
     Metric tp;
-    Addr server;
+    Metric tp_rev;
 
     hash_t conn_ht;
     Metric conn_rate;
@@ -115,8 +133,7 @@ struct _data {
 
 typedef struct _capt Capture;
 struct _capt {
-    int fd;
-	//void (*pkt_handler)(void*); 
+    int fd; 
 	int livemode;
     Data* data;
 };
@@ -126,27 +143,39 @@ void init_once_metric(Metric* metric);
 void reset_metric(Metric* metric);
 void reset(Data* data);
 Data* init_data();
-void delete_data();
-static void thread_key_setup();
+void delete_data(Data* data);
+void thread_key_setup();
 void thread_init(Data* d);
 void print_tid();
 void get_data(Data** d);
 double get_metric_min(Metric metric);
 double get_rst_avg();
 double get_err_rate();
-double get_err_rate_subtotals();
+double get_err_rate_subtotal();
 double get_req_rate();
+double get_tp_avg();
+double get_tp_rev_avg();
+double get_conn_rate();
 void add_metric_sum(Metric* metric, double amt);
-void inc_metric_total(Metric* metric);
-void inc_metric_subtotal(Metric* metric);
+void add_metric_total(Metric* metric, int amt);
+void add_metric_subtotal(Metric* metric, int amt);
 void reset_metric_subtotal(Metric* metric);
 void update_metric_min(Metric* metric, double value);
 void update_metric_max(Metric* metric, double value);
 BOOL is_server_mode();
 void extract_data(flow_t *flow);
+void compute_tp(u_int32_t payload, Data* data);
+void compute_tp_rev(u_int32_t payload, Data* data);
+void compute_req_rate(Data* data);
+void compute_rst(http_pair_t *h, Data* data);
+void compute_err_rate(int status, Data* data);
+void extract_freq_ht(hash_t* ht, Result* r, void (*cfl_add_fn)(void*, int, Result*));
+void extract_freq_ar(int* ar, int size, Result* r, void (*cfl_add_fn)(int, int, Result*));
 Result* get_result();
 void process_rate(Data* data);
-void process_data(int tid);
+void flow_hash_process();
+void free_result(Result* result);
+void process_data(int sig);
 void print_data(Result* result);
 
 #endif

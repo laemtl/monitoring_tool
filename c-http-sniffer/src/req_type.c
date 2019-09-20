@@ -1,12 +1,13 @@
-#include "req_path.h";
-#include "data.h";
+#include "req_path.h"
+#include "data.h"
 #include <inttypes.h>
 #include <libgen.h>
+#include <string.h>
 
 void req_type_cfl_add(int i, int cnt, Result* r) {
     Data* data = {0};
 	get_data(&data);
-    char* rsp_status;
+    //char* rsp_status;
 
 	if(data->req_tot <= 0) return;
 		
