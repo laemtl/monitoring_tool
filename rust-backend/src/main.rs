@@ -90,11 +90,13 @@ enum Msg {
         #[serde(skip_serializing_if = "Option::is_none")]
         rst: ::std::option::Option<Params>,                
         #[serde(skip_serializing_if = "Option::is_none")]
-        tp: ::std::option::Option<f64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         err_rate: ::std::option::Option<Params>,
         #[serde(skip_serializing_if = "Option::is_none")]
         req_rate: ::std::option::Option<Params>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        tp: ::std::option::Option<Params>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        tp_rev: ::std::option::Option<Params>,
         #[serde(skip_serializing_if = "Option::is_none")]
         conn_rate: ::std::option::Option<Params>,
         #[serde(skip_serializing_if = "Option::is_none")]
@@ -187,7 +189,7 @@ impl StreamHandler<ws::Message, ws::ProtocolError> for Ws {
                 println!("{:?}", m);
 
                 match m {
-                    Msg::Init { net_int, interval, duration, /*top_client_cnt,*/ active_metric, client_ip, client_port, server_ip, server_port } => {
+                    Msg::Init { net_int, interval, duration, active_metric, client_ip, client_port, server_ip, server_port } => {
                         let mut init = Init::new();
                         init.set_interval(interval);
                         init.set_duration(duration);
@@ -231,7 +233,7 @@ impl StreamHandler<ws::Message, ws::ProtocolError> for Ws {
                         //let ip = resolve("bmj-cluster.cs.mcgill.ca:15430");
                         SnifferServer::connect("127.0.0.1:3000", init, ws_addr);
                     }
-                    Msg::Data { time: _, net_int: _, rst: _, tp: _, err_rate: _, req_rate: _, conn_rate: _, client: _, req_path: _, req_method: _, req_type: _, rsp_status: _ } => println!("Got Data")
+                    Msg::Data { time: _, net_int: _, rst: _, tp: _, tp_rev: _, err_rate: _, req_rate: _, conn_rate: _, client: _, req_path: _, req_method: _, req_type: _, rsp_status: _ } => println!("Got Data")
                 }
             }
 
@@ -260,10 +262,24 @@ impl Handler<Data> for Ws {
                 }),
                 _ => None
             },
-            tp: None/*match data.has_tpAvg() {
-                true => Some(data.get_tpAvg()),
+            tp: match data.has_tpAvg() {
+                true => Some(Params { 
+                    avg: Some(data.get_tpAvg()),
+                    min: Some(data.get_tpMin()),
+                    max: Some(data.get_tpMax()),
+                    client: None
+                }),
                 _ => None
-            }*/,
+            },
+            tp_rev: match data.has_tpRevAvg() {
+                true => Some(Params { 
+                    avg: Some(data.get_tpRevAvg()),
+                    min: Some(data.get_tpRevMin()),
+                    max: Some(data.get_tpRevMax()),
+                    client: None
+                }),
+                _ => None
+            },
             err_rate: match data.has_errRate() {
                 true => Some(Params { 
                     avg: Some(data.get_errRate()),

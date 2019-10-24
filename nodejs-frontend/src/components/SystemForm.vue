@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="pa-0">
-    <v-navigation-drawer v-model="drawer" absolute temporary width="400">
+    <v-navigation-drawer v-model="drawer" absolute temporary width="470">
       <v-flex xs12 pa-0>
         <v-toolbar dense dark color="primary">
           <v-toolbar-title>System analysis</v-toolbar-title>
@@ -20,34 +20,15 @@
             </v-card-text>
 
             <v-layout v-for="i in netInt.length">
-              <v-flex xs12 md11>
+              <v-flex xs12 md11 class="py-0">
                 <v-text-field
                   class="pa-0"
                   v-model="netInt[i - 1]"
                   label="Network Interface (name)"
-                  required
+                  :rules="[rules.requiredRules]"
+                  validate-on-blur
                 ></v-text-field>
               </v-flex>
-              <!--<v-flex xs12 md9>
-                                    <v-text-field class="pa-0"
-                                        v-model="item.ip"
-                                        :rules="ipRules"
-                                        validate-on-blur
-                                        :counter=ipLength
-                                        label="IP"
-                                        required
-                                    ></v-text-field>
-                                </v-flex>
-                                <v-flex xs12 md3>
-                                    <v-text-field class="pa-0"
-                                        v-model="item.port"
-                                        :rules="portRules"
-                                        validate-on-blur
-                                        :counter=portLength
-                                        label="Port"
-                                        required
-                                    ></v-text-field>
-                                </v-flex>-->
               <v-icon v-if="netInt.length > 1" v-on:click="removeNetInt(i - 1)"
                 >close</v-icon
               >
@@ -55,27 +36,21 @@
                 >add_circle</v-icon
               >
             </v-layout>
-
-            <!--<v-layout>
-                                <v-btn v-on:click="addNetInt" color="primary">Add</v-btn>
-                            </v-layout>-->
-
             <v-layout>
-              <v-flex md6>
+              <v-flex md6 class="py-0">
                 <v-text-field
                   class="pa-0 ma-0"
                   v-model="interval"
-                  :rules="timeRules"
+                  :rules="[rules.requiredRules, rules.timeRules]"
                   validate-on-blur
                   label="Interval (s)"
-                  required
                 ></v-text-field>
               </v-flex>
-              <v-flex md6>
+              <v-flex md6 class="py-0">
                 <v-text-field
                   class="pa-0 ma-0"
                   v-model="duration"
-                  :rules="timeRules"
+                  :rules="[rules.requiredRules, rules.timeRules]"
                   validate-on-blur
                   label="Duration (s)"
                 ></v-text-field>
@@ -83,93 +58,81 @@
             </v-layout>
 
             <v-layout>
-              <v-flex md8>
+              <v-flex md8 class="py-0">
                 <v-text-field
                   class="pa-0 ma-0"
                   ref="clientIP"
                   v-model="client.ip"
-                  :rules="tpIpRules"
+                  :rules="[rules.ipRules, rules.tpRules]"
                   validate-on-blur
                   label="Client IP"
                 ></v-text-field>
               </v-flex>
 
-              <v-flex md4>
+              <v-flex md4 class="py-0">
                 <v-text-field
                   class="pa-0 ma-0"
                   ref="clientPort"
                   v-model="client.port"
-                  :rules="tpPortRules"
+                  :rules="[rules.portRules, rules.tpRules]"
                   validate-on-blur
                   label="Client port"
                 ></v-text-field>
               </v-flex>
             </v-layout>
 
-            <v-flex md12 v-for="(stat, id) in statistics">
-              <v-switch
-                class="ma-0"
-                color="info"
-                v-model="stat.active"
-                :label="`${stat.label}`"
-                v-on:change="configChange(id)"
-              ></v-switch>
+            <v-layout>
+              <v-flex md8 class="pt-0">
+                <v-text-field
+                  class="pa-0 ma-0"
+                  ref="serverIP"
+                  v-model="server.ip"
+                  :rules="[rules.ipRules, rules.tpRules]"
+                  validate-on-blur
+                  label="Server IP"
+                ></v-text-field>
+              </v-flex>
+              <v-flex md4 class="pt-0">
+                <v-text-field
+                  class="pa-0 ma-0"
+                  ref="serverPort"
+                  v-model="server.port"
+                  :rules="[rules.portRules, rules.tpRules]"
+                  validate-on-blur
+                  label="Server port"
+                ></v-text-field>
+              </v-flex>
+            </v-layout>
 
-              <!--<v-layout v-if="id == 'client' && stat.active">
-                                    <v-flex md8>
-                                        <v-text-field class="pa-0 ma-0"
-                                        v-model="clientCnt"
-                                        :rules="timeRules"
-                                        validate-on-blur 
-                                        label="Clients #"
-                                        ></v-text-field>
-                                    </v-flex>    
-                                </v-layout>-->
-
-              <v-layout v-if="stat.to && stat.active">
-                <v-flex md8>
-                  <v-text-field
-                    class="pa-0 ma-0"
-                    ref="serverIP"
-                    v-model="stat.to.ip"
-                    :rules="tpIpRules"
-                    validate-on-blur
-                    label="Server IP"
-                  ></v-text-field>
-                </v-flex>
-                <v-flex md4>
-                  <v-text-field
-                    class="pa-0 ma-0"
-                    ref="serverPort"
-                    v-model="stat.to.port"
-                    :rules="tpPortRules"
-                    validate-on-blur
-                    label="Server port"
-                  ></v-text-field>
-                </v-flex>
-              </v-layout>
-            </v-flex>
-
-            <!--<v-flex xs12 md9>
-                                <v-text-field class="pa-0"
-                                    v-model="ip"
-                                    :rules="ipRules"
-                                    validate-on-blur
-                                    :counter=ipLength
-                                    label="IP"
-                                    required
-                                ></v-text-field>
-                            </v-flex>
-                            <v-flex xs12 md3>
-                                <v-text-field class="pa-0"
-                                    v-model="port"
-                                    :rules="portRules"
-                                    validate-on-blur
-                                    :counter=portLength
-                                    label="Port"
-                                    required
-                                ></v-text-field>
-                            </v-flex>-->
+            <v-layout row wrap>
+              <v-flex md6 
+                v-for="(stat, id) in statistics" 
+                v-if="id != 'tp_rev'">
+                <v-layout row wrap align-center>
+                  <v-flex md10>
+                    <v-switch
+                      class="ma-0 pa-0"
+                      color="info"
+                      v-model="stat.active"
+                      :label="`${stat.label}`"
+                      v-on:change="configChange(id)"
+                    ></v-switch>
+                  </v-flex>
+                  <v-flex md2 
+                    class="swap-btn"
+                    v-if="id == 'tp'">
+                    <v-btn fab small dark
+                      class="pa-0 ma-0"
+                      color="primary" 
+                      v-model="statistics.tp_rev.active"
+                      :class="{disabled: !statistics.tp_rev.active}"
+                      @click="statistics.tp_rev.active = !statistics.tp_rev.active">
+                      <v-icon>swap_horiz</v-icon>
+                    </v-btn> 
+                  </v-flex>
+                </v-layout>             
+              </v-flex>
+            </v-layout>
           </v-container>
         </v-form>
       </v-flex>
@@ -181,7 +144,7 @@
 <script>
 const isIp = require("is-ip");
 const ipLength = 45,
-  portLength = 5; /*, clientCnt = 5*/
+  portLength = 5;
 import { configBus } from "../main";
 
 export default {
@@ -204,44 +167,24 @@ export default {
       },
       ipLength: ipLength,
       portLength: portLength,
-      //clientCnt: 5,
-      //ipRules: [v => !!v && isIp(v) && v.length <= ipLength || 'Invalid IP'],
-      //portRules: [v => !!v && !isNaN(v) && v.length > 0 && v.length <= portLength || 'Invalid port'],
-
-      ipRules: [
-        //(v) => !!v || 'IP is required',
-        v =>
-          v === null ||
-          v.length === 0 ||
-          (isIp(v) && v.length <= ipLength) ||
-          "Invalid IP"
-      ],
-      portRules: [
-        v =>
-          v === null ||
-          v.length === 0 ||
-          (!!v && !isNaN(v) && v.length > 0 && v.length <= portLength) ||
-          "Invalid port"
-      ],
-      timeRules: [v => (!!v && !isNaN(v) && v > 0) || "Invalid value"],
-      tpIpRules: [
-        v =>
-          (isIp(v) && v.length <= ipLength) ||
-          (!this.statistics.tp.active && (v === null || v.length === 0)) ||
-          "This must be filled when throuput is on"
-      ],
-      tpPortRules: [
-        v =>
-          (!!v && !isNaN(v) && v.length > 0 && v.length <= portLength) ||
-          (!this.statistics.tp.active && (v === null || v.length === 0)) ||
-          "This must be filled when throuput is on"
-      ],
+      rules: {
+        requiredRules: value => !!value || "Required",
+        timeRules: value => (!isNaN(value) && value > 0) || "Invalid value",
+        tpRules: value => { 
+          return !this.statistics.tp.active || value !== null && value.length !== 0 || "Required when throuput is on"
+        },
+        ipRules: value => { 
+          return (isIp(value) && value.length <= ipLength) || value === null || value.length === 0 || "Invalid value"
+        },
+        portRules: value => {
+          return (!!value && !isNaN(value) && value.length <= portLength) || value === null || value.length === 0 || "Invalid value"
+        },
+      },
       error: null
     };
   },
   methods: {
     addNetInt: function() {
-      //this.netInt.push({ip:'', port:''});
       this.netInt.push("");
     },
     removeNetInt: function(i) {
@@ -258,7 +201,6 @@ export default {
           netInt: this.netInt,
           client: this.client,
           server: this.server
-          //clientCnt: this.clientCnt
         });
         this.drawer = false;
       }
@@ -269,17 +211,6 @@ export default {
     configChange: function(id) {
       // Using the config bus
       configBus.$emit("configSelected", id, this.statistics[id].active);
-      /*if(id == 'tp') {
-                this.$nextTick(() => {
-                    this.$refs.clientIP.change();
-                });
-
-                //console.log(this.$refs.clientIP.$el);
-                //this.$refs.input.$el.focus();
-                //this.$refs.clientPort.$el.focus();
-                //this.$refs.serverIP.$el.focus();
-                //this.$refs.serverPort.$el.focus();
-            }*/
     }
   },
   created: function() {
@@ -294,5 +225,26 @@ export default {
 <style>
 .v-navigation-drawer__border {
   display: none;
+}
+
+.v-input .v-input__slot {
+  margin-bottom: 0 !important;
+}
+
+.v-btn--floating.v-btn--small {
+  height: 25px;
+  width: 25px;
+}
+
+.swap-btn {
+  margin-top: -10px !important;
+}
+
+.swap-btn button.disabled {
+  background: rgba(0, 0, 0, 0.12) !important;
+}
+
+.swap-btn button.disabled i {
+  color: #000 !important;
 }
 </style>

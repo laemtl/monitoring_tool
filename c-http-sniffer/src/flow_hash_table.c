@@ -168,12 +168,33 @@ flow_hash_add_packet(packet_t *packet)
 			/*
 			 * New flow record.
 			 */
-			if(packet->tcp_flags == TH_SYN){
+			// check if we have the first packet of either a request or response
+			if(packet->http == HTTP_REQ) {
+				f = flow_hash_new(cs);
+				flow_add_packet(f, packet, 1);
+			} else if(packet->http == HTTP_RSP) {
+				// Invert source and destination
+				cs.saddr = packet->daddr;
+				cs.sport = packet->dport;
+				cs.daddr = packet->saddr;
+				cs.dport = packet->sport;
+				
+				f = flow_hash_new(cs);
+				flow_add_packet(f, packet, 0);
+			} else {
+				packet_free(packet);
+			}
+
+
+			/*
+			 * New flow record.
+			 */
+			/*if(packet->tcp_flags == TH_SYN){
 				f = flow_hash_new(cs);
 				flow_add_packet(f, packet, 1);
 			}else{
 				packet_free(packet);
-			}
+			}*/
 		}
 	}
 	return 0;
