@@ -1,0 +1,15 @@
+clone repository
+ git clone git://www.icir.org/hilti
+
+sudo apt-get install bison
+sudo apt-get install flex
+
+sudo apt install clang
+sudo apt install llvm
+https://github.com/gperftools/gperftools/blob/master/INSTALL
+(install libunwind-1.4-rc1 instead of 0.99-beta)
+http://icl.cs.utk.edu/papi/software/index.html
+
+cd hilti/
+./configure
+make

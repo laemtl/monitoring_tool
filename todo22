@@ -1,0 +1,12 @@
+event system is ok
+protobuf refactoring to abstract metrics
+rust refactoring on the way
+frontend refactoring to collect metrics form DB
+
+performance test
+more extensible
+
+
+
+message for each metrics
+collect message even if connection have started

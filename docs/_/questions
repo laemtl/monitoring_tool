@@ -1,0 +1,27 @@
+Question
+-------------------------------------
+Max/Min/Average for metrics
+Several Ips and metrics, each on a graph?
+
+http protocol only
+where the pcap file are coming from??
+
+ycsb --> workload generator
+how it is used?
+
+
+- installed application on the server
+- installed system locally (with a virtual network interface (TUN)) : not working yet
+
+- research on possible communication system between the application and the sniffer
+    -> ssh : too much overhead 
+    -> direct hardware connection : not flexible enough, some suystem may require the application to be installed on a remote machine
+    -> socket is currently considered. Doing some reading to understand what that implies and possibilities
+
+- reading about the setup. Effort is made to understand all the critical part of the system.
+
+
+SSE seems to be a better option:
+https://www.smashingmagazine.com/2018/02/sse-websockets-data-flow-http2/
+
+way to group output by interface

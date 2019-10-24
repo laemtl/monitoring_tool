@@ -8,13 +8,14 @@
             <span> Analysis {{ status }} </span>
             <v-layout class="pa-2" row wrap>
               <SystemResultGraph
+                v-for="(stat, id) in statistics"
+                v-if="id != 'tp_rev'"            
                 v-bind:graph="{
                   stat: stat,
                   id: id,
                   netInt: netInt,
                   interval: interval
                 }"
-                v-for="(stat, id) in statistics"
               />
             </v-layout>
           </v-flex>
@@ -49,13 +50,13 @@ export default {
           label: "Request service time",
           type: "line",
           active: true,
-          max: 0.3
+          max: 0.5
         };
         stats["req_rate"] = {
           label: "Request rate",
           type: "line",
           active: true,
-          max: 5
+          max: 10
         };
         stats["err_rate"] = {
           label: "Error rate",
@@ -67,8 +68,10 @@ export default {
           label: "Throughput",
           type: "line",
           active: true,
-          max: 5,
-          to: { ip: null, port: null }
+          max: 1000
+        };
+        stats["tp_rev"] = {
+          active: true,
         };
         stats["conn_rate"] = {
           label: "Connection rate",
@@ -137,8 +140,9 @@ export default {
       );
     },
     openSocketListeners() {
+      console.log(process.env.VUE_APP_WS_URL);
       if(typeof process.env.VUE_APP_WS_URL !== 'string') return;
-      
+
       this.ws = new WebSocket(process.env.VUE_APP_WS_URL);
       var el = this;
 
@@ -161,18 +165,26 @@ export default {
         try {
           var data = JSON.parse(message.data);
 
+          if("tp" in data && "tp_rev" in data) {
+            data.tp.rev_avg = data.tp_rev.avg;
+            data.tp.rev_min = data.tp_rev.min;
+            data.tp.rev_max = data.tp_rev.max;
+
+            delete data.tp_rev;
+          }
+
           //console.log(data);
 
           for (var id in data) {
             //console.log(id);
             //console.log(data[id]);
 
-            //if(typeof statistics[id] !== 'undefined') {
-            configBus.$emit(id, {
-              netInt: data.netInt,
-              data: data[id]
-            });
-            //}
+            if(typeof el.statistics[id] !== 'undefined' && typeof data[id] !== 'undefined') {
+              configBus.$emit(id, {
+                netInt: data.netInt,
+                data: data[id]
+              });
+            }
           }
         } catch (e) {
           alert(e); // error in the above string (in this case, yes)!
@@ -217,7 +229,7 @@ export default {
           }
         }
 
-        console.log(params);
+        //console.log(params);
 
         el.ws.send(
           JSON.stringify({

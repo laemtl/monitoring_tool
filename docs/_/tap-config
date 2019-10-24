@@ -1,0 +1,41 @@
+mkdir -p /dev/net
+mknod /dev/net/tun c 10 200
+chmod 666 /dev/net/tun
+ip tuntap add tun0 mode tun
+ip link set tun0 up
+
+ifconfig tap0
+ip link show
+ip a a 10.0.0.1 dev tun0
+ip route add 10.0.0.0/24 dev tun0
+ip address add 10.0.0.0/24 dev tun0
+ip address delete ${address}/${prefix} dev ${interface name}
+
+
+route add -net 10.44.3.2 netmask 255.255.255.255 gw 73.83.42.22
+route add default tun0 
+
+
+
+
+route add -host 10.1.8.5 dev tun0
+
+packit   -m  inject  [-t  protocol]  [-aAbcCdDeFgGhHjJkKlLmMnNoOpPqQrRsSTuUvwWxXyYzZ]  [-i interface]
+packit -m inject -i tap0
+
+
+
+
+
+
+
+
+ip tuntap add tun0 mode tun
+ip link set tun0 up
+
+ifconfig tun0
+ip link show
+ip a a 10.0.0.1 dev tun0
+ip route add 10.0.0.0/24 dev tun0
+ip address add 10.0.0.0/24 dev tun0
+

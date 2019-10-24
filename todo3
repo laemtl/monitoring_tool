@@ -1,0 +1,34 @@
+g++ 7
+https://gist.github.com/jlblancoc/99521194aba975286c80f93e47966dc5
+
+
+
+system queue pour active
+loop only on active metrics
+
+one thread per metric : in case a metric is slow, doesn't disturb the others
+
+value int/double atomic
+
+
+// in timer
+data->int_step++;
+data->int_step = 0;
+
+data->stamp++;	
+
+
+remove condition to skip packet if it is not the first (special signature)
+
+check a protocol an get metrics for it in the frontend
+
+
+where should we start the necryption
+- port detection
+- client/server is still available
+Should we move the filter -> don't keep flow of untracked client ??
+
+- we parse first packet in pairs soneed to be decrypted.
+
+send all metrics separately
+

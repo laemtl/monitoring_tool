@@ -1,0 +1,7 @@
+watch "sudo ScapyTrafficGenerator -X http -r '-X 1 -F /home/lae/Desktop/test.txt -i wlp1s0 -s 1.1.1.1 -S 33333 -d 2.2.2.2 -D 80'"
+
+sudo ./bin/http-sniffer -i wlp1s0
+
+scp -r ./http-sniffer node-ovs:/home/lfesse/http-sniffer
+
+sudo tcpdump -p -i 904a2e38cf8f4_l "tcp port 8080" -w log.pcap

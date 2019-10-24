@@ -1,0 +1,5 @@
+local filter = require "make4ht-filter"
+local process = filter{"cleanspan", "fixligatures", "hruletohr"}
+Make:htlatex()
+Make:htlatex()
+Make:match("html$",process)

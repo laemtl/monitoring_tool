@@ -12,21 +12,20 @@ def printCheck(lib_path, libname):
     has = checkLibrary(lib_path, libname)
     print("Checking %s ... %s" % (libname, 'true' if has else 'false'))
     if not has:
-        print("Error: please install %s first or check the installed path." % libname)
+ gcc       print("Error: please install %s first or check the installed path." % libname)
         sys.exit(-1)
 
 
 # Set compiling environment
-env = Environment(CCFLAGS="-std=c++11 -Wall -w -fpermissive -g `pkg-config --cflags 'libprotobuf-c >= 1.0.0'`")
-env.Append(LINKFLAGS=["`pkg-config --libs 'libprotobuf-c >= 1.0.0'`"])
+env = Environment(CCFLAGS='-w -g')
 lib_path = ['.', '/usr/local/lib', '/usr/lib', '/usr/lib/x86_64-linux-gnu/','home/2017/yhe54/json-c/.libc']
 printCheck(lib_path, 'pthread')
 printCheck(lib_path, 'pcap')
 printCheck(lib_path, 'json-c')
-libs = Glob('.[ao]') + ['pthread', 'pcap', 'json-c', 'rt']
-cpp_path=['../include', '../include/metrics', '../include/events', '/usr/include', '/usr/local/include']
+libs = Glob('.[ao]') + ['pthread', 'pcap', 'json-c']
+cpp_path=['../include', '/usr/include', '/usr/local/include']
 
- 
+
 # Flag debug to decide if NFM libs are used to compile program
 # NFM is a network processor card driver to capture network traffic.
 if int(ARGUMENTS.get('debug', 0)):
@@ -40,7 +39,7 @@ if int(ARGUMENTS.get('debug', 0)):
 
 # Compile the programs
 env.Program(target = '../bin/http-sniffer', 
-            source = Glob('*.cpp'),
+            source = Glob('*.c'),
             LIBPATH = lib_path,
             LIBS = libs,
             CPPPATH = cpp_path)

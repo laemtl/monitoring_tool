@@ -1,0 +1,944 @@
+<!DOCTYPE html> 
+<html lang="en" xml:lang="en" > 
+<head> <title></title> 
+<meta  charset="iso-8859-1" /> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)" /> 
+<meta name="viewport" content="width=device-width,initial-scale=1" /> 
+<link rel="stylesheet" type="text/css" href="monitoring-tool-doc.css" /> 
+<meta name="src" content="monitoring-tool-doc.tex" /> 
+</head><body 
+>
+<!--l. 25--><p class="noindent" >
+                                                                          
+
+                                                                          
+</p><!--l. 33--><p class="noindent" >
+</p>
+<hr class="hrule" /><!--l. 38--><p class="noindent" ><span class="rm-lmcsc-10x-x-248">Monitoring tool Software
+documentation</span><br />
+</p><!--l. 41--><p class="noindent" >
+</p>
+<hr class="hrule" /><!--l. 48--><p class="noindent" ><span class="rm-lmcsc-10x-x-144">Laetitia Fesselier</span><br />
+<span class="rm-lmcsc-10x-x-144">laetitia.fesselier@mail.mcgill.ca</span><br />
+<span class="rm-lmcsc-10x-x-120">Supervisors: Mona ElSaadawy, Bettina Kemme</span><br />
+<span class="rm-lmcsc-10x-x-120">Distributed Information Systems Lab, McGill University</span><br />
+                                                                          
+
+                                                                          
+</p>
+   <h3 class="likesectionHead"><a 
+ id="x1-1000"></a>Contents</h3>
+   <div class="tableofcontents">
+   <span class="sectionToc" >1 <a 
+href="#x1-20001" id="QQ2-1-2">Introduction</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >1.1 <a 
+href="#x1-30001.1" id="QQ2-1-3">Available options and metrics</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >1.1.1 <a 
+href="#x1-40001.1.1" id="QQ2-1-4">Network Interface</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >1.1.2 <a 
+href="#x1-50001.1.2" id="QQ2-1-5">Interval</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >1.1.3 <a 
+href="#x1-60001.1.3" id="QQ2-1-6">Duration</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >1.1.4 <a 
+href="#x1-70001.1.4" id="QQ2-1-7">Client</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >1.1.5 <a 
+href="#x1-80001.1.5" id="QQ2-1-8">Request service time</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >1.1.6 <a 
+href="#x1-90001.1.6" id="QQ2-1-9">Request rate</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >1.1.7 <a 
+href="#x1-100001.1.7" id="QQ2-1-10">Error rate</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >1.1.8 <a 
+href="#x1-110001.1.8" id="QQ2-1-11">Throughput</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >1.1.9 <a 
+href="#x1-120001.1.9" id="QQ2-1-12">Connection rate</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >1.1.10 <a 
+href="#x1-130001.1.10" id="QQ2-1-13">Clients</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >1.1.11 <a 
+href="#x1-140001.1.11" id="QQ2-1-14">Request path</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >1.1.12 <a 
+href="#x1-150001.1.12" id="QQ2-1-15">Request method</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >1.1.13 <a 
+href="#x1-160001.1.13" id="QQ2-1-16">Request type</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >1.1.14 <a 
+href="#x1-170001.1.14" id="QQ2-1-17">Response status</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >1.2 <a 
+href="#x1-180001.2" id="QQ2-1-18">Architecture</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >1.3 <a 
+href="#x1-190001.3" id="QQ2-1-19">Server access and source file location</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >1.3.1 <a 
+href="#x1-200001.3.1" id="QQ2-1-20">Frontend</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >1.3.2 <a 
+href="#x1-210001.3.2" id="QQ2-1-21">Backend</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsubsectionToc" >1.3.3 <a 
+href="#x1-220001.3.3" id="QQ2-1-22">Sniffer</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >1.4 <a 
+href="#x1-230001.4" id="QQ2-1-23">Local development</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >1.5 <a 
+href="#x1-240001.5" id="QQ2-1-24">Useful commands</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >1.6 <a 
+href="#x1-250001.6" id="QQ2-1-25">Github repository</a></span>
+<br />   <span class="sectionToc" >2 <a 
+href="#x1-260002" id="QQ2-1-26">Frontend</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >2.1 <a 
+href="#x1-270002.1" id="QQ2-1-27">User Interface</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >2.2 <a 
+href="#x1-280002.2" id="QQ2-1-28">Installation</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >2.3 <a 
+href="#x1-290002.3" id="QQ2-1-29">Usage</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >2.4 <a 
+href="#x1-300002.4" id="QQ2-1-30">Architecture</a></span>
+<br />   <span class="sectionToc" >3 <a 
+href="#x1-310003" id="QQ2-1-31">Backend</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >3.1 <a 
+href="#x1-320003.1" id="QQ2-1-32">Installation</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >3.2 <a 
+href="#x1-330003.2" id="QQ2-1-33">Usage</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >3.3 <a 
+href="#x1-340003.3" id="QQ2-1-34">Architecture</a></span>
+<br />   <span class="sectionToc" >4 <a 
+href="#x1-350004" id="QQ2-1-35">Protocol Buffer</a></span>
+                                                                          
+
+                                                                          
+<br />   &#x00A0;<span class="subsectionToc" >4.1 <a 
+href="#x1-360004.1" id="QQ2-1-36">Installation</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.2 <a 
+href="#x1-370004.2" id="QQ2-1-37">Usage</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >4.3 <a 
+href="#x1-380004.3" id="QQ2-1-38">Architecture</a></span>
+<br />   <span class="sectionToc" >5 <a 
+href="#x1-390005" id="QQ2-1-39">Sniffer</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >5.1 <a 
+href="#x1-400005.1" id="QQ2-1-40">Installation</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >5.2 <a 
+href="#x1-410005.2" id="QQ2-1-41">Architecture</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >5.3 <a 
+href="#x1-420005.3" id="QQ2-1-42">Usage</a></span>
+<br />   <span class="sectionToc" >6 <a 
+href="#x1-430006" id="QQ2-1-43">Traffic generators</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.1 <a 
+href="#x1-440006.1" id="QQ2-1-44">YCSB</a></span>
+<br />   &#x00A0;<span class="subsectionToc" >6.2 <a 
+href="#x1-450006.2" id="QQ2-1-45">ScappyTrafficGenerator</a></span>
+   </div>
+<!--l. 57--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">1   </span> <a 
+ id="x1-20001"></a>Introduction</h3>
+<!--l. 58--><p class="noindent" >In today&#8217;s service-oriented platforms, application execution is distributed across
+many components. Monitoring the performance of such a system is a critical
+and challenging task. Most traditional monitoring techniques require an
+integration on the application level, making the process platform dependent.
+<br 
+class="newline" /><br 
+class="newline" />With the global rise of server virtualization, traditional network switches
+are being gradually replaced with software-defined network controllers
+(SDN switches) that rely on code as opposed to network bridges and
+hardware.<br 
+class="newline" /><br 
+class="newline" />The approach used in our research uses a customized port sniffer for software
+switches, moving the monitoring logic on the network level by extracting useful
+information from messages exchanged between application components.
+By doing so, a more flexible, platform independent approach is offered.
+<br 
+class="newline" /><br 
+class="newline" />To demonstrate the benefits of this approach, an application monitoring
+prototype, restricted to http traffic as a first stage, was developed using an
+existing <a 
+href="http://github.com/caesar0301/http-sniffer" >http sniffer</a> software which was extended to behave as a server service to
+                                                                          
+
+                                                                          
+perform different analysis tasks concurrently. Its architecture was re engineered
+with some performance improvement. <br 
+class="newline" /><br 
+class="newline" />
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">1.1   </span> <a 
+ id="x1-30001.1"></a>Available options and metrics</h4>
+<!--l. 88--><p class="noindent" >On the current implementation, the monitoring service requires a network
+interface, along with an analysis interval and duration, desired metrics and an
+optional client. Improvements are planned to allow the user to provide
+services&#8217; IP in replacement to the network interface, and to automatically
+detect the corresponding network interface&#8217;s name they are connected
+to.
+</p><!--l. 91--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">1.1.1   </span> <a 
+ id="x1-40001.1.1"></a>Network Interface</h5>
+<!--l. 92--><p class="noindent" >Extract information from the packets flowing over the provided network
+interface.
+</p><!--l. 94--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">1.1.2   </span> <a 
+ id="x1-50001.1.2"></a>Interval</h5>
+<!--l. 95--><p class="noindent" >Requested metrics are sent to the user every given interval.
+</p><!--l. 97--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">1.1.3   </span> <a 
+ id="x1-60001.1.3"></a>Duration</h5>
+<!--l. 98--><p class="noindent" >Requested metrics are sent to the user during the given duration.
+                                                                          
+
+                                                                          
+</p><!--l. 100--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">1.1.4   </span> <a 
+ id="x1-70001.1.4"></a>Client</h5>
+<!--l. 101--><p class="noindent" >Filter the packets, keeping only the ones with the given client or source.
+</p><!--l. 103--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">1.1.5   </span> <a 
+ id="x1-80001.1.5"></a>Request service time</h5>
+<!--l. 104--><p class="noindent" >After each time interval, compute the average Request service time (avg) and
+return, within this interval, the shortest (min) and longest rst (max). The request
+service time is the time difference between a response and the request it refers
+to.
+</p><!--l. 107--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">1.1.6   </span> <a 
+ id="x1-90001.1.6"></a>Request rate</h5>
+<!--l. 108--><p class="noindent" >After each time interval, compute the average request rate (avg) and return,
+within this interval, the lowest (min) and highest request rate (max). The request
+rate is the number of received requests over a second.
+</p><!--l. 111--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">1.1.7   </span> <a 
+ id="x1-100001.1.7"></a>Error rate</h5>
+<!--l. 112--><p class="noindent" >After each time interval, compute the average error rate (avg) and return, within
+this interval, the lowest (min) and highest error rate (max). The error rate is the
+number of received responses with a 4XX or 5XX HTTP status code over a
+second.
+</p><!--l. 115--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">1.1.8   </span> <a 
+ id="x1-110001.1.8"></a>Throughput</h5>
+<!--l. 116--><p class="noindent" >After each time interval, compute the average throughput (avg) between
+two addresses in each flow direction. Return, within this interval, the
+                                                                          
+
+                                                                          
+lowest (min) and highest throughput (max) in each flow direction. The
+throughput is the number of bytes travelling between two addresses over a
+second.
+</p><!--l. 120--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">1.1.9   </span> <a 
+ id="x1-120001.1.9"></a>Connection rate</h5>
+<!--l. 121--><p class="noindent" >After each time interval, compute the average connection rate (avg) and return,
+within this interval, the lowest (min) and highest connection rate (max). The
+connection rate is the number of distinct request source address (IP/port
+combination) over a second.
+</p><!--l. 125--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">1.1.10   </span> <a 
+ id="x1-130001.1.10"></a>Clients</h5>
+<!--l. 127--><p class="noindent" >After each time interval, compute all received (starting from the beginning of the
+analysis) clients cumulative distribution. A client is a distinct request source IP,
+ignoring the port value. All frequencies below 0.01 are ignored.
+</p><!--l. 130--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">1.1.11   </span> <a 
+ id="x1-140001.1.11"></a>Request path</h5>
+<!--l. 132--><p class="noindent" >After each time interval, compute all received (starting from the beginning of the
+analysis) request paths cumulative distribution. A request path is a distinct path
+extracted from the request URI (see <a 
+href="https://linux.die.net/man/3/dirname" >dirname()</a>). All frequencies below 0.01 are
+ignored.
+</p><!--l. 135--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">1.1.12   </span> <a 
+ id="x1-150001.1.12"></a>Request method</h5>
+<!--l. 137--><p class="noindent" >After each time interval, compute all received (starting from the beginning of the
+analysis) request methods cumulative distribution. A request method is a distinct
+basename extracted from the request URI (see the <a 
+href="http://man7.org/linux/man-pages/man3/basename.3.html" >POSIX version of basename()</a>).
+                                                                          
+
+                                                                          
+All frequencies below 0.01 are ignored.
+</p><!--l. 140--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">1.1.13   </span> <a 
+ id="x1-160001.1.13"></a>Request type</h5>
+<!--l. 142--><p class="noindent" >After each time interval, compute all received (starting from the beginning of the
+analysis) request types cumulative distribution. A request type is a keyword
+within the <a 
+href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods" >valid HTTP request methods</a>. All frequencies below 0.01 are
+ignored.
+</p><!--l. 146--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">1.1.14   </span> <a 
+ id="x1-170001.1.14"></a>Response status</h5>
+<!--l. 148--><p class="noindent" >After each time interval, compute all received (starting from the beginning of the
+analysis) response status cumulative distribution. A response status is
+an code within the <a 
+href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status" >valid HTTP status</a>. All frequencies below 0.01 are
+ignored.
+</p><!--l. 152--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">1.2   </span> <a 
+ id="x1-180001.2"></a>Architecture</h4>
+<!--l. 153--><p class="noindent" >The monitoring service is made-up of three components: a frontend (JS/Node.js),
+a backend (Rust), and a sniffer (C). It follows a distributed architecture.
+<br 
+class="newline" /><br 
+class="newline" />Users who want to monitor the performance of an application (in Figure 1.2.1
+depicted with a web- server/ database / memcache architecture) provide their
+requirements through a form (Figure 2.1.1) and receive these performance
+measurements through a dashboard (Figure 2.1.2). <br 
+class="newline" /><br 
+class="newline" />Once submitted, users specifications are transmitted in JSON through a
+WebSocket to the backend. The backend compresses the received message using
+<a 
+href="https://developers.google.com/protocol-buffers/" >Protocol Buffers</a>, and forward it to the sniffer server through a TCP socket. The
+sniffer can then proceed to the analysis and return back the results to the
+                                                                          
+
+                                                                          
+frontend, using the same pathway.
+</p>
+<div class="center" 
+>
+<!--l. 163--><p class="noindent" >
+</p><!--l. 164--><p class="noindent" ><img 
+src="assets/app-architecture.png" alt="PIC"  
+ /><br />
+<b><span class="rm-lmb-10x-x-120">Figure 1.1.1 - Monitoring Application integration in a Cloud system</span></b></p></div>
+<!--l. 169--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">1.3   </span> <a 
+ id="x1-190001.3"></a>Server access and source file location</h4>
+<!--l. 170--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">1.3.1   </span> <a 
+ id="x1-200001.3.1"></a>Frontend</h5>
+<!--l. 172--><p class="noindent" >To access the hosted frontend component:
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-1">
+ssh&#x00A0;username@bmj-cluster.cs.mcgill.ca
+&#x00A0;<br />ssh&#x00A0;node-02
+&#x00A0;<br />cd&#x00A0;/home/lfesse/monitoring_tool/nodejs-frontend
+</div>
+<!--l. 177--><p class="nopar" ><br 
+class="newline" />The Express server listens for http requests on the 3000 port. To reach
+the frontend server from an external server, use the following address:
+<br 
+class="newline" /><a 
+href="http://bmj-cluster.cs.mcgill.ca:12230/" class="url" ><span class="rm-lmtt-12">http://bmj-cluster.cs.mcgill.ca:12230/</span></a>
+</p><!--l. 183--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">1.3.2   </span> <a 
+ id="x1-210001.3.2"></a>Backend</h5>
+<!--l. 184--><p class="noindent" >To access the hosted backend component (Docker container):
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-2">
+ssh&#x00A0;username@bmj-cluster.cs.mcgill.ca
+&#x00A0;<br />ssh&#x00A0;compute-04
+&#x00A0;<br />sudo&#x00A0;docker&#x00A0;exec&#x00A0;-it&#x00A0;rust_backend&#x00A0;bash
+&#x00A0;<br />cd&#x00A0;/home/lfesse/www/rust-backend
+</div>
+<!--l. 190--><p class="nopar" ><br 
+class="newline" />The backend program opens a websocket connection listenning on the 80 port To
+send an incomming request to the websocket from an external server, use the
+following address: http://bmj-cluster.cs.mcgill.ca:15480/
+</p><!--l. 195--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">1.3.3   </span> <a 
+ id="x1-220001.3.3"></a>Sniffer</h5>
+<!--l. 196--><p class="noindent" >To access the hosted sniffer component:
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-3">
+ssh&#x00A0;username@bmj-cluster.cs.mcgill.ca
+&#x00A0;<br />ssh&#x00A0;compute-04
+&#x00A0;<br />cd&#x00A0;/home/lfesse/www/monitoring_tool/c-http-sniffer&#x00A0;
+</div>
+<!--l. 201--><p class="nopar" ><br 
+class="newline" />The sniffer program opens a tcp connection listenning on the 3000 port To send
+an incomming request to the socket from an external server, use the following
+address: http://bmj-cluster.cs.mcgill.ca:15430/
+</p><!--l. 206--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">1.4   </span> <a 
+ id="x1-230001.4"></a>Local development</h4>
+<!--l. 208--><p class="noindent" >After proceeding to the local installation of each component (see section 2.2,
+3.1, 4.1 and 5.1), you can locally run the application with the following
+procedure:
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-4">
+cd&#x00A0;nodejs-frontend/
+&#x00A0;<br />npm&#x00A0;run&#x00A0;serve
+&#x00A0;<br />
+&#x00A0;<br />cd&#x00A0;rust-backend/
+&#x00A0;<br />cargo&#x00A0;run
+&#x00A0;<br />
+&#x00A0;<br />cd&#x00A0;c-http-sniffer
+&#x00A0;<br />scons
+&#x00A0;<br />./bin/http-sniffer
+&#x00A0;<br />
+</div>
+<!--l. 220--><p class="nopar" >
+</p><!--l. 223--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">1.5   </span> <a 
+ id="x1-240001.5"></a>Useful commands</h4>
+<!--l. 224--><p class="noindent" >Get a list of all available interfaces to inspect
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-5">
+ovs-vsctl&#x00A0;list&#x00A0;interface
+</div>
+<!--l. 227--><p class="nopar" >
+</p><!--l. 229--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">1.6   </span> <a 
+ id="x1-250001.6"></a>Github repository</h4>
+<!--l. 231--><p class="noindent" >All the source code of the project can be find in the following private repository:
+<br 
+class="newline" />https://github.com/laemtl/monitoring_tool.git
+</p><!--l. 236--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">2   </span> <a 
+ id="x1-260002"></a>Frontend</h3>
+<!--l. 239--><p class="noindent" ><b><span class="rm-lmb-10x-x-120">Main dependencies:</span></b> Node.js, npm, PM2, Express, Vue, Rickshaw <br 
+class="newline" /><br 
+class="newline" />The frontend component has two purposes. First, it is the component where an
+application administrator can indicate what kind of performance monitoring
+should be performed on their application. For that, the frontend provides a
+form to collect the relevant information (choice of performance metrics,
+source, destination, analysis duration) (Figure 2.1.1). Second, the frontend
+shows the performance results over time in near real-time (Figure 2.1.2).
+<br 
+class="newline" /><br 
+class="newline" />The frontend part is built on top of Vue.js, a reactive js framework, and
+Ricksaw.js (Shutterstock), a graphing library using D3.js. <br 
+class="newline" /><br 
+class="newline" />Once an administrator has provided the details of what should be monitored, the
+frontend sends this information to the backend in json. The frontend
+receives then the performance results for visualization from the backend.
+Communication between frontend and backend is done via a bidirectional
+and persistent WebSocket (where the frontend is the client initiating the
+communication and the backend is the server accepting connections).
+<br 
+class="newline" /><br 
+class="newline" />To serve the static frontend files, a simple Express (Node.js) server is used.
+<br 
+class="newline" /><br 
+class="newline" />We also make use of PM2, a production process manager for Node.js applications
+with a built-in load balancer. It allows us to keep our application alive forever, to
+automatically reload it without downtime if it exits, and to facilitate common
+system admin tasks.
+</p><!--l. 257--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">2.1   </span> <a 
+ id="x1-270002.1"></a>User Interface</h4>
+<!--l. 259--><p class="noindent" >The current UI was built using the <a 
+href="https://vuetifyjs.com/en/" >Vuetify framework</a>. The user can expand a
+form from the left side, over the ten metric graphs. This interface is customizable,
+each matric can be deselected using the form and the corresponding graph
+disappears from the screen. <br 
+class="newline" /><br 
+class="newline" /></p>
+                                                                          
+
+                                                                          
+<div class="center" 
+>
+<!--l. 262--><p class="noindent" >
+</p><!--l. 263--><p class="noindent" ><img 
+src="assets/app-form.png" alt="PIC"  
+ /> <br />
+<b><span class="rm-lmb-10x-x-120">Figure 2.1.1 - Front-End form options</span></b></p>
+<hr class="hrule" /></div>
+<div class="center" 
+>
+<!--l. 267--><p class="noindent" >
+</p><!--l. 268--><p class="noindent" ><img 
+src="assets/app-result.png" alt="PIC"  
+ /> <br />
+<b><span class="rm-lmb-10x-x-120">Figure 2.2 - Front-End analysis result</span></b></p>
+<hr class="hrule" /></div>
+<!--l. 273--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">2.2   </span> <a 
+ id="x1-280002.2"></a>Installation</h4>
+<!--l. 274--><p class="noindent" ><b><span class="rm-lmb-10x-x-120">Install nvm (be sure &#x00A0;/.bash_profile exists first)</span></b>
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-6">
+curl&#x00A0;-o-&#x00A0;https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh&#x00A0;|&#x00A0;bash
+</div>
+<!--l. 277--><p class="nopar" ><br 
+class="newline" /><b><span class="rm-lmb-10x-x-120">Install nodejs 10.8.0</span></b>
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-7">
+nvm&#x00A0;install&#x00A0;10.8.0
+</div>
+<!--l. 282--><p class="nopar" ><br 
+class="newline" /><b><span class="rm-lmb-10x-x-120">Clone the github repository:</span></b>
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-8">
+git&#x00A0;clone&#x00A0;https://github.com/laemtl/monitoring_tool.git
+</div>
+<!--l. 287--><p class="nopar" ><br 
+class="newline" /><b><span class="rm-lmb-10x-x-120">Install all Node.js dependencies:</span></b>
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-9">
+cd&#x00A0;./monitoring_tools/nodejs-frontend
+&#x00A0;<br />npm&#x00A0;install
+</div>
+<!--l. 293--><p class="nopar" >
+</p><!--l. 295--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">2.3   </span> <a 
+ id="x1-290002.3"></a>Usage</h4>
+<!--l. 296--><p class="noindent" ><b><span class="rm-lmb-10x-x-120">Run in dev mode:</span></b>
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-10">
+npm&#x00A0;run&#x00A0;serve&#x00A0;--&#x00A0;--port&#x00A0;3000
+</div>
+<!--l. 299--><p class="nopar" >Under the dev mode, Express is not needed. <br 
+class="newline" /><br 
+class="newline" /><b><span class="rm-lmb-10x-x-120">Build the static files for production:</span></b>
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-11">
+npm&#x00A0;run&#x00A0;build
+</div>
+<!--l. 305--><p class="nopar" ><br 
+class="newline" /><b><span class="rm-lmb-10x-x-120">Start the Express server:</span></b>
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-12">
+node&#x00A0;index.js
+</div>
+<!--l. 310--><p class="nopar" >
+</p><!--l. 312--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">2.4   </span> <a 
+ id="x1-300002.4"></a>Architecture</h4>
+<!--l. 313--><p class="noindent" >The frontend component lies under /nodejs-frontend. <br 
+class="newline" />
+</p><!--l. 315--><p class="indent" >   - index.js: Main file of the Express server.
+</p><!--l. 318--><p class="indent" >   - node_modules: After npm install is invoked, contains all the dependencies of
+the project.
+</p><!--l. 321--><p class="indent" >   - dist: After a build is invoked, contains all the static files ready fo
+production.
+</p><!--l. 324--><p class="indent" >   - src: Contains all the Vue source files.
+</p><!--l. 327--><p class="indent" >   &#x00A0;&#x00A0;       - App.vue: Main template file of the Vue frontend.
+</p><!--l. 330--><p class="indent" >   &#x00A0;&#x00A0;       - main.js: Main js file of the Vue frontend.
+</p><!--l. 333--><p class="indent" >   &#x00A0;&#x00A0;       - components/SystemForm.vue: Form template file.
+</p><!--l. 336--><p class="indent" >   &#x00A0;&#x00A0;       - components/SystemResultGraph.vue: Graph template file.
+</p><!--l. 339--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">3   </span> <a 
+ id="x1-310003"></a>Backend</h3>
+                                                                          
+
+                                                                          
+<!--l. 342--><p class="noindent" ><b><span class="rm-lmb-10x-x-120">Main dependencies:</span></b> Actix-web, Rust-protobuf <br 
+class="newline" />The backend, developed in Rust, is mainly a broker between the frontend clients
+and the sniffers that enables a unified web-based interface for users to the
+monitoring platform. It forwards the specific monitoring requests from the clients
+to the relevant sniffer and receives the performance measurement results from the
+sniffers to be forwarded to the clients. It might also perform some analysis tasks
+itself should they be too time consuming to be executed at the sniffers that have
+to work at network traffic speed. <br 
+class="newline" /><br 
+class="newline" />Rust is a new compiled language, which is pretty fast (execution time benchmarks
+show it performs faster than c++) and safer because of a lot of protection
+mechanisms on compilation time. It also comes with a web server ecosystem which
+makes it a good choice for a web server. Finally, it can compile in web assembly,
+which makes it also a good choice to develop frontend features. Apart of the
+WebSocket connections with the active frontend clients, the backend also
+maintains a bi-directional TCP socket with each of the sniffers. For better
+performance, the messages sent over TCP are compressed using Google Protocol
+Buffers.<br 
+class="newline" /><br 
+class="newline" />
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">3.1   </span> <a 
+ id="x1-320003.1"></a>Installation</h4>
+<!--l. 351--><p class="noindent" ><b><span class="rm-lmb-10x-x-120">Install rustup, the Rust installer and version management tool</span></b>
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-13">
+curl&#x00A0;https://sh.rustup.rs&#x00A0;-sSf&#x00A0;|&#x00A0;sh
+</div>
+<!--l. 354--><p class="nopar" >
+</p><!--l. 356--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">3.2   </span> <a 
+ id="x1-330003.2"></a>Usage</h4>
+<!--l. 358--><p class="noindent" ><b><span class="rm-lmb-10x-x-120">Run in dev mode:</span></b>
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-14">
+cargo&#x00A0;run
+</div>
+<!--l. 361--><p class="nopar" ><br 
+class="newline" /><b><span class="rm-lmb-10x-x-120">Build the static files for production:</span></b>
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-15">
+cargo&#x00A0;build&#x00A0;--release
+</div>
+<!--l. 366--><p class="nopar" ><br 
+class="newline" /><b><span class="rm-lmb-10x-x-120">Launch the executable:</span></b>
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-16">
+./target/release/rust-backend
+</div>
+<!--l. 371--><p class="nopar" >
+</p><!--l. 373--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">3.3   </span> <a 
+ id="x1-340003.3"></a>Architecture</h4>
+<!--l. 374--><p class="noindent" >The backend component lies under /rust-backend. <br 
+class="newline" />
+</p><!--l. 376--><p class="indent" >   - build.rs: Build script, fired at each compilation.
+</p><!--l. 379--><p class="indent" >   - Cargo.toml: Configuration file, contains all the dependencies.
+</p><!--l. 382--><p class="indent" >   - target: After a build is invoked, contains all the executable, either for debug
+or release.
+</p><!--l. 385--><p class="indent" >   - src: Contains all the Rust source files.
+</p><!--l. 388--><p class="indent" >   &#x00A0;&#x00A0;       - analysis.rs: Handle the Protocol Buffer messages declared in
+../analysis.proto.
+</p><!--l. 391--><p class="indent" >   &#x00A0;&#x00A0;       - main.rs: Main file of the Rust backend.
+</p><!--l. 394--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">4   </span> <a 
+ id="x1-350004"></a>Protocol Buffer</h3>
+<!--l. 395--><p class="noindent" >For better performance, the messages sent over TCP are compressed using Google
+Protocol Buffers. In particular, the encoding uses prefix varints which efficienly
+reduces the size of each transmitted message.
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">4.1   </span> <a 
+ id="x1-360004.1"></a>Installation</h4>
+                                                                          
+
+                                                                          
+<!--l. 397--><p class="noindent" >All the instructions to proceed to the installation can be found here: <br 
+class="newline" />https://github.com/protocolbuffers/protobuf/blob/master/src/README.md
+<br 
+class="newline" /><br 
+class="newline" />The sniffer also requires the <a 
+href="https://github.com/protobuf-c/protobuf-c" >protobuf-c plugin</a>. <br 
+class="newline" />protobuf-c requires a C compiler, a C++ compiler, protobuf, and pkg-config to be
+installed, along with the autotools (autoconf, automake, libtool).
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-17">
+git&#x00A0;clone&#x00A0;https://github.com/protobuf-c/protobuf-c.git
+&#x00A0;<br />./autogen.sh&#x00A0;&amp;&amp;&#x00A0;./configure&#x00A0;&amp;&amp;&#x00A0;make&#x00A0;&amp;&amp;&#x00A0;make&#x00A0;install
+</div>
+<!--l. 405--><p class="nopar" ><br 
+class="newline" />Note that as of version of 1.0.0, the header files generated by the protoc-c
+compiler contain version guards to prevent incompatibilities due to version skew
+between the .pb-c.h files generated by protoc-c and the public protobuf-c.h
+include file supplied by the libprotobuf-c support library. Thus, it&#8217;s a good idea to
+recompile the .pb-c.c and .pb-c.h files from their source .proto files with protoc-c,
+rather than shipping potentially stale .pb-c.c and .pb-c.h files that may not be
+compatible with the libprotobuf-c headers installed on the system in project
+artifacts like repositories and release tarballs.
+</p><!--l. 410--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">4.2   </span> <a 
+ id="x1-370004.2"></a>Usage</h4>
+<!--l. 411--><p class="noindent" >All the message formats are defined in the file ./analysis.proto. Whenever this
+file is modified, we need to recompile files which contains data structure
+definitions and helper functions to support the protocol under C and Rust.
+<br 
+class="newline" /><br 
+class="newline" /><b><span class="rm-lmb-10x-x-120">Compile the c Protobuf files:</span></b>
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-18">
+cd&#x00A0;monitoring_tools/
+&#x00A0;<br />protoc&#x00A0;--c_out=.&#x00A0;analysis.proto
+&#x00A0;<br />mv&#x00A0;analysis.pb-c.h&#x00A0;./c-http-sniffer/include/analysis.pb-c.h
+&#x00A0;<br />mv&#x00A0;analysis.pb-c.c&#x00A0;./c-http-sniffer/src/analysis.pb-c.c
+</div>
+<!--l. 419--><p class="nopar" ><br 
+class="newline" /><b><span class="rm-lmb-10x-x-120">Compile the Rust Protobuf files:</span></b>
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-19">
+cargo&#x00A0;run&#x00A0;RUST_BACKTRACE=1
+</div>
+<!--l. 424--><p class="nopar" >
+</p><!--l. 426--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">4.3   </span> <a 
+ id="x1-380004.3"></a>Architecture</h4>
+<!--l. 427--><p class="noindent" >The configuration file for all defined messages lies in ./analysis.proto.
+</p><!--l. 429--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">5   </span> <a 
+ id="x1-390005"></a>Sniffer</h3>
+<!--l. 432--><p class="noindent" ><b><span class="rm-lmb-10x-x-120">Main dependencies:</span></b> protobuf-c <br 
+class="newline" />The sniffer is a component that is attached to the software switches of the cloud
+that route the cloud traffic. The sniffer, written in C, listens to relevant network
+traffic and performs some of the performance analysis on the fly by analyzing
+                                                                          
+
+                                                                          
+specific network messages. For doing such analysis work, the sniffer reads and
+extracts all the information needed from the network packets. The information is
+then stored in different data structures, typically hashtables (e.g., one for client
+relevant information, one for paths, etc.). In given time intervals, the individual
+metrics such as average response times are then computed. On a regular basis, the
+results are sent to a backend analysis server. The sniffer requires the network
+interface name of network flows to be observed, and some analysis configuration
+(interval, duration, metrics choice). It can run several analysis at the same
+time.
+</p><!--l. 438--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">5.1   </span> <a 
+ id="x1-400005.1"></a>Installation</h4>
+<!--l. 439--><p class="noindent" >If gcc is already on the system, nothing is needed besides protobuf-c (see
+section 4.1), SCons (needs Python), and the c libraries pthread, pcap,
+json-c.
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-20">
+pip&#x00A0;install&#x00A0;scons
+&#x00A0;<br />sudo&#x00A0;apt-get&#x00A0;install&#x00A0;libpthread-stubs0-dev
+&#x00A0;<br />sudo&#x00A0;apt-get&#x00A0;install&#x00A0;libpcap-dev
+&#x00A0;<br />sudo&#x00A0;apt-get&#x00A0;install&#x00A0;libjson0&#x00A0;libjson0-dev
+</div>
+<!--l. 445--><p class="nopar" >
+</p><!--l. 447--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">5.2   </span> <a 
+ id="x1-410005.2"></a>Architecture</h4>
+<!--l. 448--><p class="noindent" >The sniffer has the capability to run under 3 modes: <br 
+class="newline" />- offline; <br 
+class="newline" />- live standalone; <br 
+class="newline" />- live server; <br 
+class="newline" /><br 
+class="newline" />The sniffer was heavily modified for the current implementation, and offline
+functionality has not has been tested yet. There may be some adjustments needed
+in order to make it work properly. <br 
+class="newline" /><br 
+class="newline" />Amongst the improvements made, we reduced the latency between each packet
+capture, minimizing the risk of packet drop, by delaying the packet processing and
+filtering process. Instead, the thread handling the capture save each packet
+in a queue and let another thread doing the filtering/processing task.
+<br 
+class="newline" /><br 
+class="newline" />The live standalone mode may benefit from some additional flags in order to offer
+the same functionalities as the interface/server mode as a future improvement.
+<br 
+class="newline" /><br 
+class="newline" />Under the server mode, a thread opens a TCP connection, listenning for incoming
+request. <br 
+class="newline" /><br 
+class="newline" />The program uses 7 other threads for each analysis routine: <br 
+class="newline" />- job_pkt: process the raw packets queue, discarding non HTTP packets ;
+<br 
+class="newline" />- job_pkt_q: process the queue of filtered HTTP packets, converting them to flows
+; <br 
+class="newline" />- job_flow_q: process the flows which have received their last packet (connection
+closed) ; <br 
+class="newline" />- job_scrb_htbl: clean all the remaining flows ; <br 
+class="newline" />- timer: manage the interval and duration timers ; <br 
+class="newline" />- capture: capture all the packets on the given interface placing them in a
+raw_pkt&#x00A0;queue. <br 
+class="newline" /><br 
+class="newline" />Each of these threads shares common variables. The Data struct (see
+data.h) stores all these common variables. When a new analysis is spawned,
+a block of memory is allocated to store a Data block, and its pointer
+is stored in a pthread_key_t, a thread-specific variable. This strategy
+allows us to read/write elements of these common variables from anywhere
+within theses 4 threads functions. It act as a thread safe global variable.
+<br 
+class="newline" />The pthread_key_create() function shall create a thread-specific data key visible
+to all threads in the process. Key values provided by pthread_key_create() are
+opaque objects used to locate thread-specific data. Although the same key
+value may be used by different threads, the values bound to the key by
+pthread_setspecific() are maintained on a per-thread basis and persist for the life
+of the calling thread. <a 
+href="https://linux.die.net/man/3/pthread_key_create" class="url" ><span class="rm-lmtt-12">https://linux.die.net/man/3/pthread_key_create</span></a>
+<br 
+class="newline" />The sniffer component lies under /c-http-sniffer. <br 
+class="newline" /><br 
+class="newline" />- SConscript: Compilation configuration file. <br 
+class="newline" />- protobuf-c.c: protobuf-c library. <br 
+class="newline" />- analysis.pb-c.c: File generated by protobuf-c. <br 
+class="newline" />- client.c, conn.c, req_path.c, req_type.c, rsp_status.c: Metrics computation.
+<br 
+class="newline" />- data.c: Flows and pairs processing, metrics computation.<br 
+class="newline" />- flow.c <br 
+class="newline" />- flow_hash_table.c <br 
+class="newline" />- flow_queue.c <br 
+class="newline" />- hash_table.c <br 
+class="newline" />- http.c <br 
+class="newline" />- main.c: Main file of the sniffer program. Detect the mode and spawn the major
+threads. <br 
+class="newline" />- order.c <br 
+class="newline" />- packet.c: Packet library. <br 
+class="newline" />- packet_queue.c <br 
+class="newline" />- queue.c: Queue library. <br 
+class="newline" />- raw_pkt_queue.c <br 
+class="newline" />- server.c: Server functionalities. <br 
+class="newline" />- tcp.c <br 
+class="newline" />- timer.c <br 
+class="newline" />- util.c: Helper functions.
+</p><!--l. 503--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">5.3   </span> <a 
+ id="x1-420005.3"></a>Usage</h4>
+<!--l. 504--><p class="noindent" >./ycsb run jdbc -P ../workloads/workloadc -p jdbc.driver=com.mysql.jdbc.Driver
+-p db.url=jdbc:mysql://172.16.1.8:3306/YCSB -p db.user=root -p
+db.passwd=root -s -threads 20 -target 0 -p measurementtype=timeseries -p
+timeseries.granularity=20000 <br 
+class="newline" /><br 
+class="newline" />To compile and execute the program: <br 
+class="newline" />cd c-http-sniffer/ <br 
+class="newline" />scons <br 
+class="newline" /><br 
+class="newline" />Run in Standalone mode: <br 
+class="newline" />./bin/http-sniffer -i interface <br 
+class="newline" /><br 
+class="newline" />Run in Server mode: <br 
+class="newline" />./bin/http-sniffer
+</p><!--l. 526--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">6   </span> <a 
+ id="x1-430006"></a>Traffic generators</h3>
+                                                                          
+
+                                                                          
+<!--l. 527--><p class="noindent" >Traffic can be simulated with the following two tools: YCSB, a modified
+benchmark tool and ScapyTrafficGenerator, a network traffic simulator to test our
+system.
+</p><!--l. 529--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">6.1   </span> <a 
+ id="x1-440006.1"></a>YCSB</h4>
+<!--l. 530--><p class="noindent" >YCSB is originally a database benchmark where a YCSB client sends requests
+to a database. Our extended version has added a Tomcat webserver as
+frontend for the client (which was modified to communicate with the
+Tomcat server); the Tomcat server has access to a MySQL database and a
+Memcache server. Each component is deployed in a separate container and all
+containers are connected by an OVS switch configured via Openflow.
+The clients submit a predefined workload of HTTP requests to the web
+server whereby each request retrieves data from either the database or the
+memory cache. Recent results are cached in the Memcache server. The
+data-base schema and the query requests follow the YCSB benchmark.
+<br 
+class="newline" /><br 
+class="newline" /><b><span class="rm-lmb-10x-x-120">Log on the docker container hosting YCSB:</span></b>
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-21">
+ssh&#x00A0;username@bmj-cluster.cs.mcgill.ca
+&#x00A0;<br />ssh&#x00A0;compute-04
+&#x00A0;<br />sudo&#x00A0;docker&#x00A0;exec&#x00A0;-it&#x00A0;ycsbclient_nano&#x00A0;/bin/bash
+</div>
+<!--l. 537--><p class="nopar" ><b><span class="rm-lmb-10x-x-120">Configure the traffic simulation duration:</span></b>
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-22">
+nano&#x00A0;YCSBCLIENT/workloads/workloadc
+&#x00A0;<br />#&#x00A0;Edit&#x00A0;the&#x00A0;following&#x00A0;value&#x00A0;(in&#x00A0;sec):&#x00A0;maxexecutiontime=20
+</div>
+<!--l. 542--><p class="nopar" ><b><span class="rm-lmb-10x-x-120">Start YCSB:</span></b>
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-23">
+cd&#x00A0;YCSBCLIENT/bin/
+&#x00A0;<br />./ycsb&#x00A0;run&#x00A0;jdbc
+&#x00A0;<br />-P&#x00A0;../workloads/workloadc
+&#x00A0;<br />-p&#x00A0;jdbc.driver=com.mysql.jdbc.Driver
+&#x00A0;<br />-p&#x00A0;db.url=jdbc:mysql://172.16.1.8:3306/YCSB
+&#x00A0;<br />-p&#x00A0;db.user=root
+&#x00A0;<br />-p&#x00A0;db.passwd=root
+&#x00A0;<br />-s
+&#x00A0;<br />-threads&#x00A0;20
+&#x00A0;<br />-target&#x00A0;0
+&#x00A0;<br />-p&#x00A0;measurementtype=timeseries
+&#x00A0;<br />-p&#x00A0;timeseries.granularity=20000
+</div>
+<!--l. 557--><p class="nopar" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">6.2   </span> <a 
+ id="x1-450006.2"></a>ScappyTrafficGenerator</h4>
+<!--l. 559--><p class="noindent" >The relevant documentation can be found here: https://pypi.org/project/ScapyTrafficGenerator/
+<br 
+class="newline" /><br 
+class="newline" /><b><span class="rm-lmb-10x-x-120">Start ScappyTG:</span></b>
+                                                                          
+
+                                                                          
+</p>
+   <div class="verbatim" id="verbatim-24">
+ScapyTrafficGenerator&#x00A0;-X&#x00A0;http&#x00A0;-r&#x00A0;&#8217;-X&#x00A0;1&#x00A0;-F&#x00A0;/test.txt
+&#x00A0;<br />-i&#x00A0;interface&#x00A0;-s&#x00A0;2.2.2.2&#x00A0;-S&#x00A0;20&#x00A0;-d&#x00A0;5.5.5.5&#x00A0;-D&#x00A0;80&#x00A0;-T&#x00A0;10&#x00A0;-x&#x00A0;200&#x00A0;-u&#x00A0;/path/url&#8217;
+</div>
+<!--l. 565--><p class="nopar" >
+</p>
+    
+</body> 
+</html>
+                                                                          
+
+                                                                          
+                                                                          
+
+

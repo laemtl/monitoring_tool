@@ -217,6 +217,18 @@ export default {
           params.Max = messages[i].max;
         }
 
+        if (typeof messages[i].rev_avg !== "undefined") {
+          params.RevAvg = messages[i].rev_avg;
+        }
+
+        if (typeof messages[i].rev_min !== "undefined") {
+          params.RevMin = messages[i].rev_min;
+        }
+
+        if (typeof messages[i].rev_max !== "undefined") {
+          params.RevMax = messages[i].rev_max;
+        }
+
         if (typeof messages[i].cfreq !== "undefined") {
           for (var j = 0; j < messages[i].cfreq.length; j++) {
             params[messages[i].cfreq[j].name] = messages[i].cfreq[j].freq;
@@ -285,6 +297,7 @@ export default {
       /* Push stream data to current series, if it's not yet render-time */
       if (this.msgSeries.length < this.renderEveryNth) {
         this.msgSeries.push(message.data);
+        if(this.graph.id == 'tp') console.log(message.data);
       }
 
       /*if(typeof message.data.min !== 'undefined') {
@@ -316,8 +329,7 @@ export default {
 .chart,
 .x_axis {
   position: relative;
-  /**/
-  overflow: hidden;
+  //overflow: hidden;
 }
 
 div.y_axis {
@@ -339,7 +351,7 @@ div.y_axis {
 
 #client {
   height: 50px;
-  width: 300px;
+  width: 200px;
   float: right;
   overflow-y: scroll;
 }

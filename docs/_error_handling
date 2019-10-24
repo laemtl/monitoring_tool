@@ -1,0 +1,22 @@
+/*	
+	if (!(value = malloc(sizeof(Buffer))))
+    	printf("Thread %d could not allocate storage, errno = %d\n", threadnum, errno);
+ 	
+	pthread_exit((void *)0);
+
+	status = pthread_create( &threadid[i], NULL, threadfunc, (void *)&threadparm[i]);
+    if ( status <  0) {
+       printf("pthread_create failed, errno=%d", errno);
+       exit(2);
+    }
+
+	status = pthread_join( threadid[i],
+    (void *)&thread_stat[i]);
+    if ( status <  0) {
+       printf("pthread_join failed, thread %d, errno=%d\n", i+1, errno);
+    }
+
+    if (thread_stat[i] != 0)   {
+        printf("bad thread status, thread %d, status=%d\n", i+1, thread_stat[i]);
+    }
+	*/

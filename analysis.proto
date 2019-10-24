@@ -6,7 +6,8 @@ message Init {
     repeated string netInt = 1;
     required uint32 interval = 2;
     required uint32 duration = 3;
-    //required uint32 topClientCnt = 4;
+
+    // Change for  a list of keys??
     required uint32 activeMetric = 5;
     optional uint32 clientIP = 6;
     optional uint32 clientPort = 7;
@@ -14,54 +15,35 @@ message Init {
     optional uint32 serverPort = 9;
 };
 
-message Data {
-    required int64 time = 1;
-    required string netInt = 2;
-    
-    optional double rstAvg = 3;
-    optional double rstMin = 4;
-    optional double rstMax = 5;
-    optional double rstClient = 6;
+message Metrics {
 
-    optional double errRate = 7;
-    optional double errRateMin = 8;
-    optional double errRateMax = 9;
-    optional double errRateClient = 10;
+}
 
-    optional double reqRate = 11;
-    optional double reqRateMin = 12;
-    optional double reqRateMax = 13;
-    optional double reqRateClient = 14;
+message MetricValueMsg {
+    required string name = 1;    
+    required int64 time = 2;
+    required string netInt = 3;
+    required int64 clientId = 4;
 
-    optional double connRate = 15;
-    optional double connRateMin = 16;
-    optional double connRateMax = 17;
-    
-    //repeated Conn conns = 19;
-
-    repeated Freq client = 18;
-    repeated Freq req_path = 19;
-    repeated Freq req_method = 20;
-    repeated Freq req_type = 21;
-    repeated Freq rsp_status = 22;
-
-    optional double tpAvg = 23;
-    optional double tpMin = 24;
-    optional double tpMax = 25;
-
-    optional double tpRevAvg = 26;
-    optional double tpRevMin = 27;
-    optional double tpRevMax = 28;
+    oneof values {
+        MetricAvgMsg metricAvg = 5;
+        MetricCumDistrMsg metricCumDistr = 6;
+    }
 };
 
-/*message Conn {
-    required uint32 ip = 1;
-    required uint32 port = 2; 
-}*/
+message MetricAvgMsg {
+    required double avg = 5;
+    required double min = 6;
+    required double max = 7;
+}
 
 message Freq {
     required string name = 1;
     required double freq = 2; 
+}
+
+message MetricCumDistrMsg {
+    repeated Freq freqs = 1; 
 }
 
 message Close {}

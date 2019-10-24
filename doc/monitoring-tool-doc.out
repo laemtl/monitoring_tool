@@ -1,0 +1,44 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{Available options and metrics}{section.1}% 2
+\BOOKMARK [3][-]{subsubsection.1.1.1}{Network Interface}{subsection.1.1}% 3
+\BOOKMARK [3][-]{subsubsection.1.1.2}{Interval}{subsection.1.1}% 4
+\BOOKMARK [3][-]{subsubsection.1.1.3}{Duration}{subsection.1.1}% 5
+\BOOKMARK [3][-]{subsubsection.1.1.4}{Client}{subsection.1.1}% 6
+\BOOKMARK [3][-]{subsubsection.1.1.5}{Request service time}{subsection.1.1}% 7
+\BOOKMARK [3][-]{subsubsection.1.1.6}{Request rate}{subsection.1.1}% 8
+\BOOKMARK [3][-]{subsubsection.1.1.7}{Error rate}{subsection.1.1}% 9
+\BOOKMARK [3][-]{subsubsection.1.1.8}{Throughput}{subsection.1.1}% 10
+\BOOKMARK [3][-]{subsubsection.1.1.9}{Connection rate}{subsection.1.1}% 11
+\BOOKMARK [3][-]{subsubsection.1.1.10}{Clients}{subsection.1.1}% 12
+\BOOKMARK [3][-]{subsubsection.1.1.11}{Request path}{subsection.1.1}% 13
+\BOOKMARK [3][-]{subsubsection.1.1.12}{Request method}{subsection.1.1}% 14
+\BOOKMARK [3][-]{subsubsection.1.1.13}{Request type}{subsection.1.1}% 15
+\BOOKMARK [3][-]{subsubsection.1.1.14}{Response status}{subsection.1.1}% 16
+\BOOKMARK [2][-]{subsection.1.2}{Architecture}{section.1}% 17
+\BOOKMARK [2][-]{subsection.1.3}{Server access and source file location}{section.1}% 18
+\BOOKMARK [3][-]{subsubsection.1.3.1}{Frontend}{subsection.1.3}% 19
+\BOOKMARK [3][-]{subsubsection.1.3.2}{Backend}{subsection.1.3}% 20
+\BOOKMARK [3][-]{subsubsection.1.3.3}{Sniffer}{subsection.1.3}% 21
+\BOOKMARK [2][-]{subsection.1.4}{Local development}{section.1}% 22
+\BOOKMARK [2][-]{subsection.1.5}{Useful commands}{section.1}% 23
+\BOOKMARK [2][-]{subsection.1.6}{Github repository}{section.1}% 24
+\BOOKMARK [1][-]{section.2}{Frontend}{}% 25
+\BOOKMARK [2][-]{subsection.2.1}{User Interface}{section.2}% 26
+\BOOKMARK [2][-]{subsection.2.2}{Installation}{section.2}% 27
+\BOOKMARK [2][-]{subsection.2.3}{Usage}{section.2}% 28
+\BOOKMARK [2][-]{subsection.2.4}{Architecture}{section.2}% 29
+\BOOKMARK [1][-]{section.3}{Backend}{}% 30
+\BOOKMARK [2][-]{subsection.3.1}{Installation}{section.3}% 31
+\BOOKMARK [2][-]{subsection.3.2}{Usage}{section.3}% 32
+\BOOKMARK [2][-]{subsection.3.3}{Architecture}{section.3}% 33
+\BOOKMARK [1][-]{section.4}{Protocol Buffer}{}% 34
+\BOOKMARK [2][-]{subsection.4.1}{Installation}{section.4}% 35
+\BOOKMARK [2][-]{subsection.4.2}{Usage}{section.4}% 36
+\BOOKMARK [2][-]{subsection.4.3}{Architecture}{section.4}% 37
+\BOOKMARK [1][-]{section.5}{Sniffer}{}% 38
+\BOOKMARK [2][-]{subsection.5.1}{Installation}{section.5}% 39
+\BOOKMARK [2][-]{subsection.5.2}{Architecture}{section.5}% 40
+\BOOKMARK [2][-]{subsection.5.3}{Usage}{section.5}% 41
+\BOOKMARK [1][-]{section.6}{Traffic generators}{}% 42
+\BOOKMARK [2][-]{subsection.6.1}{YCSB}{section.6}% 43
+\BOOKMARK [2][-]{subsection.6.2}{ScappyTrafficGenerator}{section.6}% 44

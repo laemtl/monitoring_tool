@@ -1,0 +1,7 @@
+- remove shader in the grass 
+    texture instead of grass
+- configure distance of the grass
+
+- random texture
+
+- freeze on camera rotation when mouse is hidden

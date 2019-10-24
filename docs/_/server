@@ -1,0 +1,11 @@
+server install
+-------------------------------------
+sudo apt-get install curl python-software-properties
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+
+sudo apt-get install -y nodejs
+
+get number of threads for a process
+-------------------------------------
+ps axf | grep <process name> 
+ps hH p <pid> | wc -l

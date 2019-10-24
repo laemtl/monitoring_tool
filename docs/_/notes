@@ -1,0 +1,242 @@
+Where do I install the program
+-> web server
+
+
+How to connect
+-----------------------------------------
+ssh lfesse@bmj-cluster.cs.mcgill.ca
+ssh node-ovs
+cd /home/melsaa1/http-sniffer/src
+
+ssh compute-04
+
+ssh lfesse@172.16.1.3
+
+
+
+Start sniffer compute-04
+-----------------------------------------
+
+Start ycsb
+----------
+sudo docker exec -it ycsbclient /bin/bash
+cd YCSBCLIENT/bin/
+./ycsb run jdbc -P ../workloads/workloadc -p jdbc.driver=com.mysql.jdbc.Driver -p db.url=jdbc:mysql://172.16.1.8:3306/YCSB -p db.user=root -p db.passwd=root -s -threads 20 -target 0 -p measurementtype=timeseries -p timeseries.granularity=20000
+
+start sniffer(webserver)
+-------------
+./bin/http-sniffer -i ca5932b0af4c4_l
+
+
+
+
+
+
+restart the ws
+-----------------------------------------
+ssh lfesse@172.16.1.5 (ws)
+/media/sf_apache-tomcat-9.0.5/bin
+./shutdown.sh
+./startup.sh
+
+172.16.1.30 (memcache)
+172.16.1.7 (db)
+172.16.1.3 (client VM)
+
+
+
+
+copy using scp
+-----------------------------------------
+scp -r src/ lfesse@bmj-cluster:~/lfesse
+
+
+
+start OVS DB:
+export DB_SOCK=/usr/local/var/run/openvswitch/db.sock
+sudo /usr/local/share/openvswitch/scripts/ovs-ctl --no-ovs-vswitchd --db-sock="$DB_SOCK" start
+sudo /usr/local/share/openvswitch/scripts/ovs-ctl --no--ovsdb-server --db-sock="$DB_SOCK" start
+
+
+Commands
+-----------------------------------------
+ovs-vsctl list interface 
+docker ps
+
+
+Technologies used
+-----------------------------------------
+ycsb (Yahoo! Cloud Serving Benchmark) -> send data to the webserver
+    - java 
+    - database for benchmark
+Docker
+OVS (Open virtual switch)
+    - based on the openFlow protocol
+
+http-sniffer (modified)
+BPF Compiler Collection (BCC)
+
+2 versions: VM and Docker (compute4/node-ovs)
+DPDK (Data Plane Development Kit)
+    - libraries to accelerate packet processing workloads running on a wide variety of CPU architectures
+
+
+Key concept
+-----------------------------------------
+Monitoring as a service
+SDN (Software-defined networking)
+NFV  
+
+Information
+-----------------------------------------
+Hours: from 9-5
+16 weeks
+
+
+Goal
+-----------------------------------------
+Real-time, flexible, scalable and unified application performance monitoring tool 
+Collect metrics in real time (almost) from the system
+Input parameters collected from the user (dashboard)
+First target audience: cloud administrator
+
+
+Material
+-----------------------------------------
+C code for the sniffer
+
+
+Task
+-----------------------------------------
+- understand how the insterface is configured (OVS port)
+- think about how the dashboard can be implemented (C in the background)
+- add a port parameter in the program
+- first task: parametrize all options (from static to user input)
+- dashboard with response time
+- minor priority: have a web interface
+
+
+send inputs to the server
+logic fot the params
+print to the screen
+
+
+This SDN based approach uses techniques such as port mirroring and/or tunneling to enable message filtering and reformatting, and uses a customized port sniffer for software switches (such as OVS). We are currently designing the architecture of the overall Monitoring Service. 
+
+As first prototype, the system should allow users to choose the entities that should be monitored in real-time (by entering IPs and/or port numbers), and select the monitoring matrices of interest, and the monitoring interval and duration.
+
+Our first prototype will target request/reply type protocols (HTTP, database, memcache, etc.) and should provide multiple monitoring matrices such as:
+
+Request service time (minimum/maximum/average).
+Throughput in terms of sent bytes and/or packets (minimum/maximum/average)
+Error rate (the number of the failed requests out of all sent requests classified by the request type).
+Host load (number of handled requests/all received requests).
+Object popularity (the number of requests for a certain object(file, video, gif,...etc) / all received requests).
+Possibly deep inspect (e.g., to detect certain words or sentences in the message). 
+
+The user interface should be a dashboard where the user can configure what and where to monitor, and monitor results should be visualized to the user in real time. In addition, our service should raise alarm in case of outliers in the monitored matrices. For example, if a certain application request service time, error rate, or host load exceeds a certain threshold (which may be an input from the service user or learned from the monitored application through machine learning techniques), the user should be notified.
+
+Metric
+-----------------------------------------
+response time
+load
+# of request
+frequency
+*throughput
+*avg latency
+
+
+Protocol
+-----------------------------------------
+http
+
+
+Infrastructure
+-----------------------------------------
+memcache
+client server container (ycsb) 
+web server container (Apache Tomcat: java)
+    - used to emit messages with client (exchange) 
+    - link with the db
+logger container
+    -The container used to run the machine learning logs
+mySQL container (hold the ycsb db for benchmark)
+
+Software
+-----------------------------------------
+http://websocketd.com/
+https://www.webtoolkit.eu/wt/
+
+graphing tool
+-----------------------------------------
+https://plot.ly/nodejs/bar-charts/
+NodeJS / Go / C++
+
+Frontend: NodeJS
+https://community.risingstack.com/using-buffers-node-js-c-plus-plus/
+
+Real time web socket
+https://socket.io/ --> overhead to support for incompatible browser
+https://medium.com/@aeh.herman/websockets-beyond-ajax-aafa6f89901b
+http://websocketd.com/
+
+-----------------------------------------
+http: low overhead
+we can benefit from a webSocket
+web Workers API -> multithread js 
+low-latency, bi-directional, full-duplex and long-running connection between a browser and server.
+
+Assumption: the user will use an environment supporting websockets:
+https://caniuse.com/#feat=websockets
+https://thoughtbot.com/blog/real-time-online-activity-monitor-example-with-node-js-and-websocket
+
+
+Backend to parse the post response
+-----------------------------------------
+
+read c++ output
+-----------------------------------------
+
+nodeJS was chosen because it is fast to learn, write and relatively performant (frontend side)
+Go was chosen on the backend side for speed (compiled, web oriented, close to c)
+
+https://nodeaddons.com/getting-your-c-to-the-web-with-node-js/
+https://nodeaddons.com/streaming-data-from-c-to-node-js/
+https://nodeaddons.com/automating-a-c-program-from-a-node-js-web-app/
+https://community.risingstack.com/using-buffers-node-js-c-plus-plus/
+https://dzone.com/articles/understanding-execfile-spawn-exec-and-fork-in-node
+https://karthikkaranth.me/blog/calling-c-code-from-go/
+https://medium.com/factory-mind/websocket-node-js-express-step-by-step-using-typescript-725114ad5fe4
+https://github.com/websockets/ws#api-docs
+https://medium.com/factory-mind/websocket-node-js-express-step-by-step-using-typescript-725114ad5fe4
+https://github.com/websockets/ws#api-docs
+https://davidwalsh.name/websocket
+https://github.com/zaphoyd/websocketpp
+https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
+https://www.html5rocks.com/en/tutorials/eventsource/basics/
+https://nodejs.org/api/addons.html
+https://codeburst.io/polling-vs-sse-vs-websocket-how-to-choose-the-right-one-1859e4e13bd9
+https://itnext.io/javascript-real-time-visualization-of-high-frequency-streams-d6533c774794
+https://www.netburner.com/learn/websockets-for-real-time-web-and-iot-applications/
+https://hackernoon.com/n-api-and-getting-started-with-writing-c-addons-for-node-js-cf061b3eae75
+https://medium.com/@tarkus/how-to-call-c-c-code-from-node-js-86a773033892
+websocket vs SSE vs MQTT
+
+
+172.16.1.3 --> 172.16.1.5: 4228848/YCSBWebMona/ycsb?key=22049&request=scan&recordcount=10 11683 HTTP 1.1 200 0.026669
+172.16.1.3 --> 172.16.1.5: 4228848/YCSBWebMona/ycsb?key=98586&request=scan&recordcount=10 11683 HTTP 1.1 200 0.023705
+
+https://blog.jscrambler.com/vue-js-authentication-system-with-node-js-backend
+
+
+
+throughput
+--------------------------------
+from -> to
+ips
+
+
+host load
+--------------------------------
+to ip
+

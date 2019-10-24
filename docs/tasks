@@ -1,0 +1,15 @@
+This week
+--------------------------------
+- refactor of code (pthread_key_t)
+- implementation of min/max (review)
+- migration on remote server
+- config file
+- hashtable (beginning)
+- ticket system
+
+Future work
+--------------------------------
+- make the server persistent (make the sniffer to restart when it quit - log the reason of failure)
+- correct ws pb with client (send data results per client)
+- refactor hashtables and implement client/path count and popular items (continue)- check for memory leak
+- check for memory leak

@@ -1,0 +1,31 @@
+
+Thread 8 "http-sniffer" received signal SIGSEGV, Segmentation fault.
+[Switching to Thread 0x7fffeffff700 (LWP 6805)]
+memchr () at ../sysdeps/x86_64/memchr.S:154
+154	../sysdeps/x86_64/memchr.S: No such file or directory.
+(gdb) backtrace
+#0  memchr () at ../sysdeps/x86_64/memchr.S:154
+#1  0x0000000000408652 in find_line_end (data=0x7fffd400119b "", 
+    dataend=0x800000000000 <error: Cannot access memory at address 0x800000000000>, eol=0x7fffefffeab8) at src/http.c:346
+#2  0x0000000000409371 in http_header_param (
+    header=0x7fffd4000fd0 "GET /path-3/url-3 HTTP/1.1\r\nUser-Agent: curl/7.35.0\r\nHost: testhost.net\r\nAccept: */*\r\n\r\n", 
+    hlen=738193457, param=0x41664b "Referer:") at src/http.c:838
+#3  0x000000000040963c in http_parse_request (request=0x7fffe4000a80, 
+    data=0x7fffd4000fd0 "GET /path-3/url-3 HTTP/1.1\r\nUser-Agent: curl/7.35.0\r\nHost: testhost.net\r\nAccept: */*\r\n\r\n", 
+    dataend=0x7fffd4000fd0 "GET /path-3/url-3 HTTP/1.1\r\nUser-Agent: curl/7.35.0\r\nHost: testhost.net\r\nAccept: */*\r\n\r\n", 
+    time=0x7fffefffec10 "689167", seq=939966718, nxt_seq=939966718) at src/http.c:896
+#4  0x0000000000405ed6 in flow_extract_http (f=0x7fffd80008c0, closed=0) at src/flow.c:607
+#5  0x00000000004047d8 in flow_hash_process () at src/data.c:569
+#6  0x0000000000404973 in process_data (sig=0) at src/data.c:613
+#7  0x00000000004145aa in create_timer (start=1, interval=1, status=0x7fffe8000a00, callback=0x40492e <process_data>) at src/timer.c:94
+#8  0x0000000000414613 in start_interval_timer (interval=1, status=0x7fffe8000a00) at src/timer.c:105
+#9  0x0000000000414686 in start_timer (data=0x7fffe80009d0) at src/timer.c:118
+#10 0x00007ffff7bc16ba in start_thread (arg=0x7fffeffff700) at pthread_create.c:333
+#11 0x00007ffff74ad41d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:109
+(gdb) q
+A debugging session is active.
+
+	Inferior 1 [process 6788] will be killed.
+
+Quit anyway? (y or n) y
+

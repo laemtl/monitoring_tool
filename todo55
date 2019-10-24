@@ -1,0 +1,25 @@
+How we can had a metric and see the frontend updated
+
+move metric logic on the snifer with method
+
+events
+
+solve the cond where we don't create a flow if packet not first
+
+c++
+metrics file
+
+2 types: avg, cumdistr
+events (observer pattern)
+
+startAnalysis
+endAnalysis
+
+ 
+
+
+genralize hashTables
+
+
+protobuf latest
+https://github.com/protocolbuffers/protobuf/blob/master/src/README.md

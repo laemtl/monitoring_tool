@@ -1,0 +1,25 @@
+sudo docker run  --name nodejs -d -p 3000:3000 --network host --ipc=host -v /home/lfesse/http-sniffer:/home/lfesse/http-sniffer laemtl/dashboard-app
+sudo docker exec -it nodejs sh
+
+ apk update && apk add groff g++ bison flex make cmake ccache python \
+        libldap openssl-dev git linux-vanilla-dev linux-headers vim \
+        boost-dev ctags man gdb fish openssh db-dev libexecinfo-dev libexecinfo libpcap-dev json-c scons json-c-dev
+
+DNS pb in Docker: https://development.robinwinslow.uk/2016/06/23/fix-docker-networking-dns/
+
+sudo docker run --name ubuntu2 --privileged -v /home/lae/Dropbox/McGill/internship/lfesse/http-sniffer:/home/http-sniffer -itd ubuntu/v2
+
+
+sudo docker run busybox
+
+
+
+#!/bin/sh
+mkdir -p /dev/net
+mknod /dev/net/tun c 10 200
+
+iptables -t nat -A POSTROUTING -s 10.250.0.0/24 -o eth0 -j MASQUERADE
+
+openvpn --config /etc/openvpn/openvpn.conf
+https://backreference.org/2010/03/26/tuntap-interface-tutorial/
+https://arthurchiao.github.io/blog/play-with-container-network-if/

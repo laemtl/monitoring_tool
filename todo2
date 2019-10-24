@@ -1,0 +1,42 @@
+- refactored the code for c++
+- installed spicy. Not working. Using the docker version.
+- Analyzed the http packet dissector. Only header param are missing in spicy.
+
+
+
+Example of custom metrics.
+--> http
+--> new protocol
+
+Example of new protocol
+
+
+IPV6
+UDP
+
+heuristic to detect protocol
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+filder 
+symmetric key
+encryption missing (cypher)
+
