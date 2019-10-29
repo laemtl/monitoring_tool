@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
-#include "data.h" 
+#include "analysis.hpp" 
 
 // These defines come from asm-generic/siginfo.h, are necessary, but are not included by signal.h.
 #define sigev_notify_function	_sigev_un._sigev_thread._function

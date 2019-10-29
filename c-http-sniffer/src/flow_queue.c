@@ -13,7 +13,7 @@
 #include <unistd.h>
 
 #include "util.h"
-#include "data.h"
+#include "analysis.hpp"
 
 /************************
  * flow queue functions *

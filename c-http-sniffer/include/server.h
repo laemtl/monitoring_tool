@@ -13,7 +13,7 @@
 
 #include "packet.h"
 #include "analysis.pb-c.h"
-#include "data.h"
+#include "analysis.hpp"
 #include "timer.h"
 
 void start_log(char* ipaddress);

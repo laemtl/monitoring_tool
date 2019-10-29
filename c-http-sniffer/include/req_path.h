@@ -2,7 +2,7 @@
 #define PATH_H
 
 #include "attr.h"
-#include "data.h"
+#include "analysis.hpp"
 
 u_int32_t req_path_hash_fn(Attr* a);
 int req_path_compare(Attr* a1, Attr* a2);

@@ -4,7 +4,7 @@
 #include <sys/types.h>
 #include "hash_table.h"
 #include "result.h"
-#include "data.h"
+#include "analysis.hpp"
 
 u_int32_t client_hash_fn(Attr* a);
 int ip_compare(Attr* c1, Attr* c2);

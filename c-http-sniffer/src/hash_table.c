@@ -14,7 +14,7 @@
 #include <inttypes.h>
 
 #include "util.h"
-#include "data.h"
+#include "analysis.hpp"
 #include "hash_table.h"
 
 /* Initiate the hash table with no elems */

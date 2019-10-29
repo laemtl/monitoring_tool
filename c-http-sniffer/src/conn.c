@@ -1,6 +1,6 @@
 #include "attr.h"
 #include "conn.h"
-#include "data.h"
+#include "analysis.hpp"
 #include <inttypes.h>
 
 u_int32_t conn_hash_fn(Attr* c) {

@@ -11,7 +11,7 @@
 
 #include "packet.h"
 #include "util.h"
-#include "data.h"
+#include "analysis.hpp"
 
 
 BOOL 

@@ -17,16 +17,17 @@ def printCheck(lib_path, libname):
 
 
 # Set compiling environment
-env = Environment(CCFLAGS="-Wall -g `pkg-config --cflags 'libprotobuf-c >= 1.0.0'`")
+env = Environment(CC = 'g++', CCFLAGS="-Wall -fpermissive -w -g `pkg-config --cflags 'libprotobuf-c >= 1.0.0'`")
 env.Append(LINKFLAGS=["`pkg-config --libs 'libprotobuf-c >= 1.0.0'`"])
+env.Append(CXXFLAGS="-std=c++11")
 lib_path = ['.', '/usr/local/lib', '/usr/lib', '/usr/lib/x86_64-linux-gnu/','home/2017/yhe54/json-c/.libc']
 printCheck(lib_path, 'pthread')
 printCheck(lib_path, 'pcap')
 printCheck(lib_path, 'json-c')
 libs = Glob('.[ao]') + ['pthread', 'pcap', 'json-c', 'rt']
-cpp_path=['../include', '/usr/include', '/usr/local/include']
+cpp_path=['../include', '../include/metrics', '../include/events', '/usr/include', '/usr/local/include']
 
-
+ 
 # Flag debug to decide if NFM libs are used to compile program
 # NFM is a network processor card driver to capture network traffic.
 if int(ARGUMENTS.get('debug', 0)):
@@ -40,7 +41,7 @@ if int(ARGUMENTS.get('debug', 0)):
 
 # Compile the programs
 env.Program(target = '../bin/http-sniffer', 
-            source = Glob('*.c'),
+            source = Glob('*/*.cpp') + Glob('*.cpp') + Glob('*.c'),
             LIBPATH = lib_path,
             LIBS = libs,
             CPPPATH = cpp_path)

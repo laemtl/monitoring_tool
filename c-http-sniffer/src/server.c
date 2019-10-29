@@ -1,5 +1,5 @@
 #include "server.h"
-#include "data.h"
+#include "analysis.hpp"
 #include <string.h>
 #include <inttypes.h>
 #include <unistd.h>
@@ -369,6 +369,9 @@ void connection_handler(int *socket) {
 
 				//data->conn_ht.tl.size = init->topclientcnt;
 
+				
+
+
 				data->rst.active = rst_active;
 				data->req_rate.active = req_rate_active;
 				data->err_rate.active = err_rate_active;
@@ -381,7 +384,13 @@ void connection_handler(int *socket) {
 				data->req_method_active = req_method_active;
 				data->req_type_active = req_type_active;
 				data->rsp_status_active = rsp_status_active;
-			
+
+				vector<bool> status;
+				status.push_back(rst_active);
+
+				data->analysis = new Analysis();
+				data->analysis->activeMetrics(status);
+
 				start_analysis(NULL, data);
 			}
 

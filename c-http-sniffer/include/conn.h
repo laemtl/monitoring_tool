@@ -1,7 +1,7 @@
 #include <sys/types.h>
 #include "hash_table.h"
 #include "util.h"
-#include "data.h"
+#include "analysis.hpp"
 
 #ifndef CONN_H
 #define CONN_H

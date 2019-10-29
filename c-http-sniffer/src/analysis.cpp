@@ -5,13 +5,14 @@
 #include <float.h>
 #include <string.h>
 #include <unistd.h>
-#include "data.h"
+#include "analysis.hpp"
 #include "req_path.h"
 #include "conn.h"
 #include "req_type.h"
 #include "rsp_status.h"
 #include "client.h"
 #include "server.h"
+#include "util.h"
 
 extern int flow_req;
 extern int flow_rsp;
@@ -21,6 +22,28 @@ extern int rsp_n;
 extern int req_n;
 
 extern BOOL debug;
+
+Analysis::Analysis() {
+    eventManager = new EventManager();
+    metricManager = new MetricManager();
+};
+
+void Analysis::activeMetrics(vector<bool> status) {
+
+    if(status.size() != metricManager->metrics.size()) {
+        cout << "Invalid status size";
+        pthread_exit(NULL);
+    }
+
+    for (unsigned i = 0; i < status.size(); i++) {
+        if(!status.at(i))  metricManager->metrics.erase( metricManager->metrics.begin() + i);
+    }
+
+    // Register
+    for (unsigned i = 0; i <  metricManager->metrics.size(); i++) {
+        metricManager->metrics.at(i)->subscribe(eventManager);
+    }
+}
 
 //int d = 0;
 
@@ -292,17 +315,24 @@ void extract_data(flow_t *flow){
 	if(!flow->processed) {
 		add_conn(flow->socket.saddr, flow->socket.sport, data);
 		data->flow_tot++;
-		flow->processed = TRUE;				
+		flow->processed = TRUE;		
+
+		data->analysis->eventManager->newFlowReceived->notify(flow);		
 	}
 	
+	// Need client/server value
+	data->analysis->eventManager->flowUpdate->notify(flow);
+
 	if (flow->http_f != NULL){        	
-		http_pair_t *h = flow->http_f;
-		while(h != NULL) {
-			if(h->request_header != NULL) {
-				if(!h->req_processed) {
-					h->req_processed = TRUE;
-					request_t *req = h->request_header;
+		http_pair_t *pair = flow->http_f;
+		while(pair != NULL) {
+			if(pair->request_header != NULL) {
+				if(!pair->req_processed) {
+					pair->req_processed = TRUE;
+					request_t *req = pair->request_header;
 					flow_req++;
+
+					data->analysis->eventManager->requestReceived->notify(pair, flow);
 
 					data->req_tot++;
 					add_client(flow->socket.saddr, data);
@@ -311,32 +341,34 @@ void extract_data(flow_t *flow){
 					compute_req_rate(data);
 				}
 				
-				if(h->rsp_processed) {
-					http_pair_t* next = h->next;
+				if(pair->rsp_processed) {
+					http_pair_t* next = pair->next;
 
 					if(next != NULL) {
 						flow->http_f = next;
-						http_free(h);
+						http_free(pair);
 					}
-					h = next;
+					pair = next;
 					continue;
 				}
 
-				if(h->response_header != NULL) {
-					h->rsp_processed = TRUE;
+				if(pair->response_header != NULL) {
+					pair->rsp_processed = TRUE;
 					flow_rsp++;
 					data->rsp_tot++;
 					data->rsp_int_tot++;
     				data->rsp_sec_tot++;
-    
-					compute_rst(h, data);
-					response_t *rsp = h->response_header;					
+
+					data->analysis->eventManager->responseReceived->notify(pair, flow);
+
+					compute_rst(pair, data);
+					response_t *rsp = pair->response_header;					
 					compute_err_rate(rsp->status, data);
 					add_rsp_status(rsp->status, data);
 				}
 				//if(h->response_header == NULL) d++;
 			}	   
-			h = h->next;
+			pair = pair->next;
 		}
 	}
 	pthread_mutex_unlock(&(data->lock));
@@ -611,6 +643,8 @@ void process_data(int sig) {
 	// The completed flow are processed by extract_data every seconds
 	// We process the ones in the hash table using the following function 	
 	flow_hash_process();
+
+	data->analysis->eventManager->timerExpired->notify();
 	
 	pthread_mutex_lock(&(data->lock));
 	process_rate(data);
@@ -622,6 +656,8 @@ void process_data(int sig) {
 		pthread_mutex_unlock(&(data->lock));
 		return;
 	}
+
+	data->analysis->eventManager->intervalExpired->notify();
 
 	Result* result = get_result();
 	reset(data);

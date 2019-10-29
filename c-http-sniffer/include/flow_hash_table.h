@@ -1,7 +1,7 @@
 #ifndef FLOW_HTABLE_H
 #define FLOW_HTABLE_H
 
-#include "data.h"
+#include "analysis.hpp"
 
 int flow_hash_init(void* d);
 flow_t* flow_hash_new(flow_s s);
