@@ -1,13 +1,12 @@
-#ifndef __RST_H__
-#define __RST_H__
+#ifndef __REQ_RATE_H__
+#define __REQ_RATE_H__
 
 #include "metricAvg.hpp"
-#include <inttypes.h>
 
-class Rst: public MetricAvg
+class ReqRate: public MetricAvg
 {
   public:
-    Rst();
+    ReqRate();
     void subscribe(EventManager* em);
     void onNewFlowReceived(flow_t *flow);
     void onFlowUpdate(flow_t *flow);

@@ -28,21 +28,28 @@ Analysis::Analysis() {
     metricManager = new MetricManager();
 };
 
-void Analysis::activeMetrics(vector<bool> status) {
+/* vector<bool> status */
+void Analysis::activeMetrics(int activeMetrics) {
 
-    if(status.size() != metricManager->metrics.size()) {
+    /*if(status.size() != metricManager->metrics.size()) {
         cout << "Invalid status size";
         pthread_exit(NULL);
-    }
+    }*/
 
-    for (unsigned i = 0; i < status.size(); i++) {
-        if(!status.at(i))  metricManager->metrics.erase( metricManager->metrics.begin() + i);
-    }
+    /*for (unsigned i = 0; i < status.size(); i++) {
+        if(!status.at(i)) metricManager->metrics.erase(metricManager->metrics.begin() + i);
+    }*/
 
-    // Register
-    for (unsigned i = 0; i <  metricManager->metrics.size(); i++) {
-        metricManager->metrics.at(i)->subscribe(eventManager);
-    }
+	for (int i = metricManager->metrics.size() - 1; i >= 0; i--) {
+		bool status = activeMetrics & (1<<i);
+		
+		if(!status) {
+			metricManager->metrics.erase(metricManager->metrics.begin() + i);
+		} else {
+			// Register metric to its attached events
+			metricManager->metrics.at(i)->subscribe(eventManager);
+		}	
+	}
 }
 
 //int d = 0;
@@ -719,6 +726,14 @@ void print_data(Result* result) {
 
 	if(data->err_rate.active) {
 		printf("ERR RATE (avg, min, max): %f %f %f \n", result->err_rate, result->err_rate_min, result->err_rate_max);
+	}
+	
+	if(data->tp.active) {
+		printf("TP (avg, min, max): %f %" PRIu32 " %" PRIu32 " \n", result->tp_avg, result->tp_min, result->tp_max);
+	}
+
+	if(data->tp_rev.active) {
+		printf("TP REV (avg, min, max): %f %" PRIu32 " %" PRIu32 " \n", result->tp_rev_avg, result->tp_rev_min, result->tp_rev_max);
 	}
 
 	if(data->conn_rate.active) {

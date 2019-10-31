@@ -13,6 +13,7 @@
 
 #include "metricManager.hpp"
 #include "eventManager.hpp"
+#include "addr.hpp"
 
 #ifndef DEBUGGING
 #define DEBUGGING 0 
@@ -24,7 +25,8 @@
 class Analysis {
     public:
         Analysis();
-        void activeMetrics(vector<bool> status);
+        // vector<bool> status
+        void activeMetrics(int activeMetrics);
 
         EventManager* eventManager;
         MetricManager* metricManager;
@@ -118,11 +120,7 @@ class Analysis {
 
 
 
-typedef struct _addr Addr;
-struct _addr {
-	u_int32_t	ip;
-	u_int16_t	port;
-};
+
 
 typedef struct _int_metric int_metric;
 struct _int_metric {

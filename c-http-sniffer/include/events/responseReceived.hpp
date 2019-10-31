@@ -2,6 +2,7 @@
 #define __RESPONSE_RECEIVED_H__
 
 #include "event.hpp"
+#include "observer.hpp"
 #include "flow.h"
 
 class ResponseReceived: public Event {

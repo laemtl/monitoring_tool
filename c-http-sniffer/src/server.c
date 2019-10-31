@@ -385,11 +385,13 @@ void connection_handler(int *socket) {
 				data->req_type_active = req_type_active;
 				data->rsp_status_active = rsp_status_active;
 
-				vector<bool> status;
+				/*vector<bool> status;
 				status.push_back(rst_active);
+				status.push_back(req_rate_active);
+				status.push_back(err_rate_active);*/
 
 				data->analysis = new Analysis();
-				data->analysis->activeMetrics(status);
+				data->analysis->activeMetrics(init->activemetric);
 
 				start_analysis(NULL, data);
 			}

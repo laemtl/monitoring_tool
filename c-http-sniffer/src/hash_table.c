@@ -41,7 +41,9 @@ int hash_init(hash_t* ht, u_int32_t(*hash_fn)(Attr*), int(*compare_fn)(Attr*, At
     ht->compare_fn = compare_fn;
     ht->update_fn = update_fn;
 	ht->free_fn = free_fn;
-
+	
+	ht->int_cnt = 0;
+	
 	return 0;
 }
 

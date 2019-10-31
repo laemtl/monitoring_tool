@@ -1,11 +1,4 @@
-#include "event.hpp"
-#include "observer.hpp"
-#include "flow.h"
-
-class FlowUpdate: public Event {
-    public:
-        void notify(flow_t *flow);
-};
+#include "flowUpdate.hpp"
 
 void FlowUpdate::notify(flow_t *flow) {
     for (Observer *observer : observers) {

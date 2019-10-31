@@ -1,13 +1,12 @@
 #include "rst.hpp"
 
-/*double Rst::getAvg() {
-	int req_total = total->get(); 
-	if (req_total != 0) return sum->get()/req_total;
-	return 0;
-}*/
+Rst::Rst() {
+	name = "RST NEW";
+}
 
 void Rst::subscribe(EventManager* em) {
 	em->responseReceived->add(this);
+	em->intervalExpired->add(this);
 }
 
 void Rst::onResponseReceived(http_pair_t *pair, flow_t *flow) {
@@ -26,16 +25,11 @@ void Rst::onResponseReceived(http_pair_t *pair, flow_t *flow) {
 	
 	total->add(1);
 	sum->add(rst);
-	min->set(rst);
-	max->set(rst);
+	min->minimize(rst);
+	max->maximize(rst);
 }
-
 
 void Rst::onTimerExpired() {
-
-}
-
-void Rst::onIntervalExpired() {
 
 }
 

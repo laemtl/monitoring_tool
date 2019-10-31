@@ -2,6 +2,7 @@
 #define __NEW_FLOW_RECEIVED_H__
 
 #include "event.hpp"
+#include "observer.hpp"
 #include "flow.h"
 
 class NewFlowReceived: public Event {

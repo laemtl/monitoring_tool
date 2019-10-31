@@ -1,9 +1,5 @@
 #include "event.hpp"
 
-Event::Event() {
-    
-}
-
 void Event::add(Observer *obs) {
     observers.push_back(obs);
 }

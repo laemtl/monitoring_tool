@@ -1,10 +1,4 @@
-#include "event.hpp"
-#include "observer.hpp"
-
-class TimerExpired: public Event {
-    public:
-        void notify();
-};
+#include "timerExpired.hpp"
 
 void TimerExpired::notify() {
     for (Observer *observer : observers) {

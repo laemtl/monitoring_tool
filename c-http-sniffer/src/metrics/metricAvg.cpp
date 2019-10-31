@@ -2,19 +2,55 @@
 #include "metricAvg.hpp"
 
 MetricAvg::MetricAvg() {
+	subtotal = new Value();
+    total = new Value();
+    subsum = new Value();
+	sum = new Value();
+
+	avg = new Value();
+    min = new Value();
+    max = new Value();
+
+	interval = 0;
+
+    reset();
 }
 
 double MetricAvg::getAvg() {
-	if (total != 0) return sum->get() / total->get();
+	if (total->isClose(0)) return 0;
+	return sum->get() / total->get();
 }
 
 void MetricAvg::print() {
-	if(isActive())
-		printf("%s (avg, min, max): %f %f %f \n", name, getAvg(), min->get(), max->get());
+	cout << name << " (avg, min, max): " << avg->get() << " " << min->get() << " " << max->get() << endl;
+}
+
+void MetricAvg::reset() {
+	total->set(0);
+	subtotal->set(0);
+	sum->set(0);
+	subsum->set(0);
+
+	avg->set(0);
+	min->set(numeric_limits<double>::max());
+	max->set(0);
+
+	interval = 0;
+}
+
+void MetricAvg::onTimerExpired() {
+	interval++;
 }
 
 void MetricAvg::onIntervalExpired() {
-	if(!isActive()) return;
+	avg->set(getAvg());
+	double minVal = min->get();
+    double maxVal = max->get();
+
+	print();
+	reset();
+
+	//if(!isActive()) return;
 	
 	/*Result* result;
 

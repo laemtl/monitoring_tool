@@ -12,7 +12,6 @@ class Event
     protected:
         vector<Observer*> observers;
     public:
-        Event();
         void add(Observer* obs);
         void remove(Observer* obs);
 };

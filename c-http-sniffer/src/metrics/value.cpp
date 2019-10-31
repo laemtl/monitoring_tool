@@ -2,6 +2,7 @@
 
 Value::Value() {
     pthread_mutex_init(&(mutex), NULL);
+    set(0);
 }
 
 double Value::get() {

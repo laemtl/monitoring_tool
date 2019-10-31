@@ -6,6 +6,10 @@
 #include <limits>
 #include <math.h>
 
+#include <iostream>
+#include <string>
+#include <stdio.h>
+
 #define EPSILON	1e-7
 
 using namespace std; 
