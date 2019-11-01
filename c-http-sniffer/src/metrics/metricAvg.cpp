@@ -16,6 +16,11 @@ MetricAvg::MetricAvg() {
     reset();
 }
 
+void MetricAvg::subscribe(EventManager* em) {
+	em->timerExpired->add(this);
+	em->intervalExpired->add(this);
+}
+
 double MetricAvg::getAvg() {
 	if (total->isClose(0)) return 0;
 	return sum->get() / total->get();
@@ -50,7 +55,6 @@ void MetricAvg::onIntervalExpired() {
 	print();
 	reset();
 
-	//if(!isActive()) return;
 	
 	/*Result* result;
 

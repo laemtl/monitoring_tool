@@ -42,6 +42,7 @@ class MetricAvg: public Metric2, public Observer
 
     public:
 		MetricAvg();
+		void subscribe(EventManager* em);
 		virtual void reset();
 		virtual double getAvg();
 		void print();

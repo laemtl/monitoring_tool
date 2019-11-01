@@ -1,6 +1,5 @@
 #ifndef __METRIC_H__
 #define __METRIC_H__
-
 #include "eventManager.hpp"
 
 class Metric2 {

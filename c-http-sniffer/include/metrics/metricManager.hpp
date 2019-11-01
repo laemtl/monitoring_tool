@@ -7,6 +7,7 @@
 #include "tp.hpp"
 #include "tpRev.hpp"
 #include "connRate.hpp"
+#include "client.hpp"
 #include <vector> 
 #include <iostream>
 

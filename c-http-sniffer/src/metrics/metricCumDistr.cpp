@@ -59,9 +59,21 @@ MetricCumDistr::~MetricCumDistr() {
 	hash_reset(&ht);
 }
 
+void MetricCumDistr::subscribe(EventManager* em) {
+	em->timerExpired->add(this);
+	em->intervalExpired->add(this);
+}
+
 void MetricCumDistr::print() {
-	printf("%s cumulated freq list \n", name);
-	print_cfl(&(cfl));
+	cout << name << endl;
+
+	cout << "count: " << cfl.count << endl;
+	for(int i = 0; i < cfl.count; i++) {
+        printf("name: %s \n", cfl.list[i].name);
+        printf("freq: %f \n", cfl.list[i].c_freq);
+    }
+
+	//print_cfl(&(cfl));
 	printf("\n");
 }
 

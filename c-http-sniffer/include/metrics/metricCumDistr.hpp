@@ -6,7 +6,6 @@
 #include <stdio.h>
 
 #include "util.h"
-#include "attr.h"
 #include "hash_table.h"
 #include "cf_list.h"
 #include "metric.hpp"
@@ -14,7 +13,7 @@
 #define CFL_SIZE 100
 #define MIN_FREQ (double)1/CFL_SIZE
 
-class MetricCumDistr: public Metric2
+class MetricCumDistr: public Metric2, public Observer
 {
 	protected:
         string name;
@@ -22,6 +21,7 @@ class MetricCumDistr: public Metric2
 		cf_list cfl;
 
     public:
+		void subscribe(EventManager* em);
 		//MetricCumDistr();
 		~MetricCumDistr();
 		void print();

@@ -6,8 +6,9 @@ MetricManager::MetricManager() {
     metrics.push_back(new ErrRate());
     metrics.push_back(new Tp());
     metrics.push_back(new TpRev());
-
     metrics.push_back(new ConnRate());
+
+    metrics.push_back(new Client());
 }
 
 void MetricManager::getMetrics() {

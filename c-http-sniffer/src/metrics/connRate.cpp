@@ -11,7 +11,6 @@ void ConnRate::subscribe(EventManager* em) {
 }
 
 void ConnRate::onNewFlowReceived(flow_t *flow) { 	
-	printf("new flow \n");
 	subtotal->add(1);
 }
 
