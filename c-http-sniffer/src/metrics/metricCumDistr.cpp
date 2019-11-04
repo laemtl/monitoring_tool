@@ -54,6 +54,11 @@ void MCDList::print() {
 /*MetricCumDistr::~MetricCumDistr() {
 }*/
 
+MetricCumDistr::MetricCumDistr(Analysis* analysis, string name, string desc) 
+: Metric2(analysis, name, desc) {
+	cfl_init(&cfl);
+}
+
 MetricCumDistr::~MetricCumDistr() {
 	hash_clear(&ht);
 	hash_reset(&ht);
@@ -77,52 +82,73 @@ void MetricCumDistr::print() {
 	printf("\n");
 }
 
-// void (*cfl_add_fn)(void*, int, Result*)
-void extract_freq(hash_t* ht) {
-	int i;
-	//hash_mb_t *hm = NULL;
-	//node	*e = NULL;
-
-	for(i=0; i<ht->size; i++){
-		pthread_mutex_lock(&(ht->buckets[i]->mutex));
+void MetricCumDistr::cflUpdate(Hash* ht) {
+	for(int i=0; i<ht->getSize(); i++){
+		pthread_mutex_lock(&(ht->buckets[i].mutex));
 	}
 
-	for(i=0; i<ht->size; i++){
-		node* n = ht->buckets[i]->first;
+	for(int i=0; i<ht->getSize(); i++){
+		Node* n = ht->buckets[i].first;
 		while(n != NULL) {
-			Attr* a = (Attr*) n->value;
-			//cfl_add_fn(a->elem, a->cnt, r);
+			Hashable* a = (Hashable*)(n->value);
+			cflAdd(a, n->cnt);
 			n = n->next;
 		}
 	}
 
-	for(i=0; i<ht->size; i++){
-		pthread_mutex_unlock(&(ht->buckets[i]->mutex));
+	for(int i=0; i<ht->getSize(); i++){
+		pthread_mutex_unlock(&(ht->buckets[i].mutex));
 	}
 }
 
-// void (*cfl_add_fn)(int, int, Result*)
-void extract_freq(int* ar, int size) {
-	int i;
-	for(i=0; i<size; i++){
-		//cfl_add_fn(i, ar[i], r);
+void MetricCumDistr::cflUpdate(int *array, int size) {
+	for(int i=0; i<size; i++){
+		cflAdd(i, array[i]);
 	}
 }
 
-/* 
-	int c = result->client.count;
-	client = MALLOC(Analysis__Freq*, c); 
+void MetricCumDistr::sendMsg() {
+	uint8_t *buf;              // Buffer to store serialized data
+	uint64_t msg_len;          // Length of serialized data
 	
-	for(int i = 0; i < c2; i++) {
-		client[j] = MALLOC(Analysis__Freq, 1);
-		analysis__freq__init(client[j]);
-		client[j]->name = result->client.list[j].name;
-		client[j]->freq = result->client.list[j].c_freq;
+	Analysis__MetricMsg msg = ANALYSIS__METRIC_MSG__INIT;
+	msg.values_case = ANALYSIS__METRIC_MSG__VALUES_METRIC_CUM_DISTR;
+
+	Analysis__MetricCumDistrMsg cumDistrMsg = ANALYSIS__METRIC_CUM_DISTR_MSG__INIT;
+	msg.metriccumdistr = &cumDistrMsg;
+	msg.name = (char*)name.c_str();
+	msg.time = time(0);
+	Analysis__Freq **freqs = MALLOC(Analysis__Freq*, cfl.count); 
+	msg.metriccumdistr->freqs = freqs;
+	msg.metriccumdistr->n_freqs = cfl.count;
+
+	msg.netint = (char*)analysis->interface;
+
+	for(int i = 0; i < cfl.count; i++) {
+		Analysis__Freq* freq = MALLOC(Analysis__Freq, 1);
+		*freq = ANALYSIS__FREQ__INIT;
+		freq->name = cfl.list[i].name;
+		freq->freq = cfl.list[i].c_freq;
+		freqs[i] = freq;
 	}
-	msg.n_client = c;
-	msg.client = client;
 
+	msg_len = analysis__metric_msg__get_packed_size(&msg);
+	
+	// Max size of varint_len is 10 bytes
+	buf = (uint8_t*)malloc(10 + msg_len);
 
-		for(j = 0; j < c2; j++) free(client[j]);
-		free(client);
-*/
+	// Convert msg_len to a varint
+	int varint_len_len = encode_varint(buf, msg_len);	
+	
+	analysis__metric_msg__pack(&msg, buf + varint_len_len);
+	
+	// send
+	if(send(analysis->socket, buf, varint_len_len + msg_len, MSG_NOSIGNAL) < 0) {
+		cout << "Error sending response for metric" << name << endl;
+		error("Error sending response\n");
+	} 
+
+	free(buf); // Free the allocated serialized buffer
+	for(int i = 0; i < cfl.count; i++) free(freqs[i]);
+	free(freqs);	
+}

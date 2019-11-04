@@ -85,6 +85,7 @@ packet_preprocess(char *raw_data, const struct pcap_pkthdr *pkthdr)
 
 	/* Parse IP header and check TCP payload */
 	cp = cp + sizeof(ethhdr);
+
 	ip_hdr = packet_parse_iphdr(cp);
 	pkt->saddr = ip_hdr->saddr;
 	pkt->daddr = ip_hdr->daddr;
@@ -126,6 +127,7 @@ packet_preprocess(char *raw_data, const struct pcap_pkthdr *pkthdr)
 	if( !(tcp_hdr->th_sport == 80 || tcp_hdr->th_dport == 80 || \
 		tcp_hdr->th_sport == 8080 || tcp_hdr->th_dport == 8080 || \
 		tcp_hdr->th_sport == 8000 || tcp_hdr->th_dport == 8000)){
+		
 		free_ethhdr(eth_hdr);
 		free_iphdr(ip_hdr);
 		free_tcphdr(tcp_hdr);
@@ -197,6 +199,7 @@ packet_preprocess(char *raw_data, const struct pcap_pkthdr *pkthdr)
 		pkt->tcp_odata = NULL;
 		pkt->tcp_data = pkt->tcp_odata;
 	}
+
 	free_ethhdr(eth_hdr);
 	free_iphdr(ip_hdr);
 	free_tcphdr(tcp_hdr);
@@ -340,19 +343,24 @@ capture_main(void* p){
 
 	while(1){
 		raw = pcap_next(cap, &(pkthdr));
-		
+		if(raw == NULL) continue;
+
+		size_t len = pkthdr.len;
+		// 60 is the minimum size for a valid ethernet packet size
+		// 4 bytes CRC is stripped
+		if(len < 54) continue;
+
 		if ( livemode == 0 || data->status < 0) {
 			//GP_CAP_FIN = 1;
 			break;
 		} else if( NULL != raw){
 			pkt2 = MALLOC(raw_pkt, 1);
 			pkt2->pkthdr = pkthdr;
-			size_t len = pkthdr.len;
 
 			char* r = MALLOC(char, len);
-        	memcpy(r, raw, len);
+			memcpy(r, raw, len);
 			pkt2->raw = r;
-			
+
 			queue_enq(&(data->raw_pkt_queue), pkt2);
 			pak++;
 		} else {

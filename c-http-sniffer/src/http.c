@@ -887,11 +887,11 @@ http_parse_request(request_t *request, const char *data, const char *dataend, ch
 	lnl = lineep - linesp + 1;
 	request->method = http_request_method(linesp, lnl);
 	if ( request->method == HTTP_MT_NONE){
-		return -1;
+        return -1;
 	}
 
 	request->uri = http_request_uri(linesp, lnl);
-	request->version = http_request_version(linesp, lnl);
+    request->version = http_request_version(linesp, lnl);
 	request->host = http_header_param(data, hdl, "Host:");
 	request->referer = http_header_param(data, hdl, "Referer:");
 	request->user_agent = http_header_param(data, hdl, "User-Agent:");
@@ -907,6 +907,7 @@ http_parse_request(request_t *request, const char *data, const char *dataend, ch
 		request->content_encoding = http_header_param(data, hdl, "Content-Encoding:");
 		request->content_length = http_header_param(data, hdl, "Content-Length:");
 	}
+
 	return 0;
 }
 

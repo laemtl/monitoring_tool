@@ -1,7 +1,7 @@
 #include "connRate.hpp"
 
-ConnRate::ConnRate() {
-	name = "CONN RATE NEW";
+ConnRate::ConnRate(Analysis* analysis) 
+: MetricAvg(analysis, "conn_rate", "Connection rate") {
 }
 
 void ConnRate::subscribe(EventManager* em) {
@@ -14,16 +14,17 @@ void ConnRate::onNewFlowReceived(flow_t *flow) {
 	subtotal->add(1);
 }
 
-// TODO remove conn_int_cnt from hashtable
+double ConnRate::getAvg() {
+	if(analysis->interval <= 0) return 0;
+	return sum->get()/analysis->interval;
+}
+
 void ConnRate::onTimerExpired() {
 	int connCnt = subtotal->get();
 	sum->add(connCnt);
 	min->minimize(connCnt);
 	max->maximize(connCnt);
 	subtotal->set(0);
-
-	// increment interval cnt
-	total->add(1);
 
 	MetricAvg::onTimerExpired();
 }

@@ -329,13 +329,14 @@ flow_add_packet(flow_t *f, packet_t *packet, register BOOL src){
 
 	/* other packets, without sequence number checked */
 	if(src == TRUE){
-		if( f->pkts_src == 0){
+		//if(f->pkts_src == 0){
+		if(packet->tcp_flags == TH_SYN && f->pkts_src == 0){
 			/* syn */
 			f->syn_sec = packet->cap_sec;
 			f->syn_usec = packet->cap_usec;
 			cal_packet(f, packet, src);
 			packet_free(packet);
-		}else{
+		} else {
 			if(packet->tcp_flags == TH_SYN){
 				/*syn repeatly*/
 				flow_reset(f);		// Reset flow
@@ -343,7 +344,7 @@ flow_add_packet(flow_t *f, packet_t *packet, register BOOL src){
 				f->syn_usec = packet->cap_usec;
 				cal_packet(f, packet, src);
 				packet_free(packet);
-			}else{
+			} else {
 				if(packet->http != 0 ){
 					f->http = TRUE;
 					/*
@@ -523,7 +524,6 @@ flow_extract_http(flow_t *f, BOOL closed){
                 sprintf(time,"%ld",pkt->cap_usec);
 				//http_parse_request(req, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,time,pkt->tcp_seq+pkt->tcp_dl);
 				http_parse_request(req, pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,time,pkt->tcp_seq,pkt->tcp_seq+pkt->tcp_dl);
-
 			}else{
 				/* Omit the TCP handshake sequences.*/
 				/* or already processed sequence */

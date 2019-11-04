@@ -4,10 +4,11 @@
 #include "metricAvg.hpp"
 #include <inttypes.h>
 
+
 class Rst: public MetricAvg
 {
   public:
-    Rst();
+    Rst(Analysis* analysis);
     void subscribe(EventManager* em);
     void onNewFlowReceived(flow_t *flow);
     void onFlowUpdate(flow_t *flow);

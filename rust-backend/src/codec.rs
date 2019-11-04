@@ -5,7 +5,7 @@ use serde_json as json;
 use std::io;
 use tokio_io::codec::{Decoder, Encoder};
 
-use crate::analysis::Data;
+use crate::analysis::{Data,  MetricMsg};
 
 #[derive(Serialize, Deserialize, Debug, Message)]
 pub enum Msg {
@@ -17,38 +17,18 @@ pub enum Msg {
 pub struct SnifferCodec;
 
 impl Decoder for SnifferCodec {
-    type Item = Data;
+    type Item = MetricMsg;
     type Error = io::Error;
 
     fn decode(&mut self, src: &mut BytesMut) -> Result<Option<Self::Item>, Self::Error> {
-        //let mut is = CodedInputStream::from_bytes(&mut src);
-        //let mut data: Data = protobuf::parse_length_delimited_from(&mut is).unwrap();
-        //src.split_to(12);
-        //let s = src.split_to(27);
-        if src.len() >= 27 {
-            //println!("{}", src.len());
-            let data: Data = protobuf::parse_length_delimited_from_bytes(&src).unwrap();
-            src.split_to(src.len());
-            Ok(Some(data))
-        } else {
+        let mut len = src.split_to(1);
+        if(len.len() == 0) {
             Ok(None)
+        } else {
+            let mut str = src.split_to(len[0] as usize);
+            let metric: MetricMsg = protobuf::parse_from_bytes(&str).unwrap();
+            Ok(Some(metric))
         }
-
-        /*let size = {
-            if src.len() < 2 {
-                return Ok(None);
-            }
-            BigEndian::read_u16(src.as_ref()) as usize
-        };
-
-        if src.len() >= size + 2 {
-            src.split_to(2);
-            let buf = src.split_to(size);
-            //Ok(Some(json::from_slice::<Msg>(&buf)?))
-            Ok(Some(data))
-        } else {
-            Ok(None)
-        }*/
     }
 }
 

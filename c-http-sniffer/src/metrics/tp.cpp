@@ -1,14 +1,12 @@
 #include "tp.hpp"
 
-Tp::Tp() {
-	name = "TP NEW";
-	timerRef = 0;
-	intervalRef = 0;
+Tp::Tp(Analysis* analysis) 
+: MetricAvg(analysis, "tp", "Throughput"), timerRef(0), intervalRef(0) {
 }
 
 double Tp::getAvg() {
-	if(interval <= 0) return 0;
-	return (total->get() - intervalRef) / interval;
+	if(analysis->interval <= 0) return 0;
+	return (total->get() - intervalRef) / analysis->interval;
 }
 
 void Tp::subscribe(EventManager* em) {

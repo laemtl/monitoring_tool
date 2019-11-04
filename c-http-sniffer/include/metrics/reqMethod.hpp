@@ -1,7 +1,6 @@
-#ifndef __REQ_PATH_H__
-#define __REQ_PATH_H__
+#ifndef __REQ_METHOD_H__
+#define __REQ_METHOD_H__
 
-#include "analysis2.hpp"
 #include "hashTable.hpp"
 #include "cf_list.h"
 #include "metricCumDistr.hpp"
@@ -10,20 +9,18 @@
 #include <sys/types.h>
 #include <libgen.h>
 
-class ReqPath: public MetricCumDistr
+class ReqMethod: public MetricCumDistr
 {
 	private:
 		int reqTotal;
-        //int flow_tot;
 		Hash* ht;
 
 	public:
-		ReqPath(Analysis* analysis);
+		ReqMethod(Analysis* analysis);
         void subscribe(EventManager* em);
         void cflAdd(Hashable* elem, int cnt);
 		void cflAdd(int i, int cnt);
-
-		char* extractReqPath(const char* uri);
+		char* extractReqMethod(const char* uri);
 
         void onNewFlowReceived(flow_t *flow);
 		void onFlowUpdate(flow_t *flow);

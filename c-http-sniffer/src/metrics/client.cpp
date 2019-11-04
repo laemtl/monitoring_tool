@@ -1,7 +1,20 @@
 #include "client.hpp"
 
-Client::Client() {
-	name = "CLIENT NEW";
+Addr2::Addr2(u_int32_t* val) : Hashable((void*)val) {
+}
+
+int Addr2::compare(Hashable* elem) {
+    if(*(u_int32_t*)value == *(u_int32_t*) (elem->value)) return 0;
+    else if (value > elem->value) return 1;
+    return -1;
+}
+
+u_int32_t Addr2::hash() {
+    return *(u_int32_t*)value;
+}
+
+Client::Client(Analysis* analysis) 
+:MetricCumDistr(analysis, "clients", "Clients"), reqTotal(0) {
 	ht = new Hash();
 }
 
@@ -11,53 +24,34 @@ void Client::subscribe(EventManager* em) {
 	em->intervalExpired->add(this);
 }
 
-void Client::cflAdd(Addr2* addr, int cnt) {
-	if(req_tot <= 0) return;
+void Client::cflAdd(Hashable* elem, int cnt) {
+	if(reqTotal <= 0) return;
 	
-	double freq = (double) cnt / req_tot;
+	double freq = (double) cnt / reqTotal;
     if(freq > MIN_FREQ) {
-	    cfl_add(ip_ntos(*(u_int32_t*)addr->value), freq, &cfl);
+	    cfl_add(ip_ntos(*(u_int32_t*)elem->value), freq, &cfl);
 	}
 }
 
-void Client::onRequestReceived(http_pair_t *pair, flow_t *flow) {
-	cout << "request received " << endl;
-	
-	req_tot++;
+void Client::cflAdd(int i, int cnt) {
+}
 
-	request_t *req = pair->request_header;
+void Client::onRequestReceived(http_pair_t *pair, flow_t *flow) {
+	reqTotal++;
+
+	//request_t *req = pair->request_header;
 	u_int32_t* addr_ = CALLOC(u_int32_t, 1);
 	*addr_ = flow->socket.saddr;
 	Addr2* addr = new Addr2(addr_);
-	
+
 	ht->add(addr);
 }
 
 void Client::onIntervalExpired() {
-	cfl_init(&cfl);
-	extract_freq_ht();
-
+	cflUpdate(ht);
+	sendMsg();
 	print();
 	cfl_delete(&cfl);
-}
-
-void Client::extract_freq_ht() {
-	for(int i=0; i<ht->getSize(); i++){
-		pthread_mutex_lock(&(ht->buckets[i].mutex));
-	}
-
-	for(int i=0; i<ht->getSize(); i++){
-		Node* n = ht->buckets[i].first;
-		while(n != NULL) {
-			Addr2* a = (Addr2*)(n->value);
-			cflAdd(a, n->cnt);
-			n = n->next;
-		}
-	}
-
-	for(int i=0; i<ht->getSize(); i++){
-		pthread_mutex_unlock(&(ht->buckets[i].mutex));
-	}
 }
 
 void Client::onNewFlowReceived(flow_t *flow) {

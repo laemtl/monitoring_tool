@@ -23,35 +23,6 @@ extern int req_n;
 
 extern BOOL debug;
 
-Analysis::Analysis() {
-    eventManager = new EventManager();
-    metricManager = new MetricManager();
-};
-
-/* vector<bool> status */
-void Analysis::activeMetrics(int activeMetrics) {
-
-    /*if(status.size() != metricManager->metrics.size()) {
-        cout << "Invalid status size";
-        pthread_exit(NULL);
-    }*/
-
-    /*for (unsigned i = 0; i < status.size(); i++) {
-        if(!status.at(i)) metricManager->metrics.erase(metricManager->metrics.begin() + i);
-    }*/
-
-	for (int i = metricManager->metrics.size() - 1; i >= 0; i--) {
-		bool status = activeMetrics & (1<<i);
-		
-		if(!status) {
-			metricManager->metrics.erase(metricManager->metrics.begin() + i);
-		} else {
-			// Register metric to its attached events
-			metricManager->metrics.at(i)->subscribe(eventManager);
-		}	
-	}
-}
-
 //int d = 0;
 
 /* Output flow's brief to stdout */
@@ -343,7 +314,12 @@ void extract_data(flow_t *flow){
 
 					data->req_tot++;
 					add_client(flow->socket.saddr, data);
-					add_req_path(req->uri, data);
+
+					// URI is NULL when req->method == HTTP_MT_NONE
+					if(req->uri != NULL) {
+						add_req_path(req->uri, data);
+					}
+					
 					add_req_type(req->method, data);
 					compute_req_rate(data);
 				}

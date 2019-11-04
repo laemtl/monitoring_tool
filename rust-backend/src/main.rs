@@ -7,7 +7,7 @@ extern crate log;
 mod analysis;
 mod codec;
 
-use crate::analysis::{Init, Data};
+use crate::analysis::{Init, Data, MetricMsg, MetricAvgMsg, MetricCumDistrMsg};
 use protobuf::{
     CodedOutputStream, Message, RepeatedField
 };
@@ -45,6 +45,13 @@ fn ws_index(r: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error>
     let res = ws::start(Ws::new(), &r, stream);
     //println!("{:?}", res.as_ref().unwrap());
     res
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct MetricAvg {
+    avg: f64,
+    min: f64,
+    max: f64
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -109,6 +116,17 @@ enum Msg {
         req_type: ::std::option::Option<CFreq>,
         #[serde(skip_serializing_if = "Option::is_none")]
         rsp_status: ::std::option::Option<CFreq>
+    },
+
+    Metric {
+        name: String,    
+        time: i64,
+        net_int: String,
+        client_id: i64,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        metricAvg: std::option::Option<MetricAvg>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        metricCumDistr: std::option::Option<CFreq>
     }
 }
 
@@ -233,7 +251,8 @@ impl StreamHandler<ws::Message, ws::ProtocolError> for Ws {
                         //let ip = resolve("bmj-cluster.cs.mcgill.ca:15430");
                         SnifferServer::connect("127.0.0.1:3000", init, ws_addr);
                     }
-                    Msg::Data { time: _, net_int: _, rst: _, tp: _, tp_rev: _, err_rate: _, req_rate: _, conn_rate: _, client: _, req_path: _, req_method: _, req_type: _, rsp_status: _ } => println!("Got Data")
+                    Msg::Data { time: _, net_int: _, rst: _, tp: _, tp_rev: _, err_rate: _, req_rate: _, conn_rate: _, client: _, req_path: _, req_method: _, req_type: _, rsp_status: _ } => println!("Got Data"),
+                    _ => {}
                 }
             }
 
@@ -246,165 +265,58 @@ impl StreamHandler<ws::Message, ws::ProtocolError> for Ws {
     }
 }
 
-impl Handler<Data> for Ws {
+impl Handler<MetricMsg> for Ws {
     type Result = ();
 
-    fn handle(&mut self, data: Data, ctx: &mut Self::Context) {
-        let msg = Msg::Data {
-            time: data.get_time(),
-            net_int: data.get_netInt().to_string(),
-            rst: match data.has_rstAvg() {
-                true => Some(Params { 
-                    avg: Some(data.get_rstAvg()),
-                    min: Some(data.get_rstMin()),
-                    max: Some(data.get_rstMax()),
-                    client: None
-                }),
-                _ => None
-            },
-            tp: match data.has_tpAvg() {
-                true => Some(Params { 
-                    avg: Some(data.get_tpAvg()),
-                    min: Some(data.get_tpMin()),
-                    max: Some(data.get_tpMax()),
-                    client: None
-                }),
-                _ => None
-            },
-            tp_rev: match data.has_tpRevAvg() {
-                true => Some(Params { 
-                    avg: Some(data.get_tpRevAvg()),
-                    min: Some(data.get_tpRevMin()),
-                    max: Some(data.get_tpRevMax()),
-                    client: None
-                }),
-                _ => None
-            },
-            err_rate: match data.has_errRate() {
-                true => Some(Params { 
-                    avg: Some(data.get_errRate()),
-                    min: Some(data.get_errRateMin()),
-                    max: Some(data.get_errRateMax()),
-                    client: None
-                }),
-                _ => None
-            },
-            req_rate: match data.has_reqRate() {
-                true => Some(Params { 
-                    avg: Some(data.get_reqRate()),
-                    min: Some(data.get_reqRateMin()),
-                    max: Some(data.get_reqRateMax()),
-                    client: None 
-                }),
-                _ => None
-            },
-            conn_rate: match data.has_connRate() {
-                true => Some(Params { 
-                    avg: Some(data.get_connRate()),
-                    min: Some(data.get_connRateMin()),
-                    max: Some(data.get_connRateMax()),
-                    client: None
-                }),
-                _ => None
-            },
-            client: {
-                let mut v = Vec::new();
-                for client in data.get_client() {
-                    let cfi = CFreqItem {
-                        name: client.get_name().to_string(),
-                        freq: client.get_freq()
-                    };
-                    v.push(cfi);
-                }
-
-                let cf = CFreq {
-                    cfreq: v
+    fn handle(&mut self, metric: MetricMsg, ctx: &mut Self::Context) {
+        let mut metricAvg = None;
+        if(metric.has_metricAvg()) {
+            let mAvg = metric.get_metricAvg();
+            metricAvg = Some(MetricAvg {
+                avg: mAvg.get_avg(),
+                min: mAvg.get_min(),
+                max: mAvg.get_max()
+            });
+        }
+        
+        let mut metricCumDistr = None;
+        if(metric.has_metricCumDistr()) {  
+            let mCumDistr = metric.get_metricCumDistr();
+            let mut v = Vec::new();
+            for freq in mCumDistr.get_freqs() {
+                let cfi = CFreqItem {
+                    name: freq.get_name().to_string(),
+                    freq: freq.get_freq()
                 };
+                v.push(cfi);
+            }
 
-                Some(cf)
-            },
-            req_path: {
-                let mut v = Vec::new();
-                for req_path in data.get_req_path() {
-                    let cfi = CFreqItem {
-                        name: req_path.get_name().to_string(),
-                        freq: req_path.get_freq()
-                    };
-                    v.push(cfi);
-                }    
+            let cf = CFreq {
+                cfreq: v
+            };
 
-                let cf = CFreq {
-                    cfreq: v
-                };
+            metricCumDistr = Some(cf)
+        }
 
-                Some(cf)
-            },
-            req_method: {
-                let mut v = Vec::new();
-                for req_method in data.get_req_method() {
-                    let cfi = CFreqItem {
-                        name: req_method.get_name().to_string(),
-                        freq: req_method.get_freq()
-                    };
-                    v.push(cfi);
-                }    
-
-                let cf = CFreq {
-                    cfreq: v
-                };
-
-                Some(cf)
-            },
-            req_type: {
-                let mut v = Vec::new();
-                for req_type in data.get_req_type() {
-                    let cfi = CFreqItem {
-                        name: req_type.get_name().to_string(),
-                        freq: req_type.get_freq()
-                    };
-                    v.push(cfi);
-                }    
-                
-                let cf = CFreq {
-                    cfreq: v
-                };
-
-                Some(cf)
-            },
-            rsp_status: {
-                let mut v = Vec::new();
-                for rsp_status in data.get_rsp_status() {
-                    let cfi = CFreqItem {
-                        name: rsp_status.get_name().to_string(),
-                        freq: rsp_status.get_freq()
-                    };
-                    v.push(cfi);
-                }    
-                
-                let cf = CFreq {
-                    cfreq: v
-                };
-
-                Some(cf)
-            },
+        let msg = Msg::Metric {
+            name: metric.get_name().to_string(),    
+            time: metric.get_time(),
+            net_int: metric.get_netInt().to_string(),
+            client_id: 0,
+            metricAvg: metricAvg,
+            metricCumDistr: metricCumDistr
         };
 
         let serialized = serde_json::to_string(&msg).unwrap();
-        ctx.text(serialized);
 
-        /*ctx.text("{ 
-            netInt:".to_string() + &data.get_netInt().to_string() + &",".to_string()
-            + &"rst:".to_string() + &data.get_rst().to_string() + &",".to_string()
-            + &"erate:".to_string() + &data.get_errRate().to_string() + &",".to_string()
-            + &"}".to_string()
-        );*/
+        ctx.text(serialized);
     }
 }
 
 /// Define tcp server that will accept incoming tcp connection and create
 /// chat actors.
 struct SnifferServer {
-    recipient: Recipient<Data>
+    recipient: Recipient<MetricMsg>
 }
 
 fn resolve(host: &str) -> io::Result<Vec<IpAddr>> {
@@ -453,15 +365,15 @@ impl Actor for SnifferServer {
     }
 }
 
-impl actix::Message for Data {
+impl actix::Message for MetricMsg {
     type Result = ();
 }
 
 /// Handler for `ws::Message`
-impl StreamHandler<Data, io::Error> for SnifferServer {
+impl StreamHandler<MetricMsg, io::Error> for SnifferServer {
     
-    fn handle(&mut self, data: Data, _ctx: &mut Context<Self>) { 
-        if let Err(error) = self.recipient.do_send(data) {
+    fn handle(&mut self, metric: MetricMsg, _ctx: &mut Context<Self>) { 
+        if let Err(error) = self.recipient.do_send(metric) {
             println!("do_send failed: {}", error);
         }
     }

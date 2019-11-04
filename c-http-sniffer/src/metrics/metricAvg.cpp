@@ -1,7 +1,9 @@
 // TODO: separate protobuf
 #include "metricAvg.hpp"
+#include <inttypes.h>
 
-MetricAvg::MetricAvg() {
+MetricAvg::MetricAvg(Analysis* analysis, string name, string desc) 
+: Metric2(analysis, name, desc) {
 	subtotal = new Value();
     total = new Value();
     subsum = new Value();
@@ -10,8 +12,6 @@ MetricAvg::MetricAvg() {
 	avg = new Value();
     min = new Value();
     max = new Value();
-
-	interval = 0;
 
     reset();
 }
@@ -39,64 +39,48 @@ void MetricAvg::reset() {
 	avg->set(0);
 	min->set(numeric_limits<double>::max());
 	max->set(0);
-
-	interval = 0;
 }
 
 void MetricAvg::onTimerExpired() {
-	interval++;
 }
 
 void MetricAvg::onIntervalExpired() {
 	avg->set(getAvg());
-	double minVal = min->get();
-    double maxVal = max->get();
-
+	sendMsg();
 	print();
 	reset();
-
-	
-	/*Result* result;
-
-	result->interface = (char*)data->interface;	
-	result->client_sock = data->client_sock;
-
-	result->rst_avg = getAvg();
-	result->rst_min = getMin();
-    result->rst_max = getMax();
-
-	// only for AvgMetric
-	reset();
-
-	if(debug) {
-		print(result);
-		fflush(stdout);
-	}
-
-	// Struct are passed by value so the code below will execute correctly in an MT env
-	if(analysis.is_server_mode()) {
-		send(result);
-	} 
-
-	//free_result(result);
-	
-	if(data->status < 0) {
-		pthread_exit(NULL);		
-	}*/
 }	
 
-void MetricAvg::prepareMsg(double avg, double min, double max) {
-	uint8_t *buf;                 // Buffer to store serialized data
+void MetricAvg::sendMsg() {
+	uint8_t *buf;              // Buffer to store serialized data
 	uint64_t msg_len;          // Length of serialized data
-		
-	/*if(mValue->client_sock < 0) {
-		error("Socket is not defined\n");
-	}
+	
+	Analysis__MetricMsg msg = ANALYSIS__METRIC_MSG__INIT;
+	msg.values_case = ANALYSIS__METRIC_MSG__VALUES_METRIC_AVG;
 
-	analysis::MetricValueMsg* msg = new analysis::MetricValueMsg();
-	msg->set_name(mValue->name);
-	msg->set_netint(mValue->interface);
-	metric.set_avg(avg);
-	metric.set_min(min);
-	metric.set_max(max);*/
+	Analysis__MetricAvgMsg avgMsg = ANALYSIS__METRIC_AVG_MSG__INIT;
+	msg.metricavg = &avgMsg;
+	msg.name = (char*)name.c_str();
+	msg.netint = (char*)analysis->interface;
+	msg.time = time(0);
+	msg.metricavg->avg = avg->get();
+	msg.metricavg->min = min->get();
+	msg.metricavg->max = max->get();
+
+	msg_len = analysis__metric_msg__get_packed_size(&msg);
+
+	// Max size of varint_len is 10 bytes
+	buf = CALLOC(uint8_t, 10 + msg_len);
+
+	// Convert msg_len to a varint
+	int varint_len_len = encode_varint(buf, msg_len);	
+	analysis__metric_msg__pack(&msg, buf + varint_len_len);
+	
+	// send
+	if(send(analysis->socket, buf, varint_len_len + msg_len, MSG_NOSIGNAL) < 0) {
+		cout << "Error sending response for metric" << name << endl;
+		error("Error sending response\n");
+	} 
+
+	free(buf); // Free the allocated serialized buffer	
 }

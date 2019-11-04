@@ -12,21 +12,9 @@
 #include <unistd.h>
 #include <inttypes.h>
 #include "util.h"
+#include "hashable.hpp"
 
 #define HASH_SIZE	13200
-
-class Hashable 
-{
-	public:
-		void* value;
-		pthread_mutex_t mutex;
-		virtual u_int32_t hash();
-
-        Hashable(void* val);
-        void setValue(void* val);
-        int compare(Hashable* elem);
-        ~Hashable();
-};
 
 class Bucket;
 

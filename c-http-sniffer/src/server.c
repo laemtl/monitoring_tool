@@ -246,9 +246,9 @@ int send_data(Result* result) {
 	analysis__data__pack(&msg, buf + varint_len_len);
 	
 	//fprintf(stderr, "Writing %d serialized bytes\n", varint_len_len + msg_len); // See the length of message
-	if(send(result->client_sock, buf, varint_len_len + msg_len, MSG_NOSIGNAL) < 0) {
+	/*/if(send(result->client_sock, buf, varint_len_len + msg_len, MSG_NOSIGNAL) < 0) {
 		error("Error sending response\n");
-	} 
+	}*/
 
 	free(buf); // Free the allocated serialized buffer
 	
@@ -390,7 +390,7 @@ void connection_handler(int *socket) {
 				status.push_back(req_rate_active);
 				status.push_back(err_rate_active);*/
 
-				data->analysis = new Analysis();
+				data->analysis = new Analysis(*socket, init->netint[i], init->interval);
 				data->analysis->activeMetrics(init->activemetric);
 
 				start_analysis(NULL, data);
@@ -529,25 +529,6 @@ void start_server() {
 			syslog(LOG_ERR, "accept failed with errno = %d\n", errno);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /** Added Functionality: Sending packets to remote node.
  *  Following code opens socket on given IP address and port to send

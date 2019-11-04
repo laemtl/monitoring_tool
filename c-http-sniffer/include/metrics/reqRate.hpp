@@ -6,13 +6,14 @@
 class ReqRate: public MetricAvg
 {
   public:
-    ReqRate();
+    ReqRate(Analysis* analysis);
     void subscribe(EventManager* em);
     void onNewFlowReceived(flow_t *flow);
     void onFlowUpdate(flow_t *flow);
     void onRequestReceived(http_pair_t *pair, flow_t *flow);
     void onResponseReceived(http_pair_t *pair, flow_t *flow);
     void onTimerExpired();
+    double ReqRate::getAvg();
 };
 
 #endif

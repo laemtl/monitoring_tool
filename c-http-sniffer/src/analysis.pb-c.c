@@ -97,6 +97,141 @@ void   analysis__data__free_unpacked
   assert(message->base.descriptor == &analysis__data__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
+void   analysis__metric_list__init
+                     (Analysis__MetricList         *message)
+{
+  static const Analysis__MetricList init_value = ANALYSIS__METRIC_LIST__INIT;
+  *message = init_value;
+}
+size_t analysis__metric_list__get_packed_size
+                     (const Analysis__MetricList *message)
+{
+  assert(message->base.descriptor == &analysis__metric_list__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
+}
+size_t analysis__metric_list__pack
+                     (const Analysis__MetricList *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &analysis__metric_list__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
+}
+size_t analysis__metric_list__pack_to_buffer
+                     (const Analysis__MetricList *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &analysis__metric_list__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
+}
+Analysis__MetricList *
+       analysis__metric_list__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (Analysis__MetricList *)
+     protobuf_c_message_unpack (&analysis__metric_list__descriptor,
+                                allocator, len, data);
+}
+void   analysis__metric_list__free_unpacked
+                     (Analysis__MetricList *message,
+                      ProtobufCAllocator *allocator)
+{
+  if(!message)
+    return;
+  assert(message->base.descriptor == &analysis__metric_list__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
+}
+void   analysis__metric_msg__init
+                     (Analysis__MetricMsg         *message)
+{
+  static const Analysis__MetricMsg init_value = ANALYSIS__METRIC_MSG__INIT;
+  *message = init_value;
+}
+size_t analysis__metric_msg__get_packed_size
+                     (const Analysis__MetricMsg *message)
+{
+  assert(message->base.descriptor == &analysis__metric_msg__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
+}
+size_t analysis__metric_msg__pack
+                     (const Analysis__MetricMsg *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &analysis__metric_msg__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
+}
+size_t analysis__metric_msg__pack_to_buffer
+                     (const Analysis__MetricMsg *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &analysis__metric_msg__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
+}
+Analysis__MetricMsg *
+       analysis__metric_msg__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (Analysis__MetricMsg *)
+     protobuf_c_message_unpack (&analysis__metric_msg__descriptor,
+                                allocator, len, data);
+}
+void   analysis__metric_msg__free_unpacked
+                     (Analysis__MetricMsg *message,
+                      ProtobufCAllocator *allocator)
+{
+  if(!message)
+    return;
+  assert(message->base.descriptor == &analysis__metric_msg__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
+}
+void   analysis__metric_avg_msg__init
+                     (Analysis__MetricAvgMsg         *message)
+{
+  static const Analysis__MetricAvgMsg init_value = ANALYSIS__METRIC_AVG_MSG__INIT;
+  *message = init_value;
+}
+size_t analysis__metric_avg_msg__get_packed_size
+                     (const Analysis__MetricAvgMsg *message)
+{
+  assert(message->base.descriptor == &analysis__metric_avg_msg__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
+}
+size_t analysis__metric_avg_msg__pack
+                     (const Analysis__MetricAvgMsg *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &analysis__metric_avg_msg__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
+}
+size_t analysis__metric_avg_msg__pack_to_buffer
+                     (const Analysis__MetricAvgMsg *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &analysis__metric_avg_msg__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
+}
+Analysis__MetricAvgMsg *
+       analysis__metric_avg_msg__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (Analysis__MetricAvgMsg *)
+     protobuf_c_message_unpack (&analysis__metric_avg_msg__descriptor,
+                                allocator, len, data);
+}
+void   analysis__metric_avg_msg__free_unpacked
+                     (Analysis__MetricAvgMsg *message,
+                      ProtobufCAllocator *allocator)
+{
+  if(!message)
+    return;
+  assert(message->base.descriptor == &analysis__metric_avg_msg__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
+}
 void   analysis__freq__init
                      (Analysis__Freq         *message)
 {
@@ -140,6 +275,51 @@ void   analysis__freq__free_unpacked
   if(!message)
     return;
   assert(message->base.descriptor == &analysis__freq__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
+}
+void   analysis__metric_cum_distr_msg__init
+                     (Analysis__MetricCumDistrMsg         *message)
+{
+  static const Analysis__MetricCumDistrMsg init_value = ANALYSIS__METRIC_CUM_DISTR_MSG__INIT;
+  *message = init_value;
+}
+size_t analysis__metric_cum_distr_msg__get_packed_size
+                     (const Analysis__MetricCumDistrMsg *message)
+{
+  assert(message->base.descriptor == &analysis__metric_cum_distr_msg__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
+}
+size_t analysis__metric_cum_distr_msg__pack
+                     (const Analysis__MetricCumDistrMsg *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &analysis__metric_cum_distr_msg__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
+}
+size_t analysis__metric_cum_distr_msg__pack_to_buffer
+                     (const Analysis__MetricCumDistrMsg *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &analysis__metric_cum_distr_msg__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
+}
+Analysis__MetricCumDistrMsg *
+       analysis__metric_cum_distr_msg__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (Analysis__MetricCumDistrMsg *)
+     protobuf_c_message_unpack (&analysis__metric_cum_distr_msg__descriptor,
+                                allocator, len, data);
+}
+void   analysis__metric_cum_distr_msg__free_unpacked
+                     (Analysis__MetricCumDistrMsg *message,
+                      ProtobufCAllocator *allocator)
+{
+  if(!message)
+    return;
+  assert(message->base.descriptor == &analysis__metric_cum_distr_msg__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
 void   analysis__close__init
@@ -706,6 +886,191 @@ const ProtobufCMessageDescriptor analysis__data__descriptor =
   (ProtobufCMessageInit) analysis__data__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
+#define analysis__metric_list__field_descriptors NULL
+#define analysis__metric_list__field_indices_by_name NULL
+#define analysis__metric_list__number_ranges NULL
+const ProtobufCMessageDescriptor analysis__metric_list__descriptor =
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "analysis.MetricList",
+  "MetricList",
+  "Analysis__MetricList",
+  "analysis",
+  sizeof(Analysis__MetricList),
+  0,
+  analysis__metric_list__field_descriptors,
+  analysis__metric_list__field_indices_by_name,
+  0,  analysis__metric_list__number_ranges,
+  (ProtobufCMessageInit) analysis__metric_list__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
+static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[6] =
+{
+  {
+    "name",
+    1,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_STRING,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__MetricMsg, name),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "time",
+    2,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_INT64,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__MetricMsg, time),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "netInt",
+    3,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_STRING,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__MetricMsg, netint),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "clientId",
+    4,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_INT64,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__MetricMsg, clientid),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "metricAvg",
+    5,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_MESSAGE,
+    offsetof(Analysis__MetricMsg, values_case),
+    offsetof(Analysis__MetricMsg, metricavg),
+    &analysis__metric_avg_msg__descriptor,
+    NULL,
+    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "metricCumDistr",
+    6,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_MESSAGE,
+    offsetof(Analysis__MetricMsg, values_case),
+    offsetof(Analysis__MetricMsg, metriccumdistr),
+    &analysis__metric_cum_distr_msg__descriptor,
+    NULL,
+    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
+static const unsigned analysis__metric_msg__field_indices_by_name[] = {
+  3,   /* field[3] = clientId */
+  4,   /* field[4] = metricAvg */
+  5,   /* field[5] = metricCumDistr */
+  0,   /* field[0] = name */
+  2,   /* field[2] = netInt */
+  1,   /* field[1] = time */
+};
+static const ProtobufCIntRange analysis__metric_msg__number_ranges[1 + 1] =
+{
+  { 1, 0 },
+  { 0, 6 }
+};
+const ProtobufCMessageDescriptor analysis__metric_msg__descriptor =
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "analysis.MetricMsg",
+  "MetricMsg",
+  "Analysis__MetricMsg",
+  "analysis",
+  sizeof(Analysis__MetricMsg),
+  6,
+  analysis__metric_msg__field_descriptors,
+  analysis__metric_msg__field_indices_by_name,
+  1,  analysis__metric_msg__number_ranges,
+  (ProtobufCMessageInit) analysis__metric_msg__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
+static const ProtobufCFieldDescriptor analysis__metric_avg_msg__field_descriptors[3] =
+{
+  {
+    "avg",
+    5,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_DOUBLE,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__MetricAvgMsg, avg),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "min",
+    6,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_DOUBLE,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__MetricAvgMsg, min),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "max",
+    7,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_DOUBLE,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__MetricAvgMsg, max),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
+static const unsigned analysis__metric_avg_msg__field_indices_by_name[] = {
+  0,   /* field[0] = avg */
+  2,   /* field[2] = max */
+  1,   /* field[1] = min */
+};
+static const ProtobufCIntRange analysis__metric_avg_msg__number_ranges[1 + 1] =
+{
+  { 5, 0 },
+  { 0, 3 }
+};
+const ProtobufCMessageDescriptor analysis__metric_avg_msg__descriptor =
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "analysis.MetricAvgMsg",
+  "MetricAvgMsg",
+  "Analysis__MetricAvgMsg",
+  "analysis",
+  sizeof(Analysis__MetricAvgMsg),
+  3,
+  analysis__metric_avg_msg__field_descriptors,
+  analysis__metric_avg_msg__field_indices_by_name,
+  1,  analysis__metric_avg_msg__number_ranges,
+  (ProtobufCMessageInit) analysis__metric_avg_msg__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
 static const ProtobufCFieldDescriptor analysis__freq__field_descriptors[2] =
 {
   {
@@ -755,6 +1120,44 @@ const ProtobufCMessageDescriptor analysis__freq__descriptor =
   analysis__freq__field_indices_by_name,
   1,  analysis__freq__number_ranges,
   (ProtobufCMessageInit) analysis__freq__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
+static const ProtobufCFieldDescriptor analysis__metric_cum_distr_msg__field_descriptors[1] =
+{
+  {
+    "freqs",
+    1,
+    PROTOBUF_C_LABEL_REPEATED,
+    PROTOBUF_C_TYPE_MESSAGE,
+    offsetof(Analysis__MetricCumDistrMsg, n_freqs),
+    offsetof(Analysis__MetricCumDistrMsg, freqs),
+    &analysis__freq__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
+static const unsigned analysis__metric_cum_distr_msg__field_indices_by_name[] = {
+  0,   /* field[0] = freqs */
+};
+static const ProtobufCIntRange analysis__metric_cum_distr_msg__number_ranges[1 + 1] =
+{
+  { 1, 0 },
+  { 0, 1 }
+};
+const ProtobufCMessageDescriptor analysis__metric_cum_distr_msg__descriptor =
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "analysis.MetricCumDistrMsg",
+  "MetricCumDistrMsg",
+  "Analysis__MetricCumDistrMsg",
+  "analysis",
+  sizeof(Analysis__MetricCumDistrMsg),
+  1,
+  analysis__metric_cum_distr_msg__field_descriptors,
+  analysis__metric_cum_distr_msg__field_indices_by_name,
+  1,  analysis__metric_cum_distr_msg__number_ranges,
+  (ProtobufCMessageInit) analysis__metric_cum_distr_msg__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
 #define analysis__close__field_descriptors NULL

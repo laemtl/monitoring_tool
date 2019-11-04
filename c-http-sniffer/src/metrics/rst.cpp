@@ -1,7 +1,7 @@
 #include "rst.hpp"
 
-Rst::Rst() {
-	name = "RST NEW";
+Rst::Rst(Analysis* analysis) 
+: MetricAvg(analysis, "rst", "Request service time") {
 }
 
 void Rst::subscribe(EventManager* em) {

@@ -1,30 +1,8 @@
 #include "hashTable.hpp"
 
-Hashable::Hashable(void* val) : value(val) {
-}
-
-void Hashable::setValue(void* val) {
-    value = val;
-}
-
-int Hashable::compare(Hashable* elem) {
-    if(value == elem->value) return 0;
-    else if (value > elem->value) return 1;
-    return -1;
-}
-
-u_int32_t Hashable::hash() {
-    return *(u_int32_t*)value;
-}
-
-Hashable::~Hashable() {
-    free(value);
-}
-
 /* Initiate the hash table with no elems */
-Hash::Hash() {
+Hash::Hash() : cnt(0), size(HASH_SIZE) {
     pthread_mutex_init(&mutex, NULL);
-    size = HASH_SIZE;
     buckets = new Bucket[size];
     /*for(int i=0; i<size; i++){
         buckets[i] = new Bucket();
@@ -40,25 +18,25 @@ Node* Hash::create(Hashable *value) {
     if(value == NULL) error("Value can't be NULL \n");
     
     Node* n = new Node(value);
-    Bucket b = buckets[value->hash() % size];
+    Bucket* b = &(buckets[value->hash() % size]);
 
-    pthread_mutex_lock(&(b.mutex));
+    pthread_mutex_lock(&(b->mutex));
 
-    if(b.elm_cnt == 0 ){
+    if(b->elm_cnt == 0 ){
         n->next = NULL;
         n->prev = NULL;
-        b.first = n;
+        b->first = n;
     } else {
-        b.last->next = n;
-        n->prev = b.last;
+        b->last->next = n;
+        n->prev = b->last;
     }
-    b.last = n;
-    b.last->next = NULL;
-    n->bucket = &b;
-    b.elm_cnt++;
+    b->last = n;
+    b->last->next = NULL;
+    n->bucket = b;
+    b->elm_cnt++;
     cnt++;
 
-    pthread_mutex_unlock(&(b.mutex));
+    pthread_mutex_unlock(&(b->mutex));
     return n;
 }
 
@@ -67,16 +45,19 @@ Node* Hash::find(Hashable *value) {
     if(value == NULL) error("Value can't be NULL \n");
     
     u_int32_t key = value->hash() % size;
-    Bucket b = buckets[key];
-    Node	*e = NULL;
 
-    pthread_mutex_lock(&(b.mutex));
+    Bucket* b = &(buckets[key]);
+    Node  *e = NULL;
 
-    if (b.elm_cnt > 0){
-        e = b.first;
+    pthread_mutex_lock(&(b->mutex));
+    
+    if (b->elm_cnt > 0){
+        e = b->first;
         while(e != NULL){
+            int c = value->compare(e->value);
+            
             if(value->compare(e->value) == 0){
-                pthread_mutex_unlock(&(b.mutex));
+                pthread_mutex_unlock(&(b->mutex));
                 return e;
             } else {
                 e = e->next;
@@ -84,7 +65,7 @@ Node* Hash::find(Hashable *value) {
             }
         }
     }
-    pthread_mutex_unlock(&(b.mutex));
+    pthread_mutex_unlock(&(b->mutex));
     return NULL;
 }
 

@@ -1,7 +1,7 @@
 #include "errRate.hpp"
 
-ErrRate::ErrRate() {
-	name = "ERR RATE NEW";
+ErrRate::ErrRate(Analysis* analysis) 
+: MetricAvg(analysis, "err_rate", "Error rate"){
 }
 
 double ErrRate::getRate() {

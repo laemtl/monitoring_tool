@@ -26,15 +26,16 @@ void cfl_add(char* name, double c_freq, cf_list* cfl) {
 }
 
 void cfl_delete(cf_list* cfl) {
-    int i;
-    for(i = 0; i < cfl->count; i++) {
+    for(int i = 0; i < cfl->count; i++) {
         free(cfl->list[i].name);
+        cfl->list[i].name = NULL;
+        cfl->list[i].c_freq = 0;
     }
+    cfl->count = 0;
 }
 
 void print_cfl(cf_list* cfl) {
-    int i;
-    for(i = 0; i < cfl->count; i++) {
+    for(int i = 0; i < cfl->count; i++) {
         printf("name: %s \n", cfl->list[i].name);
         printf("freq: %f \n", cfl->list[i].c_freq);
     }

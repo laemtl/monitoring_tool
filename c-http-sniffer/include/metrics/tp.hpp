@@ -10,7 +10,7 @@ class Tp: public MetricAvg
     u_int32_t intervalRef;
     
     public:
-      Tp();
+      Tp(Analysis* analysis);
       void subscribe(EventManager* em);
       void onNewFlowReceived(flow_t *flow);
       void onFlowUpdate(flow_t *flow);

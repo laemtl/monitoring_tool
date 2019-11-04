@@ -201,11 +201,11 @@ export default {
     /* Insert received datapoints into the chart */
     insertDatapoints(messages, chart) {
       for (let i = 0; i < messages.length; i++) {
-        //console.log(messages);
+        console.log(messages[i]);
 
         var params = {};
         //for (var j = 0; j < this.graph.netInt.length; j++) {
-        if (typeof messages[i].min !== "undefined") {
+        if (typeof messages[i].avg !== "undefined") {
           params.Average = messages[i].avg;
         }
 

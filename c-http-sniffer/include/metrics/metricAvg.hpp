@@ -5,10 +5,9 @@
 //#include "metricValue.hpp"
 #include "value.hpp"
 #include "observer.hpp"
-
-#include <iostream>
-#include <string>
 #include <stdio.h>
+#include "analysis2.hpp"
+#include "server.h"
 
 /*class MAItem {
     double avg;
@@ -23,11 +22,10 @@ class MAValue : public MetricValue
 
 using namespace std; 
 
-class MetricAvg: public Metric2, public Observer
+//class Analysis;
+class MetricAvg : public Metric2, public Observer
 {
 	protected:
-        string name;
-		
 		Value* subtotal;
         Value* total;
         
@@ -38,10 +36,8 @@ class MetricAvg: public Metric2, public Observer
         Value* min;
         Value* max;
 
-		u_int32_t interval;
-
     public:
-		MetricAvg();
+		MetricAvg(Analysis* analysis, string name, string desc);
 		void subscribe(EventManager* em);
 		virtual void reset();
 		virtual double getAvg();
@@ -49,6 +45,7 @@ class MetricAvg: public Metric2, public Observer
 		void onTimerExpired();
 		void onIntervalExpired();
 		void prepareMsg(double avg, double min, double max);
+		void sendMsg(); 
 };
 
 #endif

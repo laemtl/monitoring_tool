@@ -1760,6 +1760,872 @@ impl ::protobuf::reflect::ProtobufValue for Data {
 }
 
 #[derive(PartialEq,Clone,Default)]
+pub struct MetricList {
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a MetricList {
+    fn default() -> &'a MetricList {
+        <MetricList as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl MetricList {
+    pub fn new() -> MetricList {
+        ::std::default::Default::default()
+    }
+}
+
+impl ::protobuf::Message for MetricList {
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &::std::any::Any {
+        self as &::std::any::Any
+    }
+    fn as_any_mut(&mut self) -> &mut ::std::any::Any {
+        self as &mut ::std::any::Any
+    }
+    fn into_any(self: Box<Self>) -> ::std::boxed::Box<::std::any::Any> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> MetricList {
+        MetricList::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
+        };
+        unsafe {
+            descriptor.get(|| {
+                let fields = ::std::vec::Vec::new();
+                ::protobuf::reflect::MessageDescriptor::new::<MetricList>(
+                    "MetricList",
+                    fields,
+                    file_descriptor_proto()
+                )
+            })
+        }
+    }
+
+    fn default_instance() -> &'static MetricList {
+        static mut instance: ::protobuf::lazy::Lazy<MetricList> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const MetricList,
+        };
+        unsafe {
+            instance.get(MetricList::new)
+        }
+    }
+}
+
+impl ::protobuf::Clear for MetricList {
+    fn clear(&mut self) {
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for MetricList {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for MetricList {
+    fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
+        ::protobuf::reflect::ProtobufValueRef::Message(self)
+    }
+}
+
+#[derive(PartialEq,Clone,Default)]
+pub struct MetricMsg {
+    // message fields
+    name: ::protobuf::SingularField<::std::string::String>,
+    time: ::std::option::Option<i64>,
+    netInt: ::protobuf::SingularField<::std::string::String>,
+    clientId: ::std::option::Option<i64>,
+    // message oneof groups
+    pub values: ::std::option::Option<MetricMsg_oneof_values>,
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a MetricMsg {
+    fn default() -> &'a MetricMsg {
+        <MetricMsg as ::protobuf::Message>::default_instance()
+    }
+}
+
+#[derive(Clone,PartialEq,Debug)]
+pub enum MetricMsg_oneof_values {
+    metricAvg(MetricAvgMsg),
+    metricCumDistr(MetricCumDistrMsg),
+}
+
+impl MetricMsg {
+    pub fn new() -> MetricMsg {
+        ::std::default::Default::default()
+    }
+
+    // required string name = 1;
+
+
+    pub fn get_name(&self) -> &str {
+        match self.name.as_ref() {
+            Some(v) => &v,
+            None => "",
+        }
+    }
+    pub fn clear_name(&mut self) {
+        self.name.clear();
+    }
+
+    pub fn has_name(&self) -> bool {
+        self.name.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_name(&mut self, v: ::std::string::String) {
+        self.name = ::protobuf::SingularField::some(v);
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_name(&mut self) -> &mut ::std::string::String {
+        if self.name.is_none() {
+            self.name.set_default();
+        }
+        self.name.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_name(&mut self) -> ::std::string::String {
+        self.name.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
+    // required int64 time = 2;
+
+
+    pub fn get_time(&self) -> i64 {
+        self.time.unwrap_or(0)
+    }
+    pub fn clear_time(&mut self) {
+        self.time = ::std::option::Option::None;
+    }
+
+    pub fn has_time(&self) -> bool {
+        self.time.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_time(&mut self, v: i64) {
+        self.time = ::std::option::Option::Some(v);
+    }
+
+    // required string netInt = 3;
+
+
+    pub fn get_netInt(&self) -> &str {
+        match self.netInt.as_ref() {
+            Some(v) => &v,
+            None => "",
+        }
+    }
+    pub fn clear_netInt(&mut self) {
+        self.netInt.clear();
+    }
+
+    pub fn has_netInt(&self) -> bool {
+        self.netInt.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_netInt(&mut self, v: ::std::string::String) {
+        self.netInt = ::protobuf::SingularField::some(v);
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_netInt(&mut self) -> &mut ::std::string::String {
+        if self.netInt.is_none() {
+            self.netInt.set_default();
+        }
+        self.netInt.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_netInt(&mut self) -> ::std::string::String {
+        self.netInt.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
+    // required int64 clientId = 4;
+
+
+    pub fn get_clientId(&self) -> i64 {
+        self.clientId.unwrap_or(0)
+    }
+    pub fn clear_clientId(&mut self) {
+        self.clientId = ::std::option::Option::None;
+    }
+
+    pub fn has_clientId(&self) -> bool {
+        self.clientId.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_clientId(&mut self, v: i64) {
+        self.clientId = ::std::option::Option::Some(v);
+    }
+
+    // optional .analysis.MetricAvgMsg metricAvg = 5;
+
+
+    pub fn get_metricAvg(&self) -> &MetricAvgMsg {
+        match self.values {
+            ::std::option::Option::Some(MetricMsg_oneof_values::metricAvg(ref v)) => v,
+            _ => MetricAvgMsg::default_instance(),
+        }
+    }
+    pub fn clear_metricAvg(&mut self) {
+        self.values = ::std::option::Option::None;
+    }
+
+    pub fn has_metricAvg(&self) -> bool {
+        match self.values {
+            ::std::option::Option::Some(MetricMsg_oneof_values::metricAvg(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_metricAvg(&mut self, v: MetricAvgMsg) {
+        self.values = ::std::option::Option::Some(MetricMsg_oneof_values::metricAvg(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_metricAvg(&mut self) -> &mut MetricAvgMsg {
+        if let ::std::option::Option::Some(MetricMsg_oneof_values::metricAvg(_)) = self.values {
+        } else {
+            self.values = ::std::option::Option::Some(MetricMsg_oneof_values::metricAvg(MetricAvgMsg::new()));
+        }
+        match self.values {
+            ::std::option::Option::Some(MetricMsg_oneof_values::metricAvg(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_metricAvg(&mut self) -> MetricAvgMsg {
+        if self.has_metricAvg() {
+            match self.values.take() {
+                ::std::option::Option::Some(MetricMsg_oneof_values::metricAvg(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            MetricAvgMsg::new()
+        }
+    }
+
+    // optional .analysis.MetricCumDistrMsg metricCumDistr = 6;
+
+
+    pub fn get_metricCumDistr(&self) -> &MetricCumDistrMsg {
+        match self.values {
+            ::std::option::Option::Some(MetricMsg_oneof_values::metricCumDistr(ref v)) => v,
+            _ => MetricCumDistrMsg::default_instance(),
+        }
+    }
+    pub fn clear_metricCumDistr(&mut self) {
+        self.values = ::std::option::Option::None;
+    }
+
+    pub fn has_metricCumDistr(&self) -> bool {
+        match self.values {
+            ::std::option::Option::Some(MetricMsg_oneof_values::metricCumDistr(..)) => true,
+            _ => false,
+        }
+    }
+
+    // Param is passed by value, moved
+    pub fn set_metricCumDistr(&mut self, v: MetricCumDistrMsg) {
+        self.values = ::std::option::Option::Some(MetricMsg_oneof_values::metricCumDistr(v))
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_metricCumDistr(&mut self) -> &mut MetricCumDistrMsg {
+        if let ::std::option::Option::Some(MetricMsg_oneof_values::metricCumDistr(_)) = self.values {
+        } else {
+            self.values = ::std::option::Option::Some(MetricMsg_oneof_values::metricCumDistr(MetricCumDistrMsg::new()));
+        }
+        match self.values {
+            ::std::option::Option::Some(MetricMsg_oneof_values::metricCumDistr(ref mut v)) => v,
+            _ => panic!(),
+        }
+    }
+
+    // Take field
+    pub fn take_metricCumDistr(&mut self) -> MetricCumDistrMsg {
+        if self.has_metricCumDistr() {
+            match self.values.take() {
+                ::std::option::Option::Some(MetricMsg_oneof_values::metricCumDistr(v)) => v,
+                _ => panic!(),
+            }
+        } else {
+            MetricCumDistrMsg::new()
+        }
+    }
+}
+
+impl ::protobuf::Message for MetricMsg {
+    fn is_initialized(&self) -> bool {
+        if self.name.is_none() {
+            return false;
+        }
+        if self.time.is_none() {
+            return false;
+        }
+        if self.netInt.is_none() {
+            return false;
+        }
+        if self.clientId.is_none() {
+            return false;
+        }
+        if let Some(MetricMsg_oneof_values::metricAvg(ref v)) = self.values {
+            if !v.is_initialized() {
+                return false;
+            }
+        }
+        if let Some(MetricMsg_oneof_values::metricCumDistr(ref v)) = self.values {
+            if !v.is_initialized() {
+                return false;
+            }
+        }
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    ::protobuf::rt::read_singular_string_into(wire_type, is, &mut self.name)?;
+                },
+                2 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_int64()?;
+                    self.time = ::std::option::Option::Some(tmp);
+                },
+                3 => {
+                    ::protobuf::rt::read_singular_string_into(wire_type, is, &mut self.netInt)?;
+                },
+                4 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_int64()?;
+                    self.clientId = ::std::option::Option::Some(tmp);
+                },
+                5 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    self.values = ::std::option::Option::Some(MetricMsg_oneof_values::metricAvg(is.read_message()?));
+                },
+                6 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    self.values = ::std::option::Option::Some(MetricMsg_oneof_values::metricCumDistr(is.read_message()?));
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if let Some(ref v) = self.name.as_ref() {
+            my_size += ::protobuf::rt::string_size(1, &v);
+        }
+        if let Some(v) = self.time {
+            my_size += ::protobuf::rt::value_size(2, v, ::protobuf::wire_format::WireTypeVarint);
+        }
+        if let Some(ref v) = self.netInt.as_ref() {
+            my_size += ::protobuf::rt::string_size(3, &v);
+        }
+        if let Some(v) = self.clientId {
+            my_size += ::protobuf::rt::value_size(4, v, ::protobuf::wire_format::WireTypeVarint);
+        }
+        if let ::std::option::Option::Some(ref v) = self.values {
+            match v {
+                &MetricMsg_oneof_values::metricAvg(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+                },
+                &MetricMsg_oneof_values::metricCumDistr(ref v) => {
+                    let len = v.compute_size();
+                    my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+                },
+            };
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
+        if let Some(ref v) = self.name.as_ref() {
+            os.write_string(1, &v)?;
+        }
+        if let Some(v) = self.time {
+            os.write_int64(2, v)?;
+        }
+        if let Some(ref v) = self.netInt.as_ref() {
+            os.write_string(3, &v)?;
+        }
+        if let Some(v) = self.clientId {
+            os.write_int64(4, v)?;
+        }
+        if let ::std::option::Option::Some(ref v) = self.values {
+            match v {
+                &MetricMsg_oneof_values::metricAvg(ref v) => {
+                    os.write_tag(5, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+                    os.write_raw_varint32(v.get_cached_size())?;
+                    v.write_to_with_cached_sizes(os)?;
+                },
+                &MetricMsg_oneof_values::metricCumDistr(ref v) => {
+                    os.write_tag(6, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+                    os.write_raw_varint32(v.get_cached_size())?;
+                    v.write_to_with_cached_sizes(os)?;
+                },
+            };
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &::std::any::Any {
+        self as &::std::any::Any
+    }
+    fn as_any_mut(&mut self) -> &mut ::std::any::Any {
+        self as &mut ::std::any::Any
+    }
+    fn into_any(self: Box<Self>) -> ::std::boxed::Box<::std::any::Any> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> MetricMsg {
+        MetricMsg::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
+        };
+        unsafe {
+            descriptor.get(|| {
+                let mut fields = ::std::vec::Vec::new();
+                fields.push(::protobuf::reflect::accessor::make_singular_field_accessor::<_, ::protobuf::types::ProtobufTypeString>(
+                    "name",
+                    |m: &MetricMsg| { &m.name },
+                    |m: &mut MetricMsg| { &mut m.name },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeInt64>(
+                    "time",
+                    |m: &MetricMsg| { &m.time },
+                    |m: &mut MetricMsg| { &mut m.time },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_singular_field_accessor::<_, ::protobuf::types::ProtobufTypeString>(
+                    "netInt",
+                    |m: &MetricMsg| { &m.netInt },
+                    |m: &mut MetricMsg| { &mut m.netInt },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeInt64>(
+                    "clientId",
+                    |m: &MetricMsg| { &m.clientId },
+                    |m: &mut MetricMsg| { &mut m.clientId },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_singular_message_accessor::<_, MetricAvgMsg>(
+                    "metricAvg",
+                    MetricMsg::has_metricAvg,
+                    MetricMsg::get_metricAvg,
+                ));
+                fields.push(::protobuf::reflect::accessor::make_singular_message_accessor::<_, MetricCumDistrMsg>(
+                    "metricCumDistr",
+                    MetricMsg::has_metricCumDistr,
+                    MetricMsg::get_metricCumDistr,
+                ));
+                ::protobuf::reflect::MessageDescriptor::new::<MetricMsg>(
+                    "MetricMsg",
+                    fields,
+                    file_descriptor_proto()
+                )
+            })
+        }
+    }
+
+    fn default_instance() -> &'static MetricMsg {
+        static mut instance: ::protobuf::lazy::Lazy<MetricMsg> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const MetricMsg,
+        };
+        unsafe {
+            instance.get(MetricMsg::new)
+        }
+    }
+}
+
+impl ::protobuf::Clear for MetricMsg {
+    fn clear(&mut self) {
+        self.name.clear();
+        self.time = ::std::option::Option::None;
+        self.netInt.clear();
+        self.clientId = ::std::option::Option::None;
+        self.values = ::std::option::Option::None;
+        self.values = ::std::option::Option::None;
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for MetricMsg {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for MetricMsg {
+    fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
+        ::protobuf::reflect::ProtobufValueRef::Message(self)
+    }
+}
+
+#[derive(PartialEq,Clone,Default)]
+pub struct MetricAvgMsg {
+    // message fields
+    avg: ::std::option::Option<f64>,
+    min: ::std::option::Option<f64>,
+    max: ::std::option::Option<f64>,
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a MetricAvgMsg {
+    fn default() -> &'a MetricAvgMsg {
+        <MetricAvgMsg as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl MetricAvgMsg {
+    pub fn new() -> MetricAvgMsg {
+        ::std::default::Default::default()
+    }
+
+    // required double avg = 5;
+
+
+    pub fn get_avg(&self) -> f64 {
+        self.avg.unwrap_or(0.)
+    }
+    pub fn clear_avg(&mut self) {
+        self.avg = ::std::option::Option::None;
+    }
+
+    pub fn has_avg(&self) -> bool {
+        self.avg.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_avg(&mut self, v: f64) {
+        self.avg = ::std::option::Option::Some(v);
+    }
+
+    // required double min = 6;
+
+
+    pub fn get_min(&self) -> f64 {
+        self.min.unwrap_or(0.)
+    }
+    pub fn clear_min(&mut self) {
+        self.min = ::std::option::Option::None;
+    }
+
+    pub fn has_min(&self) -> bool {
+        self.min.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_min(&mut self, v: f64) {
+        self.min = ::std::option::Option::Some(v);
+    }
+
+    // required double max = 7;
+
+
+    pub fn get_max(&self) -> f64 {
+        self.max.unwrap_or(0.)
+    }
+    pub fn clear_max(&mut self) {
+        self.max = ::std::option::Option::None;
+    }
+
+    pub fn has_max(&self) -> bool {
+        self.max.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_max(&mut self, v: f64) {
+        self.max = ::std::option::Option::Some(v);
+    }
+}
+
+impl ::protobuf::Message for MetricAvgMsg {
+    fn is_initialized(&self) -> bool {
+        if self.avg.is_none() {
+            return false;
+        }
+        if self.min.is_none() {
+            return false;
+        }
+        if self.max.is_none() {
+            return false;
+        }
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                5 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_double()?;
+                    self.avg = ::std::option::Option::Some(tmp);
+                },
+                6 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_double()?;
+                    self.min = ::std::option::Option::Some(tmp);
+                },
+                7 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_double()?;
+                    self.max = ::std::option::Option::Some(tmp);
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        if let Some(v) = self.avg {
+            my_size += 9;
+        }
+        if let Some(v) = self.min {
+            my_size += 9;
+        }
+        if let Some(v) = self.max {
+            my_size += 9;
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
+        if let Some(v) = self.avg {
+            os.write_double(5, v)?;
+        }
+        if let Some(v) = self.min {
+            os.write_double(6, v)?;
+        }
+        if let Some(v) = self.max {
+            os.write_double(7, v)?;
+        }
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &::std::any::Any {
+        self as &::std::any::Any
+    }
+    fn as_any_mut(&mut self) -> &mut ::std::any::Any {
+        self as &mut ::std::any::Any
+    }
+    fn into_any(self: Box<Self>) -> ::std::boxed::Box<::std::any::Any> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> MetricAvgMsg {
+        MetricAvgMsg::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
+        };
+        unsafe {
+            descriptor.get(|| {
+                let mut fields = ::std::vec::Vec::new();
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
+                    "avg",
+                    |m: &MetricAvgMsg| { &m.avg },
+                    |m: &mut MetricAvgMsg| { &mut m.avg },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
+                    "min",
+                    |m: &MetricAvgMsg| { &m.min },
+                    |m: &mut MetricAvgMsg| { &mut m.min },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
+                    "max",
+                    |m: &MetricAvgMsg| { &m.max },
+                    |m: &mut MetricAvgMsg| { &mut m.max },
+                ));
+                ::protobuf::reflect::MessageDescriptor::new::<MetricAvgMsg>(
+                    "MetricAvgMsg",
+                    fields,
+                    file_descriptor_proto()
+                )
+            })
+        }
+    }
+
+    fn default_instance() -> &'static MetricAvgMsg {
+        static mut instance: ::protobuf::lazy::Lazy<MetricAvgMsg> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const MetricAvgMsg,
+        };
+        unsafe {
+            instance.get(MetricAvgMsg::new)
+        }
+    }
+}
+
+impl ::protobuf::Clear for MetricAvgMsg {
+    fn clear(&mut self) {
+        self.avg = ::std::option::Option::None;
+        self.min = ::std::option::Option::None;
+        self.max = ::std::option::Option::None;
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for MetricAvgMsg {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for MetricAvgMsg {
+    fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
+        ::protobuf::reflect::ProtobufValueRef::Message(self)
+    }
+}
+
+#[derive(PartialEq,Clone,Default)]
 pub struct Freq {
     // message fields
     name: ::protobuf::SingularField<::std::string::String>,
@@ -1984,6 +2850,182 @@ impl ::protobuf::reflect::ProtobufValue for Freq {
 }
 
 #[derive(PartialEq,Clone,Default)]
+pub struct MetricCumDistrMsg {
+    // message fields
+    freqs: ::protobuf::RepeatedField<Freq>,
+    // special fields
+    pub unknown_fields: ::protobuf::UnknownFields,
+    pub cached_size: ::protobuf::CachedSize,
+}
+
+impl<'a> ::std::default::Default for &'a MetricCumDistrMsg {
+    fn default() -> &'a MetricCumDistrMsg {
+        <MetricCumDistrMsg as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl MetricCumDistrMsg {
+    pub fn new() -> MetricCumDistrMsg {
+        ::std::default::Default::default()
+    }
+
+    // repeated .analysis.Freq freqs = 1;
+
+
+    pub fn get_freqs(&self) -> &[Freq] {
+        &self.freqs
+    }
+    pub fn clear_freqs(&mut self) {
+        self.freqs.clear();
+    }
+
+    // Param is passed by value, moved
+    pub fn set_freqs(&mut self, v: ::protobuf::RepeatedField<Freq>) {
+        self.freqs = v;
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_freqs(&mut self) -> &mut ::protobuf::RepeatedField<Freq> {
+        &mut self.freqs
+    }
+
+    // Take field
+    pub fn take_freqs(&mut self) -> ::protobuf::RepeatedField<Freq> {
+        ::std::mem::replace(&mut self.freqs, ::protobuf::RepeatedField::new())
+    }
+}
+
+impl ::protobuf::Message for MetricCumDistrMsg {
+    fn is_initialized(&self) -> bool {
+        for v in &self.freqs {
+            if !v.is_initialized() {
+                return false;
+            }
+        };
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream) -> ::protobuf::ProtobufResult<()> {
+        while !is.eof()? {
+            let (field_number, wire_type) = is.read_tag_unpack()?;
+            match field_number {
+                1 => {
+                    ::protobuf::rt::read_repeated_message_into(wire_type, is, &mut self.freqs)?;
+                },
+                _ => {
+                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u32 {
+        let mut my_size = 0;
+        for value in &self.freqs {
+            let len = value.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+        };
+        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
+        self.cached_size.set(my_size);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream) -> ::protobuf::ProtobufResult<()> {
+        for v in &self.freqs {
+            os.write_tag(1, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+            os.write_raw_varint32(v.get_cached_size())?;
+            v.write_to_with_cached_sizes(os)?;
+        };
+        os.write_unknown_fields(self.get_unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn get_cached_size(&self) -> u32 {
+        self.cached_size.get()
+    }
+
+    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
+        &self.unknown_fields
+    }
+
+    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
+        &mut self.unknown_fields
+    }
+
+    fn as_any(&self) -> &::std::any::Any {
+        self as &::std::any::Any
+    }
+    fn as_any_mut(&mut self) -> &mut ::std::any::Any {
+        self as &mut ::std::any::Any
+    }
+    fn into_any(self: Box<Self>) -> ::std::boxed::Box<::std::any::Any> {
+        self
+    }
+
+    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
+        Self::descriptor_static()
+    }
+
+    fn new() -> MetricCumDistrMsg {
+        MetricCumDistrMsg::new()
+    }
+
+    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
+        static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
+        };
+        unsafe {
+            descriptor.get(|| {
+                let mut fields = ::std::vec::Vec::new();
+                fields.push(::protobuf::reflect::accessor::make_repeated_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<Freq>>(
+                    "freqs",
+                    |m: &MetricCumDistrMsg| { &m.freqs },
+                    |m: &mut MetricCumDistrMsg| { &mut m.freqs },
+                ));
+                ::protobuf::reflect::MessageDescriptor::new::<MetricCumDistrMsg>(
+                    "MetricCumDistrMsg",
+                    fields,
+                    file_descriptor_proto()
+                )
+            })
+        }
+    }
+
+    fn default_instance() -> &'static MetricCumDistrMsg {
+        static mut instance: ::protobuf::lazy::Lazy<MetricCumDistrMsg> = ::protobuf::lazy::Lazy {
+            lock: ::protobuf::lazy::ONCE_INIT,
+            ptr: 0 as *const MetricCumDistrMsg,
+        };
+        unsafe {
+            instance.get(MetricCumDistrMsg::new)
+        }
+    }
+}
+
+impl ::protobuf::Clear for MetricCumDistrMsg {
+    fn clear(&mut self) {
+        self.freqs.clear();
+        self.unknown_fields.clear();
+    }
+}
+
+impl ::std::fmt::Debug for MetricCumDistrMsg {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for MetricCumDistrMsg {
+    fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
+        ::protobuf::reflect::ProtobufValueRef::Message(self)
+    }
+}
+
+#[derive(PartialEq,Clone,Default)]
 pub struct Close {
     // special fields
     pub unknown_fields: ::protobuf::UnknownFields,
@@ -2139,9 +3181,18 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x18\x18\x20\x01(\x01R\x05tpMin\x12\x14\n\x05tpMax\x18\x19\x20\x01(\x01R\
     \x05tpMax\x12\x1a\n\x08tpRevAvg\x18\x1a\x20\x01(\x01R\x08tpRevAvg\x12\
     \x1a\n\x08tpRevMin\x18\x1b\x20\x01(\x01R\x08tpRevMin\x12\x1a\n\x08tpRevM\
-    ax\x18\x1c\x20\x01(\x01R\x08tpRevMax\".\n\x04Freq\x12\x12\n\x04name\x18\
-    \x01\x20\x02(\tR\x04name\x12\x12\n\x04freq\x18\x02\x20\x02(\x01R\x04freq\
-    \"\x07\n\x05Close\
+    ax\x18\x1c\x20\x01(\x01R\x08tpRevMax\"\x0c\n\nMetricList\"\xf0\x01\n\tMe\
+    tricMsg\x12\x12\n\x04name\x18\x01\x20\x02(\tR\x04name\x12\x12\n\x04time\
+    \x18\x02\x20\x02(\x03R\x04time\x12\x16\n\x06netInt\x18\x03\x20\x02(\tR\
+    \x06netInt\x12\x1a\n\x08clientId\x18\x04\x20\x02(\x03R\x08clientId\x126\
+    \n\tmetricAvg\x18\x05\x20\x01(\x0b2\x16.analysis.MetricAvgMsgH\0R\tmetri\
+    cAvg\x12E\n\x0emetricCumDistr\x18\x06\x20\x01(\x0b2\x1b.analysis.MetricC\
+    umDistrMsgH\0R\x0emetricCumDistrB\x08\n\x06values\"D\n\x0cMetricAvgMsg\
+    \x12\x10\n\x03avg\x18\x05\x20\x02(\x01R\x03avg\x12\x10\n\x03min\x18\x06\
+    \x20\x02(\x01R\x03min\x12\x10\n\x03max\x18\x07\x20\x02(\x01R\x03max\".\n\
+    \x04Freq\x12\x12\n\x04name\x18\x01\x20\x02(\tR\x04name\x12\x12\n\x04freq\
+    \x18\x02\x20\x02(\x01R\x04freq\"9\n\x11MetricCumDistrMsg\x12$\n\x05freqs\
+    \x18\x01\x20\x03(\x0b2\x0e.analysis.FreqR\x05freqs\"\x07\n\x05Close\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {

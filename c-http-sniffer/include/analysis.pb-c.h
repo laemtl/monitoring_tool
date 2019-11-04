@@ -17,7 +17,11 @@ PROTOBUF_C__BEGIN_DECLS
 
 typedef struct _Analysis__Init Analysis__Init;
 typedef struct _Analysis__Data Analysis__Data;
+typedef struct _Analysis__MetricList Analysis__MetricList;
+typedef struct _Analysis__MetricMsg Analysis__MetricMsg;
+typedef struct _Analysis__MetricAvgMsg Analysis__MetricAvgMsg;
 typedef struct _Analysis__Freq Analysis__Freq;
+typedef struct _Analysis__MetricCumDistrMsg Analysis__MetricCumDistrMsg;
 typedef struct _Analysis__Close Analysis__Close;
 
 
@@ -114,6 +118,52 @@ struct  _Analysis__Data
     , 0, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,NULL, 0,NULL, 0,NULL, 0,NULL, 0,NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 
 
+struct  _Analysis__MetricList
+{
+  ProtobufCMessage base;
+};
+#define ANALYSIS__METRIC_LIST__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&analysis__metric_list__descriptor) \
+     }
+
+
+typedef enum {
+  ANALYSIS__METRIC_MSG__VALUES__NOT_SET = 0,
+  ANALYSIS__METRIC_MSG__VALUES_METRIC_AVG = 5,
+  ANALYSIS__METRIC_MSG__VALUES_METRIC_CUM_DISTR = 6
+    PROTOBUF_C__FORCE_ENUM_TO_BE_INT_SIZE(ANALYSIS__METRIC_MSG__VALUES)
+} Analysis__MetricMsg__ValuesCase;
+
+struct  _Analysis__MetricMsg
+{
+  ProtobufCMessage base;
+  char *name;
+  int64_t time;
+  char *netint;
+  int64_t clientid;
+  Analysis__MetricMsg__ValuesCase values_case;
+  union {
+    Analysis__MetricAvgMsg *metricavg;
+    Analysis__MetricCumDistrMsg *metriccumdistr;
+  };
+};
+#define ANALYSIS__METRIC_MSG__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&analysis__metric_msg__descriptor) \
+    , NULL, 0, NULL, 0, ANALYSIS__METRIC_MSG__VALUES__NOT_SET, {0} }
+
+
+struct  _Analysis__MetricAvgMsg
+{
+  ProtobufCMessage base;
+  double avg;
+  double min;
+  double max;
+};
+#define ANALYSIS__METRIC_AVG_MSG__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&analysis__metric_avg_msg__descriptor) \
+    , 0, 0, 0 }
+
+
 struct  _Analysis__Freq
 {
   ProtobufCMessage base;
@@ -123,6 +173,17 @@ struct  _Analysis__Freq
 #define ANALYSIS__FREQ__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&analysis__freq__descriptor) \
     , NULL, 0 }
+
+
+struct  _Analysis__MetricCumDistrMsg
+{
+  ProtobufCMessage base;
+  size_t n_freqs;
+  Analysis__Freq **freqs;
+};
+#define ANALYSIS__METRIC_CUM_DISTR_MSG__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&analysis__metric_cum_distr_msg__descriptor) \
+    , 0,NULL }
 
 
 struct  _Analysis__Close
@@ -172,6 +233,63 @@ Analysis__Data *
 void   analysis__data__free_unpacked
                      (Analysis__Data *message,
                       ProtobufCAllocator *allocator);
+/* Analysis__MetricList methods */
+void   analysis__metric_list__init
+                     (Analysis__MetricList         *message);
+size_t analysis__metric_list__get_packed_size
+                     (const Analysis__MetricList   *message);
+size_t analysis__metric_list__pack
+                     (const Analysis__MetricList   *message,
+                      uint8_t             *out);
+size_t analysis__metric_list__pack_to_buffer
+                     (const Analysis__MetricList   *message,
+                      ProtobufCBuffer     *buffer);
+Analysis__MetricList *
+       analysis__metric_list__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data);
+void   analysis__metric_list__free_unpacked
+                     (Analysis__MetricList *message,
+                      ProtobufCAllocator *allocator);
+/* Analysis__MetricMsg methods */
+void   analysis__metric_msg__init
+                     (Analysis__MetricMsg         *message);
+size_t analysis__metric_msg__get_packed_size
+                     (const Analysis__MetricMsg   *message);
+size_t analysis__metric_msg__pack
+                     (const Analysis__MetricMsg   *message,
+                      uint8_t             *out);
+size_t analysis__metric_msg__pack_to_buffer
+                     (const Analysis__MetricMsg   *message,
+                      ProtobufCBuffer     *buffer);
+Analysis__MetricMsg *
+       analysis__metric_msg__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data);
+void   analysis__metric_msg__free_unpacked
+                     (Analysis__MetricMsg *message,
+                      ProtobufCAllocator *allocator);
+/* Analysis__MetricAvgMsg methods */
+void   analysis__metric_avg_msg__init
+                     (Analysis__MetricAvgMsg         *message);
+size_t analysis__metric_avg_msg__get_packed_size
+                     (const Analysis__MetricAvgMsg   *message);
+size_t analysis__metric_avg_msg__pack
+                     (const Analysis__MetricAvgMsg   *message,
+                      uint8_t             *out);
+size_t analysis__metric_avg_msg__pack_to_buffer
+                     (const Analysis__MetricAvgMsg   *message,
+                      ProtobufCBuffer     *buffer);
+Analysis__MetricAvgMsg *
+       analysis__metric_avg_msg__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data);
+void   analysis__metric_avg_msg__free_unpacked
+                     (Analysis__MetricAvgMsg *message,
+                      ProtobufCAllocator *allocator);
 /* Analysis__Freq methods */
 void   analysis__freq__init
                      (Analysis__Freq         *message);
@@ -190,6 +308,25 @@ Analysis__Freq *
                       const uint8_t       *data);
 void   analysis__freq__free_unpacked
                      (Analysis__Freq *message,
+                      ProtobufCAllocator *allocator);
+/* Analysis__MetricCumDistrMsg methods */
+void   analysis__metric_cum_distr_msg__init
+                     (Analysis__MetricCumDistrMsg         *message);
+size_t analysis__metric_cum_distr_msg__get_packed_size
+                     (const Analysis__MetricCumDistrMsg   *message);
+size_t analysis__metric_cum_distr_msg__pack
+                     (const Analysis__MetricCumDistrMsg   *message,
+                      uint8_t             *out);
+size_t analysis__metric_cum_distr_msg__pack_to_buffer
+                     (const Analysis__MetricCumDistrMsg   *message,
+                      ProtobufCBuffer     *buffer);
+Analysis__MetricCumDistrMsg *
+       analysis__metric_cum_distr_msg__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data);
+void   analysis__metric_cum_distr_msg__free_unpacked
+                     (Analysis__MetricCumDistrMsg *message,
                       ProtobufCAllocator *allocator);
 /* Analysis__Close methods */
 void   analysis__close__init
@@ -218,8 +355,20 @@ typedef void (*Analysis__Init_Closure)
 typedef void (*Analysis__Data_Closure)
                  (const Analysis__Data *message,
                   void *closure_data);
+typedef void (*Analysis__MetricList_Closure)
+                 (const Analysis__MetricList *message,
+                  void *closure_data);
+typedef void (*Analysis__MetricMsg_Closure)
+                 (const Analysis__MetricMsg *message,
+                  void *closure_data);
+typedef void (*Analysis__MetricAvgMsg_Closure)
+                 (const Analysis__MetricAvgMsg *message,
+                  void *closure_data);
 typedef void (*Analysis__Freq_Closure)
                  (const Analysis__Freq *message,
+                  void *closure_data);
+typedef void (*Analysis__MetricCumDistrMsg_Closure)
+                 (const Analysis__MetricCumDistrMsg *message,
                   void *closure_data);
 typedef void (*Analysis__Close_Closure)
                  (const Analysis__Close *message,
@@ -232,7 +381,11 @@ typedef void (*Analysis__Close_Closure)
 
 extern const ProtobufCMessageDescriptor analysis__init__descriptor;
 extern const ProtobufCMessageDescriptor analysis__data__descriptor;
+extern const ProtobufCMessageDescriptor analysis__metric_list__descriptor;
+extern const ProtobufCMessageDescriptor analysis__metric_msg__descriptor;
+extern const ProtobufCMessageDescriptor analysis__metric_avg_msg__descriptor;
 extern const ProtobufCMessageDescriptor analysis__freq__descriptor;
+extern const ProtobufCMessageDescriptor analysis__metric_cum_distr_msg__descriptor;
 extern const ProtobufCMessageDescriptor analysis__close__descriptor;
 
 PROTOBUF_C__END_DECLS

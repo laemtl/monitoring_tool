@@ -10,10 +10,10 @@
 #include "hash_table.h"
 #include "queue.h"
 #include "result.h"
-
-#include "metricManager.hpp"
-#include "eventManager.hpp"
 #include "addr.hpp"
+#include "analysis2.hpp"
+//#include "eventManager.hpp"
+//#include "metricManager.hpp"
 
 #ifndef DEBUGGING
 #define DEBUGGING 0 
@@ -21,20 +21,6 @@
 
 #define EPSILON	1e-7
 #define CLOSE(a,b) (fabs(a - b)<EPSILON)
-
-class Analysis {
-    public:
-        Analysis();
-        // vector<bool> status
-        void activeMetrics(int activeMetrics);
-
-        EventManager* eventManager;
-        MetricManager* metricManager;
-};
-
-
-
-
 
 
 /*class Analysis {

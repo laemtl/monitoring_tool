@@ -20,6 +20,12 @@ void start_log(char* ipaddress);
 void start_server();
 void start_analysis(char* ipaddress, Data* data);
 int send_data(Result* result);
+size_t decode_varint(int sock);
+int encode_varint(uint8_t *const buffer, uint64_t value);
+void connection_handler(int *socket);
+void stop_server();
+void onExit(int signum);
+
   
 /*typedef struct analysis_conn_ {
     uint32_t socket;

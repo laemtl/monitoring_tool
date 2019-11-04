@@ -79,7 +79,7 @@ export default {
           active: true,
           max: 2
         };
-        stats["client"] = {
+        stats["clients"] = {
           label: "Clients",
           type: "area",
           active: true,
@@ -164,6 +164,8 @@ export default {
       this.ws.onmessage = function(message) {
         try {
           var data = JSON.parse(message.data);
+          
+          console.log(data);
 
           if("tp" in data && "tp_rev" in data) {
             data.tp.rev_avg = data.tp_rev.avg;
@@ -175,17 +177,23 @@ export default {
 
           //console.log(data);
 
-          for (var id in data) {
+          //for (var id in data) {
             //console.log(id);
             //console.log(data[id]);
+          
 
-            if(typeof el.statistics[id] !== 'undefined' && typeof data[id] !== 'undefined') {
-              configBus.$emit(id, {
+            if(typeof el.statistics[data.name] !== 'undefined' && typeof data.metricAvg !== "undefined") {
+              configBus.$emit(data.name, {
                 netInt: data.netInt,
-                data: data[id]
+                data: data.metricAvg
+              });
+            } else if(typeof el.statistics[data.name] !== 'undefined' && typeof data.metricCumDistr !== "undefined") {
+              configBus.$emit(data.name, {
+                netInt: data.netInt,
+                data: data.metricCumDistr
               });
             }
-          }
+          //}
         } catch (e) {
           alert(e); // error in the above string (in this case, yes)!
         }
