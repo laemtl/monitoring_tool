@@ -11,7 +11,8 @@ struct _raw_pkt {
 	struct pcap_pkthdr pkthdr;
 };
 
-void raw_packet_free(raw_pkt* p);
-void raw_pkt_queue_init();
-
+void raw_packet_free(raw_pkt* p) {
+    free(p->raw);
+    free(p);
+}
 #endif

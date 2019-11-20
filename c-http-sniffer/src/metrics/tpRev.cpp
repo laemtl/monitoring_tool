@@ -5,7 +5,7 @@ TpRev::TpRev(Analysis* analysis)
 : MetricAvg(analysis, "tp_rev", "Reverse Throughput"), timerRef(0), intervalRef(0) {
 }
 
-void TpRev::onFlowUpdate(flow_t *flow) {
+void TpRev::onFlowUpdate(Flow* flow) {
 	u_int32_t payload = flow->payload_dst;
 	total->set(payload);
 }
@@ -21,13 +21,13 @@ void TpRev::subscribe(EventManager* em) {
 	em->intervalExpired->add(this);
 }
 
-void TpRev::onNewFlowReceived(flow_t *flow) {
+void TpRev::onNewFlowReceived(Flow* flow) {
 }
 
-void TpRev::onRequestReceived(http_pair_t *pair, flow_t *flow) {
+void TpRev::onRequestReceived(pair_t *pair, Flow* flow) {
 }
 
-void TpRev::onResponseReceived(http_pair_t *pair, flow_t *flow) {
+void TpRev::onResponseReceived(pair_t *pair, Flow* flow) {
 }
 
 void TpRev::onTimerExpired() {

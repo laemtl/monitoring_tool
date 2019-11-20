@@ -25,7 +25,7 @@ void ReqMethod::cflAdd(Hashable* elem, int cnt) {
 void ReqMethod::cflAdd(int i, int cnt) {
 }
 
-void ReqMethod::onRequestReceived(http_pair_t *pair, flow_t *flow) {
+void ReqMethod::onRequestReceived(pair_t *pair, Flow* flow) {
 	reqTotal++;
 	const char *uri = pair->request_header->uri;
 	char* reqPath = extractReqMethod(uri);
@@ -52,18 +52,21 @@ char* ReqMethod::extractReqMethod(const char* uri) {
 
 void ReqMethod::onIntervalExpired() {
 	cflUpdate(ht);
-	sendMsg();
+	if(analysis->isServerMode()) sendMsg();
 	print();
 	cfl_delete(&cfl);
 }
 
-void ReqMethod::onNewFlowReceived(flow_t *flow) {
+void ReqMethod::onAnalysisEnded() {
 }
 
-void ReqMethod::onFlowUpdate(flow_t *flow) {
+void ReqMethod::onNewFlowReceived(Flow* flow) {
 }
 
-void ReqMethod::onResponseReceived(http_pair_t *pair, flow_t *flow) {
+void ReqMethod::onFlowUpdate(Flow* flow) {
+}
+
+void ReqMethod::onResponseReceived(pair_t *pair, Flow* flow) {
 }
 
 void ReqMethod::onTimerExpired() {

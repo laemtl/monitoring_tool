@@ -1,10 +1,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
-
+#include <stdio.h>
 #include "util.h"
-#include "analysis.hpp"
-#include "attr.h"
-
 #include "cf_list.h"
 
 void cfl_init(cf_list* cfl) {

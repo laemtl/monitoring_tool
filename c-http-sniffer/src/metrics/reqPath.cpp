@@ -26,12 +26,16 @@ void ReqPath::cflAdd(Hashable* elem, int cnt) {
 void ReqPath::cflAdd(int i, int cnt) {
 }
 
-void ReqPath::onRequestReceived(http_pair_t *pair, flow_t *flow) {
+void ReqPath::onRequestReceived(pair_t *pair, Flow* flow) {
 	reqTotal++;
 	const char *uri = pair->request_header->uri;
-	char* reqPath = extractReqPath(uri);
-	StringHash* path = new StringHash(reqPath);
-	ht->add(path);
+	
+	// URI is NULL when req->method == HTTP_MT_NONE
+	if(uri != NULL) {
+		char* reqPath = extractReqPath(uri);
+		StringHash* path = new StringHash(reqPath);
+		ht->add(path);
+	}
 }
 
 char* ReqPath::extractReqPath(const char* uri) {
@@ -56,18 +60,21 @@ char* ReqPath::extractReqPath(const char* uri) {
 
 void ReqPath::onIntervalExpired() {
 	cflUpdate(ht);
-	sendMsg();
+	if(analysis->isServerMode()) sendMsg();
 	print();
 	cfl_delete(&cfl);
 }
 
-void ReqPath::onNewFlowReceived(flow_t *flow) {
+void ReqPath::onAnalysisEnded() {
 }
 
-void ReqPath::onFlowUpdate(flow_t *flow) {
+void ReqPath::onNewFlowReceived(Flow* flow) {
 }
 
-void ReqPath::onResponseReceived(http_pair_t *pair, flow_t *flow) {
+void ReqPath::onFlowUpdate(Flow* flow) {
+}
+
+void ReqPath::onResponseReceived(pair_t *pair, Flow* flow) {
 }
 
 void ReqPath::onTimerExpired() {

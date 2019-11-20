@@ -24,12 +24,13 @@ class ReqType : public MetricCumDistr
 		void cflAdd(int index, int cnt);
         void extract_freq_ht();
 
-        void onNewFlowReceived(flow_t *flow);
-		void onFlowUpdate(flow_t *flow);
-		void onRequestReceived(http_pair_t *pair, flow_t *flow);
-		void onResponseReceived(http_pair_t *pair, flow_t *flow);
+        void onNewFlowReceived(Flow* flow);
+		void onFlowUpdate(Flow* flow);
+		void onRequestReceived(pair_t *pair, Flow* flow);
+		void onResponseReceived(pair_t *pair, Flow* flow);
 		void onTimerExpired();
         void onIntervalExpired();
+		void onAnalysisEnded();
 };
 
 #endif

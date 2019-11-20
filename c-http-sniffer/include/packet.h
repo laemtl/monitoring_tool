@@ -119,20 +119,5 @@ free_iphdr(iphdr *h);					/* Free a IP header object */
 void
 free_tcphdr(tcphdr *h);					/* Free a TCP header object */
 
-/* Packet queue functions */
-/* Located in packet/queue.c */
-BOOL
-packet_queue_init(void*);			/* Initialize */		
-BOOL
-packet_queue_enq(packet_t *pkt);	/* Enqueue */
-packet_t *
-packet_queue_deq(void);				/* Dequeue */
-BOOL
-packet_queue_clr(void);				/* Clear queue */
-unsigned int
-packet_queue_len(void);				/* Get the length of queue */
-void 
-packet_queue_print(void);			/* Print queue details for debugging */
-
 
 #endif /* __PACKET_H__ */

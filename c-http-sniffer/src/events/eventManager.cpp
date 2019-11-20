@@ -7,4 +7,5 @@ EventManager::EventManager() {
     responseReceived = new ResponseReceived(); 
     timerExpired = new TimerExpired();
     intervalExpired = new IntervalExpired();
+    analysisEnded = new AnalysisEnded();
 }

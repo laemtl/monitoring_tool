@@ -9,6 +9,12 @@ double Value::get() {
     if(isClose(numeric_limits<double>::max())) {
         return 0;
     }
+    
+    double v;
+    pthread_mutex_lock(&(mutex));
+    v = val;
+    pthread_mutex_unlock(&(mutex));
+
     return val;
 }
 

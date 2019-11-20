@@ -36,7 +36,7 @@ void Client::cflAdd(Hashable* elem, int cnt) {
 void Client::cflAdd(int i, int cnt) {
 }
 
-void Client::onRequestReceived(http_pair_t *pair, flow_t *flow) {
+void Client::onRequestReceived(pair_t *pair, Flow* flow) {
 	reqTotal++;
 
 	//request_t *req = pair->request_header;
@@ -49,18 +49,21 @@ void Client::onRequestReceived(http_pair_t *pair, flow_t *flow) {
 
 void Client::onIntervalExpired() {
 	cflUpdate(ht);
-	sendMsg();
+	if(analysis->isServerMode()) sendMsg();
 	print();
 	cfl_delete(&cfl);
 }
 
-void Client::onNewFlowReceived(flow_t *flow) {
+void Client::onAnalysisEnded() {
 }
 
-void Client::onFlowUpdate(flow_t *flow) {
+void Client::onNewFlowReceived(Flow* flow) {
 }
 
-void Client::onResponseReceived(http_pair_t *pair, flow_t *flow) {
+void Client::onFlowUpdate(Flow* flow) {
+}
+
+void Client::onResponseReceived(pair_t *pair, Flow* flow) {
 }
 
 void Client::onTimerExpired() {

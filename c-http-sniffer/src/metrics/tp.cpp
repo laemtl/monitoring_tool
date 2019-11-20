@@ -15,18 +15,19 @@ void Tp::subscribe(EventManager* em) {
 	em->intervalExpired->add(this);
 }
 
-void Tp::onNewFlowReceived(flow_t *flow) {
+void Tp::onNewFlowReceived(Flow* flow) {
 }
 
-void Tp::onFlowUpdate(flow_t *flow) {
+void Tp::onFlowUpdate(Flow* flow) {
+	// TODO Check client / server value
 	u_int32_t payload = flow->payload_src;
 	total->set(payload);
 }
 
-void Tp::onRequestReceived(http_pair_t *pair, flow_t *flow) {
+void Tp::onRequestReceived(pair_t *pair, Flow* flow) {
 }
 
-void Tp::onResponseReceived(http_pair_t *pair, flow_t *flow) {
+void Tp::onResponseReceived(pair_t *pair, Flow* flow) {
 }
 
 void Tp::onTimerExpired() {

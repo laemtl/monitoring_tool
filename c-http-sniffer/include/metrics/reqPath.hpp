@@ -1,7 +1,7 @@
 #ifndef __REQ_PATH_H__
 #define __REQ_PATH_H__
 
-#include "analysis2.hpp"
+#include "analysis.hpp"
 #include "hashTable.hpp"
 #include "cf_list.h"
 #include "metricCumDistr.hpp"
@@ -25,12 +25,13 @@ class ReqPath: public MetricCumDistr
 
 		char* extractReqPath(const char* uri);
 
-        void onNewFlowReceived(flow_t *flow);
-		void onFlowUpdate(flow_t *flow);
-		void onRequestReceived(http_pair_t *pair, flow_t *flow);
-		void onResponseReceived(http_pair_t *pair, flow_t *flow);
+        void onNewFlowReceived(Flow* flow);
+		void onFlowUpdate(Flow* flow);
+		void onRequestReceived(pair_t *pair, Flow* flow);
+		void onResponseReceived(pair_t *pair, Flow* flow);
 		void onTimerExpired();
         void onIntervalExpired();
+		void onAnalysisEnded();
 };
 
 #endif

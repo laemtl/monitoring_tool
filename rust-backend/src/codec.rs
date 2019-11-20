@@ -21,13 +21,21 @@ impl Decoder for SnifferCodec {
     type Error = io::Error;
 
     fn decode(&mut self, src: &mut BytesMut) -> Result<Option<Self::Item>, Self::Error> {
-        let mut len = src.split_to(1);
-        if(len.len() == 0) {
+        if(src.len() == 0) {
+            //println!("len 0");
             Ok(None)
         } else {
-            let mut str = src.split_to(len[0] as usize);
-            let metric: MetricMsg = protobuf::parse_from_bytes(&str).unwrap();
-            Ok(Some(metric))
+            let mut len = src[0] as usize;
+            if(src.len() < len + 1) {
+                //println!("not enough len");
+                Ok(None)
+            } else {
+                src.split_to(1);
+                let mut str = src.split_to(len);
+                let metric: MetricMsg = protobuf::parse_from_bytes(&str).unwrap();
+                //println!("len: {}", len);
+                Ok(Some(metric))
+            }
         }
     }
 }

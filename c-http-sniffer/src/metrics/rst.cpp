@@ -9,7 +9,7 @@ void Rst::subscribe(EventManager* em) {
 	em->intervalExpired->add(this);
 }
 
-void Rst::onResponseReceived(http_pair_t *pair, flow_t *flow) {
+void Rst::onResponseReceived(pair_t *pair, Flow* flow) {
 	//if(!isActive()) return;
 
 	// Compute response time
@@ -33,14 +33,14 @@ void Rst::onTimerExpired() {
 
 }
 
-void Rst::onNewFlowReceived(flow_t *flow) {
+void Rst::onNewFlowReceived(Flow* flow) {
 
 }
 
-void Rst::onFlowUpdate(flow_t *flow) {
+void Rst::onFlowUpdate(Flow* flow) {
 
 }
 
-void Rst::onRequestReceived(http_pair_t *pair, flow_t *flow) {
+void Rst::onRequestReceived(pair_t *pair, Flow* flow) {
 
 }

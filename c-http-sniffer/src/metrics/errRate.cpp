@@ -16,7 +16,7 @@ void ErrRate::subscribe(EventManager* em) {
 	em->intervalExpired->add(this);
 }
 
-void ErrRate::onResponseReceived(http_pair_t *pair, flow_t *flow) {
+void ErrRate::onResponseReceived(pair_t *pair, Flow* flow) {
 	// total number of received response
 	subtotal->add(1);
 	total->add(1);
@@ -42,11 +42,11 @@ void ErrRate::onTimerExpired() {
 	subtotal->set(0);
 }
 
-void ErrRate::onNewFlowReceived(flow_t *flow) {
+void ErrRate::onNewFlowReceived(Flow* flow) {
 }
 
-void ErrRate::onFlowUpdate(flow_t *flow) {
+void ErrRate::onFlowUpdate(Flow* flow) {
 }
 
-void ErrRate::onRequestReceived(http_pair_t *pair, flow_t *flow) {
+void ErrRate::onRequestReceived(pair_t *pair, Flow* flow) {
 }

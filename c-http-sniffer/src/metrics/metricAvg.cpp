@@ -27,7 +27,8 @@ double MetricAvg::getAvg() {
 }
 
 void MetricAvg::print() {
-	cout << name << " (avg, min, max): " << avg->get() << " " << min->get() << " " << max->get() << endl;
+	if(analysis->debug)
+		cout << name << " (avg, min, max): " << avg->get() << " " << min->get() << " " << max->get() << endl;
 }
 
 void MetricAvg::reset() {
@@ -46,10 +47,13 @@ void MetricAvg::onTimerExpired() {
 
 void MetricAvg::onIntervalExpired() {
 	avg->set(getAvg());
-	sendMsg();
+	if(analysis->isServerMode()) sendMsg();
 	print();
 	reset();
 }	
+
+void MetricAvg::onAnalysisEnded() {
+}
 
 void MetricAvg::sendMsg() {
 	uint8_t *buf;              // Buffer to store serialized data

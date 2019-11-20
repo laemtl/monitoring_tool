@@ -16,17 +16,22 @@
 #include "analysis.hpp"
 #include "timer.h"
 
+class Config {
+    public:
+        int socket; 
+        bool debug;
+        Config(int socket, bool debug) : socket(socket), debug(debug) {};
+};
+
 void start_log(char* ipaddress);
-void start_server();
-void start_analysis(char* ipaddress, Data* data);
-int send_data(Result* result);
+void start_server(void* debug);
+void start_analysis(char* ipaddress, Analysis* analysis);
 size_t decode_varint(int sock);
 int encode_varint(uint8_t *const buffer, uint64_t value);
-void connection_handler(int *socket);
+void connection_handler(Config* config);
 void stop_server();
 void onExit(int signum);
 
-  
 /*typedef struct analysis_conn_ {
     uint32_t socket;
 } Client;*/

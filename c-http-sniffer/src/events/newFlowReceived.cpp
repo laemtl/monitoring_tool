@@ -1,6 +1,6 @@
 #include "newFlowReceived.hpp"
 
-void NewFlowReceived::notify(flow_t *flow) {
+void NewFlowReceived::notify(Flow* flow) {
     for (Observer *observer : observers) {
         observer->onNewFlowReceived(flow);
     }

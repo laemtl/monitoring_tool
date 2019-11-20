@@ -7,6 +7,7 @@
 #include "responseReceived.hpp"
 #include "timerExpired.hpp"
 #include "intervalExpired.hpp"
+#include "analysisEnded.hpp"
 
 class EventManager 
 {
@@ -19,6 +20,7 @@ class EventManager
         ResponseReceived* responseReceived;
         TimerExpired* timerExpired;
         IntervalExpired* intervalExpired;
+        AnalysisEnded* analysisEnded;
 };
 
 #endif

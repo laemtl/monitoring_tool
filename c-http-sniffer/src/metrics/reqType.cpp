@@ -25,7 +25,7 @@ void ReqType::cflAdd(int index, int cnt) {
 	}
 }
 
-void ReqType::onRequestReceived(http_pair_t *pair, flow_t *flow) {
+void ReqType::onRequestReceived(pair_t *pair, Flow* flow) {
 	reqTotal++;
     http_mthd type = pair->request_header->method;
     int* cnt = &(reqType[type]);
@@ -34,18 +34,21 @@ void ReqType::onRequestReceived(http_pair_t *pair, flow_t *flow) {
 
 void ReqType::onIntervalExpired() {
     cflUpdate(reqType, reqTypeSize);
-	sendMsg();
+	if(analysis->isServerMode()) sendMsg();
 	print();
 	cfl_delete(&cfl);
 }
 
-void ReqType::onNewFlowReceived(flow_t *flow) {
+void ReqType::onAnalysisEnded() {
 }
 
-void ReqType::onFlowUpdate(flow_t *flow) {
+void ReqType::onNewFlowReceived(Flow* flow) {
 }
 
-void ReqType::onResponseReceived(http_pair_t *pair, flow_t *flow) {
+void ReqType::onFlowUpdate(Flow* flow) {
+}
+
+void ReqType::onResponseReceived(pair_t *pair, Flow* flow) {
 }
 
 void ReqType::onTimerExpired() {

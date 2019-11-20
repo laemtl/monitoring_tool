@@ -13,7 +13,7 @@
 #include "cf_list.h"
 #include "metric.hpp"
 #include "server.h"
-#include "analysis2.hpp"
+#include "analysis.hpp"
 
 #define CFL_SIZE 100
 #define MIN_FREQ (double)1/CFL_SIZE
@@ -21,7 +21,7 @@
 class MetricCumDistr: public Metric2, public Observer
 {
 	protected:
-        hash_t ht;
+        Hash ht;
 		cf_list cfl;
 
     public:

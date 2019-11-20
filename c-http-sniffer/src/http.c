@@ -204,12 +204,12 @@ IsHttpPacket(const char *ptr, const int datalen)
 	return FALSE;
 }
 
-http_pair_t*
+pair_t*
 http_new(void)
 {
-	http_pair_t	*h = NULL;
-	h = CALLOC(http_pair_t, 1);
-	//memset(h, 0, sizeof(http_pair_t));
+	pair_t	*h = NULL;
+	h = CALLOC(pair_t, 1);
+	//memset(h, 0, sizeof(pair_t));
 	
 	return h;
 }
@@ -297,7 +297,7 @@ http_response_free(response_t *r)
 }
 
 void
-http_free(http_pair_t *h)
+pair_free(pair_t *h)
 {
 	if(h->request_header != NULL)
 		http_request_free(h->request_header);
@@ -307,7 +307,7 @@ http_free(http_pair_t *h)
 }
 
 int	
-http_add_request(http_pair_t *h, request_t *req)
+http_add_request(pair_t *h, request_t *req)
 {
 	if(h == NULL) return 2;
 
@@ -320,7 +320,7 @@ http_add_request(http_pair_t *h, request_t *req)
 }
 
 int 
-http_add_response(http_pair_t *h, response_t *rsp)
+http_add_response(pair_t *h, response_t *rsp)
 {
 	if(h->response_header == NULL){
 		h->response_header = rsp;

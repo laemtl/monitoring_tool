@@ -221,8 +221,8 @@ struct _response_t
 /*
  * HTTP request and response pair.
  */
-typedef struct _http_pair_t	http_pair_t;
-struct _http_pair_t
+typedef struct _pair_t	pair_t;
+struct _pair_t
 {
 	request_t	*request_header;
 	response_t	*response_header;
@@ -239,7 +239,7 @@ struct _http_pair_t
 	u_int32_t	req_body_len;
 	u_int32_t	rsp_body_len;
 
-	http_pair_t	*next;
+	pair_t	*next;
     BOOL req_processed;
     BOOL rsp_processed;                                     /* if the http_pair has already been processed or not */
 };
@@ -248,14 +248,14 @@ char* IsRequest(const char *p, const int datalen);	    /* If the packet carries 
 char* IsResponse(const char *p, const int datalen);	    /* If the packet carries HTTP response data */
 BOOL IsHttpPacket(const char *p, const int datalen);	/* If the packet carries HTTP(request or response) data */
 
-http_pair_t* http_new(void);						    /* Create a new http_pair_t object */
-void http_free(http_pair_t *h);			                /* Free a http_pair_t object */
+pair_t* http_new(void);						    /* Create a new pair_t object */
+void pair_free(pair_t *h);			                /* Free a pair_t object */
 request_t* http_request_new(void);				        /* Create a new request_t object */
 void http_request_free(request_t *req);	                /* Free a request_t object */
 response_t* http_response_new(void);			        /* Create a new response_t object */
 void http_response_free(response_t *rsp);			    /* Free a response_t object */
-int http_add_request(http_pair_t *h, request_t *req);	/* Add a request_t object to http_pair_t request chain */
-int http_add_response(http_pair_t *h, response_t *rsp);	/* Add a response_t object to http_pair_t response chain */
+int http_add_request(pair_t *h, request_t *req);	/* Add a request_t object to pair_t request chain */
+int http_add_response(pair_t *h, response_t *rsp);	/* Add a response_t object to pair_t response chain */
 
 //int http_parse_request(request_t *request, const char *data, const char *dataend,char* time, long bytes);		/* Parse the packet and store in a request_t object */
 int http_parse_request(request_t *request, const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq);   /* Parse the packet and store in a request_t object */

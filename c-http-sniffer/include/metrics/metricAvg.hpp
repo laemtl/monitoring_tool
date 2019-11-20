@@ -6,7 +6,7 @@
 #include "value.hpp"
 #include "observer.hpp"
 #include <stdio.h>
-#include "analysis2.hpp"
+#include "analysis.hpp"
 #include "server.h"
 
 /*class MAItem {
@@ -44,6 +44,7 @@ class MetricAvg : public Metric2, public Observer
 		void print();
 		void onTimerExpired();
 		void onIntervalExpired();
+		void onAnalysisEnded();
 		void prepareMsg(double avg, double min, double max);
 		void sendMsg(); 
 };

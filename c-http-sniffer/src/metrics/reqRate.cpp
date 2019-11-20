@@ -17,11 +17,11 @@ double ReqRate::getAvg() {
 	return sum->get()/analysis->interval;
 }
 
-void ReqRate::onRequestReceived(http_pair_t *pair, flow_t *flow) {
+void ReqRate::onRequestReceived(pair_t *pair, Flow* flow) {
 	subtotal->add(1);
 }
 
-void ReqRate::onResponseReceived(http_pair_t *pair, flow_t *flow) {
+void ReqRate::onResponseReceived(pair_t *pair, Flow* flow) {
 }
 
 void ReqRate::onTimerExpired() {
@@ -33,8 +33,8 @@ void ReqRate::onTimerExpired() {
 	subtotal->set(0);
 }
 
-void ReqRate::onNewFlowReceived(flow_t *flow) {
+void ReqRate::onNewFlowReceived(Flow* flow) {
 }
 
-void ReqRate::onFlowUpdate(flow_t *flow) {
+void ReqRate::onFlowUpdate(Flow* flow) {
 }

@@ -11,29 +11,35 @@
 #include "analysis.hpp" 
 
 // These defines come from asm-generic/siginfo.h, are necessary, but are not included by signal.h.
-#define sigev_notify_function	_sigev_un._sigev_thread._function
-#define sigev_notify_attributes	_sigev_un._sigev_thread._attribute
 #define sigev_notify_thread_id	_sigev_un._tid
 
 #define PERIOD_SIG SIGRTMIN
 #define CLOCKID CLOCK_REALTIME
 #define SIG SIGRTMIN
 
-void stop_analysis(int sig) {
-	Data* data = {0};
-	get_data(&data);
 
-	data->status = -1;
-
-	//timer_delete(tid);
+void stop_analysis(void* a) {
+	Analysis* analysis = (Analysis*) a;
+	analysis->eventManager->analysisEnded->notify();
 	pthread_exit(NULL);
 }
 
-static pid_t gettid(void) {
-	return syscall(SYS_gettid);
+void processData(void* a) {
+	Analysis* analysis = (Analysis*) a;
+	analysis->int_step++;
+
+	// The completed flow are processed by extract_data every seconds
+	// We process the ones in the hash table using the following function 	
+	analysis->flowHashProcess();
+	analysis->eventManager->timerExpired->notify();
+	 
+	if(analysis->int_step < analysis->interval) return;
+
+	analysis->eventManager->intervalExpired->notify();
+	analysis->int_step = 0;
 }
 
-void create_timer(long start, long interval, int* status, void (*callback) (int)) {
+void create_timer(long start, long interval, Analysis* analysis, void (*callback) (void*)) {
 	sigset_t mask;
 	int sig;
 	timer_t timerid;
@@ -46,8 +52,8 @@ void create_timer(long start, long interval, int* status, void (*callback) (int)
 	its.it_interval.tv_sec = interval;
 	its.it_interval.tv_nsec = 0;
 
-	while(*status < 1) 
-		nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
+	//while(analysis->status < 1) 
+	//	nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
 
 	// by default, SIGCHLD is set to be ignored so unless we happen
     // to be blocked on sigwaitinfo() at the time that SIGCHLD
@@ -56,24 +62,27 @@ void create_timer(long start, long interval, int* status, void (*callback) (int)
     // above, it will not affect us.  At the same time we will make
     // it a queued signal so that if more than one are set on us,
     // sigwaitinfo() will get them all.
-	struct sigaction sa;
+	//struct sigaction sa;
 	// Install timer_handler as the signal handler for SIGALRM.
-	memset (&sa, 0, sizeof (sa));
-	sa.sa_handler = &stop_analysis;
-	sigaction (PERIOD_SIG, &sa, NULL);
+	//memset (&sa, 0, sizeof (sa));
+	//sa.sa_handler = &stop_analysis;
+	//sigaction (PERIOD_SIG, &sa, NULL);
 	
-	se.sigev_notify = SIGEV_THREAD_ID;
-	se.sigev_signo = PERIOD_SIG;
-	se.sigev_notify_thread_id = gettid();
-  	se.sigev_value.sival_ptr = callback;
+	se.sigev_notify = SIGEV_THREAD;
+	//se.sigev_signo = PERIOD_SIG;
+
+	//se.sigev_notify_thread_id = gettid();
+	se.sigev_notify_function = callback;
+  	se.sigev_value.sival_ptr = (void*)analysis;
+	se.sigev_notify_attributes = NULL;
 
 	/* Bloque le signal PERIOD_SIG pour le thread appelant uniquement */
-	if (sigemptyset(&mask) ||
+	/*if (sigemptyset(&mask) ||
 	    sigaddset(&mask, PERIOD_SIG) ||
 	    sigprocmask(SIG_BLOCK, &mask, NULL))
-		pthread_exit((void *) 10);
+		pthread_exit((void *) 10);*/
 
-	if (timer_create(CLOCK_REALTIME, &se, &timerid)) {
+	if (timer_create(CLOCK_REALTIME, &se, &timerid) == -1) {
 		error("Error with timer_create\n");
 	}
 	
@@ -81,8 +90,9 @@ void create_timer(long start, long interval, int* status, void (*callback) (int)
 		error("Error with timer_settime\n");
 	}
 
-	while (1) {
-		if ((sig = sigwaitinfo(&mask, &si)) < 0) {
+	while (!analysis->isStopped()) usleep(100);
+
+		/*if ((sig = sigwaitinfo(&mask, &si)) < 0) {
 			error("Error with sigwaitinfo\n");
 		}
 			
@@ -90,30 +100,23 @@ void create_timer(long start, long interval, int* status, void (*callback) (int)
 			// printf("signal: %d", sig);
 			continue;
 		}
+		
+		callback(analysis);*/
 
-		callback(0);
-		//callback(timerid);
-	}
+	timer_delete(timerid);
 }
 
-void start_duration_timer(Data* data) {
-	thread_init(data);
-	create_timer(data->duration, 0, &(data->status), stop_analysis);
+void start_duration_timer(Analysis* analysis) {
+	create_timer(analysis->duration, 0, analysis, stop_analysis);
 }
 
-void start_interval_timer(uint32_t interval, int* status) {
-	create_timer(interval, interval, status, process_data);
-}
-
-void start_timer(Data* data) {
-	thread_init(data);
-        
-    pthread_t timer_duration;
-    if(data->duration > 0) {	    
-	    pthread_create(&timer_duration, NULL, (void*)start_duration_timer, data);
+void start_timer(Analysis* analysis) {
+	pthread_t timer_duration;
+    if(analysis->duration > 0) {	    
+	    pthread_create(&timer_duration, NULL, (void*)start_duration_timer, analysis);
 		pthread_detach(timer_duration);
     }
 
 	// start an interval timer wich fires every seconds to compute rates
-	start_interval_timer(1, &(data->status));
+	create_timer(1, 1, analysis, processData);
 }

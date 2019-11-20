@@ -60,8 +60,8 @@ MetricCumDistr::MetricCumDistr(Analysis* analysis, string name, string desc)
 }
 
 MetricCumDistr::~MetricCumDistr() {
-	hash_clear(&ht);
-	hash_reset(&ht);
+	ht.clear();
+	ht.reset();
 }
 
 void MetricCumDistr::subscribe(EventManager* em) {
@@ -70,16 +70,18 @@ void MetricCumDistr::subscribe(EventManager* em) {
 }
 
 void MetricCumDistr::print() {
-	cout << name << endl;
+	if(analysis->debug) {
+		cout << name << endl;
 
-	cout << "count: " << cfl.count << endl;
-	for(int i = 0; i < cfl.count; i++) {
-        printf("name: %s \n", cfl.list[i].name);
-        printf("freq: %f \n", cfl.list[i].c_freq);
-    }
+		cout << "count: " << cfl.count << endl;
+		for(int i = 0; i < cfl.count; i++) {
+			printf("name: %s \n", cfl.list[i].name);
+			printf("freq: %f \n", cfl.list[i].c_freq);
+		}
 
-	//print_cfl(&(cfl));
-	printf("\n");
+		//print_cfl(&(cfl));
+		printf("\n");
+	}
 }
 
 void MetricCumDistr::cflUpdate(Hash* ht) {
@@ -145,6 +147,7 @@ void MetricCumDistr::sendMsg() {
 	// send
 	if(send(analysis->socket, buf, varint_len_len + msg_len, MSG_NOSIGNAL) < 0) {
 		cout << "Error sending response for metric" << name << endl;
+		perror("\nError is: ");
 		error("Error sending response\n");
 	} 
 

@@ -3,11 +3,11 @@
 
 #include "event.hpp"
 #include "observer.hpp"
-#include "flow.h"
+#include "flow.hpp"
 
 class RequestReceived: public Event {
     public:
-        void notify(http_pair_t *pair, flow_t *flow);
+        void notify(pair_t *pair, Flow *flow);
 };
 
 #endif

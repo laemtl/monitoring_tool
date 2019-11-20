@@ -3,11 +3,11 @@
 
 #include "event.hpp"
 #include "observer.hpp"
-#include "flow.h"
+#include "flow.hpp"
 
 class FlowUpdate: public Event {
     public:
-        void notify(flow_t *flow);
+        void notify(Flow *flow);
 };
 
 #endif

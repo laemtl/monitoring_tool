@@ -8,12 +8,13 @@
 #include <errno.h>
 #include <signal.h> 
 #include <inttypes.h>
+#include <limits>
 
 #include "raw_packet.h"
-#include "flow.h"
+#include "flow.hpp"
 #include "util.h"
 #include "server.h"
-#include "flow_hash_table.h"
+#include "flowHashTable.hpp"
 #include "timer.h"
 
 int pak = 0;
@@ -26,21 +27,17 @@ int raw_rsp = 0;
 int flow_req = 0;
 int flow_rsp = 0;
 
-BOOL debug = FALSE;
-
 //int GP_CAP_FIN = 0; /* Flag for offline PCAP sniffing */
 
 void
-debugging_print(Data* data){
-	thread_init(data);
-
+debugging_print(Analysis* analysis){
 	while(1){
-		if ( data->status < 0) {
+		if (analysis->status < 0) {
 			break;
 		} else {
-			packet_queue_print();
-			flow_hash_print();
-			flow_queue_print();
+			analysis->pq->print();
+			analysis->fht->print();
+			analysis->fq->print();
 			sleep(1);
 		}
 	}
@@ -127,6 +124,8 @@ packet_preprocess(char *raw_data, const struct pcap_pkthdr *pkthdr)
 	if( !(tcp_hdr->th_sport == 80 || tcp_hdr->th_dport == 80 || \
 		tcp_hdr->th_sport == 8080 || tcp_hdr->th_dport == 8080 || \
 		tcp_hdr->th_sport == 8000 || tcp_hdr->th_dport == 8000)){
+
+		// 11211
 		
 		free_ethhdr(eth_hdr);
 		free_iphdr(ip_hdr);
@@ -162,9 +161,6 @@ packet_preprocess(char *raw_data, const struct pcap_pkthdr *pkthdr)
 			char *head_end = NULL;
 			//int hdl = 0;
 			head_end = IsRequest(cp, pkt->tcp_dl);
-			
-			Data* data = {0};
-	        get_data(&data);
 			
 			if( head_end != NULL ){
 				/* First packet of request. */
@@ -206,23 +202,21 @@ packet_preprocess(char *raw_data, const struct pcap_pkthdr *pkthdr)
 	return pkt;
 }
 
-void process_packet(Data* data) {
-	thread_init(data);
-
+void process_packet(Analysis* analysis) {
 	packet_t *packet = NULL;
 	raw_pkt *rpkt = NULL;
 	
 	while(1){
-		rpkt = (raw_pkt*)queue_deq(&(data->raw_pkt_queue));
+		rpkt = (raw_pkt*)analysis->rpq->deq();
 		
-		if (data->status < 0 && rpkt == NULL) {
+		if (analysis->isStopped() && rpkt == NULL) {
 			break;
 		} else if (rpkt != NULL){
 			packet = packet_preprocess(rpkt->raw, &(rpkt->pkthdr));
 			raw_packet_free(rpkt);
 
 			if (NULL != packet){
-				packet_queue_enq(packet);
+				analysis->pq->enq(packet);
 			}
 			continue;
 		} else {
@@ -236,16 +230,15 @@ void process_packet(Data* data) {
  * Fetch a packet from packet queue and add it to any flow.
  */
 int
-process_packet_queue(Data* data){
+process_packet_queue(Analysis* analysis){
 	packet_t *pkt = NULL;
-	thread_init(data);
-
+	
 	while(1){
-		pkt = packet_queue_deq();
-		if ( data->status < 0 ) {
+		pkt = analysis->pq->deq();
+		if (analysis->isStopped()) {
 			break;
 		} else if (pkt != NULL){
-			flow_hash_add_packet(pkt);
+			analysis->fht->add_packet(pkt);
 			pak_deq++;
 			
 			continue;
@@ -261,19 +254,18 @@ process_packet_queue(Data* data){
  * Fetch a flow from flow queue and process it
  */
 int
-process_flow_queue(Data* data){
-	flow_t	*flow = NULL;
-	thread_init(data);
-
+process_flow_queue(Analysis* analysis){
+	Flow *flow = NULL;
+	
 	while(1){
-		flow = flow_queue_deq();
+		flow = analysis->fq->deq();
 
-		if (data->status < 0) {
+		if (analysis->status < 0) {
 			break;
 		} else if(flow != NULL){
-			flow_extract_http(flow, TRUE);
-			extract_data(flow);
-			flow_free(flow);
+			flow->extract_http(TRUE);
+			analysis->extractData(flow);
+			delete flow;
 			continue;
 		} else {
 			nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
@@ -287,19 +279,18 @@ process_flow_queue(Data* data){
  * Scrub flow hash table to forcely close dead flows.
  */
 void
-scrubbing_flow_htbl(Data* data){
+scrubbing_flow_htbl(Analysis* analysis){
 	int num;
-	thread_init(data);
 
 	while(1){
 		sleep(10);
-		if (data->status == 1){
-			num = flow_scrubber(60*10);	// flow timeout in seconds
-			printf("Cleaned: %d flows \n", num);
-		} else if (data->status == -1){
-			num = flow_scrubber(-1); // cleanse all flows
+		if (analysis->isStopped()){
+			num = analysis->fht->flow_scrubber(-1); // cleanse all flows
 			printf("Cleaned: %d flows \n", num);
 			break;
+		} else {
+			num = analysis->fht->flow_scrubber(60*10);	// flow timeout in seconds
+			printf("Cleaned: %d flows \n", num);
 		}
 	}
 	pthread_exit(NULL);
@@ -309,18 +300,14 @@ scrubbing_flow_htbl(Data* data){
  * Main capture function
  */
 int
-capture_main(void* p){
+capture_main(void* a){
 	char errbuf[PCAP_ERRBUF_SIZE];
 	memset(errbuf, 0, PCAP_ERRBUF_SIZE);
 	pcap_t *cap = NULL;
 	
-	Capture* param = (Capture*) p;
-	Data* data = param->data;
-	const char* interface = data->interface;
-	int livemode = param->livemode;
-	
-	thread_init(data);
-	raw_pkt_queue_init();
+	Analysis* analysis = (Analysis*) a;
+	const char* interface = analysis->interface;
+	int livemode = analysis->livemode;
 
 	const u_char *raw = NULL;
 	struct pcap_pkthdr pkthdr;
@@ -335,7 +322,7 @@ capture_main(void* p){
 
 	if( cap == NULL) {
 		printf("errbuf %s\n", errbuf); 
-		data->status = -1;
+		analysis->stop();
 		pthread_exit(NULL);
 	}
 
@@ -350,7 +337,7 @@ capture_main(void* p){
 		// 4 bytes CRC is stripped
 		if(len < 54) continue;
 
-		if ( livemode == 0 || data->status < 0) {
+		if ( livemode == 0 || analysis->status < 0) {
 			//GP_CAP_FIN = 1;
 			break;
 		} else if( NULL != raw){
@@ -361,7 +348,7 @@ capture_main(void* p){
 			memcpy(r, raw, len);
 			pkt2->raw = r;
 
-			queue_enq(&(data->raw_pkt_queue), pkt2);
+			analysis->rpq->enq(pkt2);
 			pak++;
 		} else {
 			nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
@@ -374,7 +361,7 @@ capture_main(void* p){
 	return 0;
 }
 
-void start_analysis(char* ipaddress, Data* data) {
+void start_analysis(char* ipaddress, Analysis* analysis) {
 	void *thread_result;
 	time_t start, end;
 	time(&start);
@@ -389,39 +376,30 @@ void start_analysis(char* ipaddress, Data* data) {
 	pthread_t job_debug_p;
 #endif
 
-	Capture* param = CALLOC(Capture, 1);
-	//param->fd = ipaddress;
-	param->livemode = 1;
-	param->data = data;
-
+	analysis->livemode = 1;
+	
 	printf("Http-sniffer started: %s", ctime(&start));
 
-	/* Initialization of packet and flow data structures */
-	
-	packet_queue_init((void*)data);
-	flow_init((void*)data);
-	data->status = 1;
-
 	/* Start packet receiving thread */
-	pthread_create(&job_pkt, NULL, (void*)process_packet, data);
+	pthread_create(&job_pkt, NULL, (void*)process_packet, analysis);
 	
 	/* Start packet receiving thread */
-	pthread_create(&job_pkt_q, NULL, (void*)process_packet_queue, data);
+	pthread_create(&job_pkt_q, NULL, (void*)process_packet_queue, analysis);
 	
 	/* Start dead flow cleansing thread */
-	pthread_create(&job_scrb_htbl, NULL, (void*)scrubbing_flow_htbl, data);
+	pthread_create(&job_scrb_htbl, NULL, (void*)scrubbing_flow_htbl, analysis);
 
 	/* Start flow processing thread */
-	pthread_create(&job_flow_q, NULL, (void*)process_flow_queue, data);
+	pthread_create(&job_flow_q, NULL, (void*)process_flow_queue, analysis);
 
-	pthread_create(&timer, NULL, (void*)start_timer, data);
+	pthread_create(&timer, NULL, (void*)start_timer, analysis);
 
 #if DEBUGGING == 1
-	pthread_create(&job_debug_p, NULL, (void*)debugging_print, data);
+	pthread_create(&job_debug_p, NULL, (void*)debugging_print, analysis);
 #endif
 
 	/* Start main capture in live or offline mode */
-	pthread_create(&capture, NULL, (void*)capture_main, param);
+	pthread_create(&capture, NULL, (void*)capture_main, analysis);
 
 	// Wait for all threads to finish
 	pthread_join(timer, NULL);
@@ -430,7 +408,7 @@ void start_analysis(char* ipaddress, Data* data) {
 	pthread_join(job_flow_q, &thread_result);
 	pthread_join(job_scrb_htbl, &thread_result);
 	pthread_join(job_pkt, &thread_result);
-	
+
 #if DEBUGGING == 1
 	pthread_join(job_debug_p, &thread_result);
 #endif
@@ -438,21 +416,11 @@ void start_analysis(char* ipaddress, Data* data) {
 	time(&end);
 	printf("Time elapsed: %d s\n", (int)(end - start));
 
-	//if(data == NULL) printf("Data is NULL \n");
-	
-	flow_hash_clear(data);
-	flow_hash_reset(data);
-	delete_data(data);
-	//data = NULL;
-
-	free(param);
-	//param = NULL;
+	analysis->fht->clear();
+	analysis->fht->reset();
 }
 
 void sigintHandler(int sig_num) { 
-    Data* data = {0};
-	get_data(&data);
-	
 	signal(SIGINT, sigintHandler); 
     printf("pak: %d \n", pak);
 	printf("dpak: %d \n", pak_deq);
@@ -474,6 +442,7 @@ int main(int argc, char *argv[]){
 	char* interface = NULL;
 	char* ipaddress = NULL;
 	int opt;
+	bool debug = false;
 
 	signal(SIGINT, sigintHandler);
 	printf("My process ID : %d\n", getpid());
@@ -488,7 +457,7 @@ int main(int argc, char *argv[]){
 			case 'p':
 				ipaddress = optarg; break;
 			case 'd':
-				debug = TRUE; break;
+				debug = true; break;
 		}
 	}
     
@@ -496,16 +465,14 @@ int main(int argc, char *argv[]){
 	if (interface == NULL){
 		/* Start server thread */
 		pthread_t job_server;
-		pthread_create(&job_server, NULL, (void*)start_server, NULL);
+		pthread_create(&job_server, NULL, (void*)start_server, &debug);
 		pthread_join(job_server, NULL);
 	
 	// Interface is provided - RUN in app mode
 	} else {		
-		Data* data = init_data();
-		thread_init(data);
-		data->interface = interface;
-        data->interval = 5;
-		start_analysis(ipaddress, data);
+		Analysis* analysis = new Analysis(-1, interface, 5, 600, false, debug);
+		analysis->activeMetrics(std::numeric_limits<int>::max());
+		start_analysis(ipaddress, analysis);
 	}
 
 	return 0;

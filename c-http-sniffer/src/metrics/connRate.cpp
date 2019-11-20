@@ -10,7 +10,7 @@ void ConnRate::subscribe(EventManager* em) {
 	em->intervalExpired->add(this);
 }
 
-void ConnRate::onNewFlowReceived(flow_t *flow) { 	
+void ConnRate::onNewFlowReceived(Flow* flow) { 	
 	subtotal->add(1);
 }
 
@@ -29,11 +29,11 @@ void ConnRate::onTimerExpired() {
 	MetricAvg::onTimerExpired();
 }
 
-void ConnRate::onFlowUpdate(flow_t *flow) {
+void ConnRate::onFlowUpdate(Flow* flow) {
 }
 
-void ConnRate::onRequestReceived(http_pair_t *pair, flow_t *flow) {
+void ConnRate::onRequestReceived(pair_t *pair, Flow* flow) {
 }
 
-void ConnRate::onResponseReceived(http_pair_t *pair, flow_t *flow) {
+void ConnRate::onResponseReceived(pair_t *pair, Flow* flow) {
 }

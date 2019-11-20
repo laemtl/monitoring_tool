@@ -25,23 +25,26 @@ void RspStatus::cflAdd(int index, int cnt) {
 	}
 }
 
-void RspStatus::onRequestReceived(http_pair_t *pair, flow_t *flow) {
+void RspStatus::onRequestReceived(pair_t *pair, Flow* flow) {
 }
 
 void RspStatus::onIntervalExpired() {
 	cflUpdate(rspStatus, rspStatusSize);
-	sendMsg();
+	if(analysis->isServerMode()) sendMsg();
 	print();
 	cfl_delete(&cfl);
 }
 
-void RspStatus::onNewFlowReceived(flow_t *flow) {
+void RspStatus::onAnalysisEnded() {
 }
 
-void RspStatus::onFlowUpdate(flow_t *flow) {
+void RspStatus::onNewFlowReceived(Flow* flow) {
 }
 
-void RspStatus::onResponseReceived(http_pair_t *pair, flow_t *flow) {
+void RspStatus::onFlowUpdate(Flow* flow) {
+}
+
+void RspStatus::onResponseReceived(pair_t *pair, Flow* flow) {
 	rspTotal++;
     
     // Atomic increment
