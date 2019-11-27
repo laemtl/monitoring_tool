@@ -203,6 +203,7 @@ int Flow::add_packet(packet_t *packet, register bool src){
             pthread_mutex_unlock(&(hmb->mutex));
             return 1;
         }else{
+            packet->type = 0;
             cal_packet(packet, src);
             packet_free(packet);
             close = true;
@@ -219,9 +220,11 @@ int Flow::add_packet(packet_t *packet, register bool src){
             ack2_usec = packet->cap_usec;
             /* round trip time in microsecond */
             rtt = (ack2_sec - syn_sec) * 1000000 + (ack2_usec - syn_usec);
-
+            
+            packet->type = 0;
             cal_packet(packet, src);
             packet_free(packet);
+            
             pthread_mutex_unlock(&(hmb->mutex));
             return 0;
         }
@@ -236,6 +239,7 @@ int Flow::add_packet(packet_t *packet, register bool src){
             close = SERVER_CLOSE;
         }	
 
+        packet->type = 0;
         cal_packet(packet, src);
         packet_free(packet);
 
@@ -256,6 +260,8 @@ int Flow::add_packet(packet_t *packet, register bool src){
             /* syn */
             syn_sec = packet->cap_sec;
             syn_usec = packet->cap_usec;
+
+            packet->type = 0;
             cal_packet(packet, src);
             packet_free(packet);
         } else {
@@ -264,6 +270,8 @@ int Flow::add_packet(packet_t *packet, register bool src){
                 reset();		// Reset flow
                 syn_sec = packet->cap_sec;
                 syn_usec = packet->cap_usec;
+
+                packet->type = 0;
                 cal_packet(packet, src);
                 packet_free(packet);
             } else {
@@ -275,6 +283,7 @@ int Flow::add_packet(packet_t *packet, register bool src){
                     hook_packet(packet, src);
                     cal_packet(packet,src);
                 }else{
+                    packet->type = 0;
                     cal_packet(packet, src);
                     packet_free(packet);
                 }
@@ -289,6 +298,7 @@ int Flow::add_packet(packet_t *packet, register bool src){
             hook_packet(packet, src);
             cal_packet(packet, src);
         }else{
+            packet->type = 0;
             cal_packet(packet, src);
             packet_free(packet);
         }
