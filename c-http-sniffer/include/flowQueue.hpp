@@ -10,8 +10,8 @@
 #include <unistd.h>
 
 #include "util.h"
-#include "flow.hpp"
 
+class Flow;
 class FlowQueue {
 	public:
 		pthread_mutex_t mutex;
@@ -26,5 +26,7 @@ class FlowQueue {
 		int len();
 		void print();
 };
+
+#include "flow.hpp"
 
 #endif

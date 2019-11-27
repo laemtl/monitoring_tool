@@ -125,10 +125,10 @@ int FlowHashTable::add_packet(packet_t *packet) {
 			* New flow record.
 			*/
 			// check if we have the first packet of either a request or response
-			if(packet->http == HTTP_REQ) {
+			if(packet->type == REQ) {
 				f = create(cs);
 				f->add_packet(packet, 1);
-			} else if(packet->http == HTTP_RSP) {
+			} else if(packet->type == RSP) {
 				// Invert source and destination
 				cs.saddr = packet->daddr;
 				cs.sport = packet->dport;

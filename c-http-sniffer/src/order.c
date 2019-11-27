@@ -50,9 +50,9 @@ seq_t *seq_pkt(packet_t *p){
 	s = CALLOC(seq_t, 1);
 	s->pkt = p;
 	if ((p->tcp_flags & TH_ACK) == TH_ACK)
-		s->ack = TRUE;
+		s->ack = true;
 	else
-		s->ack = FALSE;
+		s->ack = false;
 	s->next = NULL;
 	s->seq = p->tcp_seq;
 	if((p->tcp_flags & TH_SYN) == TH_SYN || (p->tcp_flags & TH_FIN) == TH_FIN){

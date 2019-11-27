@@ -3,12 +3,11 @@
 
 #include <vector>
 #include <algorithm>
-#include "observer.hpp"
 
 using namespace std;
 
-class Event
-{
+class Observer;
+class Event {
     protected:
         vector<Observer*> observers;
     public:

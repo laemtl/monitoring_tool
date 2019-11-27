@@ -23,7 +23,7 @@ class MAValue : public MetricValue
 using namespace std; 
 
 //class Analysis;
-class MetricAvg : public Metric2, public Observer
+class MetricAvg : public Metric, public Observer
 {
 	protected:
 		Value* subtotal;
@@ -37,7 +37,7 @@ class MetricAvg : public Metric2, public Observer
         Value* max;
 
     public:
-		MetricAvg(Analysis* analysis, string name, string desc);
+		MetricAvg(Protocol* protocol, Analysis* analysis, string name, string desc);
 		void subscribe(EventManager* em);
 		virtual void reset();
 		virtual double getAvg();

@@ -18,7 +18,7 @@ class ReqPath: public MetricCumDistr
 		Hash* ht;
 
 	public:
-		ReqPath(Analysis* analysis);
+		ReqPath(Protocol* protocol, Analysis* analysis);
         void subscribe(EventManager* em);
         void cflAdd(Hashable* elem, int cnt);
 		void cflAdd(int i, int cnt);
@@ -27,8 +27,8 @@ class ReqPath: public MetricCumDistr
 
         void onNewFlowReceived(Flow* flow);
 		void onFlowUpdate(Flow* flow);
-		void onRequestReceived(pair_t *pair, Flow* flow);
-		void onResponseReceived(pair_t *pair, Flow* flow);
+		void onRequestReceived(Pair *pair, Flow* flow);
+		void onResponseReceived(Pair *pair, Flow* flow);
 		void onTimerExpired();
         void onIntervalExpired();
 		void onAnalysisEnded();

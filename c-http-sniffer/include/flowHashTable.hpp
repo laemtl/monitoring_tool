@@ -9,10 +9,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include "flow.hpp"
 #include "util.h"
 #include "packet.h"
-#include "queue.hpp"
 
 #define HASH_SIZE	13200
 
@@ -20,6 +18,23 @@
 ( (flow_socket.sport & 0xff) | ((flow_socket.dport & 0xff) << 8) | \
   ((flow_socket.saddr & 0xff) << 16) | ((flow_socket.daddr & 0xff) << 24) \
 ) % HASH_SIZE)
+
+class Flow;
+class Queue;
+struct _flow_s;
+typedef struct _flow_s	flow_s;
+
+/**
+ * Hash management block
+ */
+typedef struct _hash_mb_t hash_mb_t;
+struct _hash_mb_t
+{
+	Flow	*first;
+	Flow	*last;
+	pthread_mutex_t mutex;
+	int		elm_cnt;
+};
 
 class FlowHashTable {
 	public:
@@ -40,5 +55,8 @@ class FlowHashTable {
 		int flow_scrubber(const int timeout);
 		void print();
 };
+
+#include "flow.hpp"
+#include "queue.hpp"
 
 #endif

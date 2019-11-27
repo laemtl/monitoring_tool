@@ -1,8 +1,10 @@
 #include "reqType.hpp"
+#include "http.hpp"
 
-ReqType::ReqType(Analysis* analysis) 
-: MetricCumDistr(analysis, "req_type", "Request type"), reqTotal(0) {
-	reqTypeSize = sizeof(reqType)/sizeof(reqType[0]);
+ReqType::ReqType(Protocol* protocol, Analysis* analysis) 
+: MetricCumDistr(protocol, analysis, "req_type", "Request type"), reqTotal(0) {
+	reqTypeSize = protocol->getMethodCount();
+	reqType = new int[reqTypeSize]{};
 }
 
 void ReqType::subscribe(EventManager* em) {
@@ -19,15 +21,15 @@ void ReqType::cflAdd(int index, int cnt) {
 
 	if(freq > MIN_FREQ) {
         // Item is freed on cfl_delete so we need a copy
-        char* type = HTTP_METHOD_STRING_ARRAY[index];
+        char* type = protocol->getMethodName(index);
         char* reqType = strdup(type);
 		cfl_add(reqType, freq, &cfl);	
 	}
 }
 
-void ReqType::onRequestReceived(pair_t *pair, Flow* flow) {
+void ReqType::onRequestReceived(Pair *pair, Flow* flow) {
 	reqTotal++;
-    http_mthd type = pair->request_header->method;
+    Method type = ((_http::Request*)pair->request_header)->method;
     int* cnt = &(reqType[type]);
     __atomic_fetch_add(cnt, 1, __ATOMIC_SEQ_CST);
 }
@@ -48,7 +50,7 @@ void ReqType::onNewFlowReceived(Flow* flow) {
 void ReqType::onFlowUpdate(Flow* flow) {
 }
 
-void ReqType::onResponseReceived(pair_t *pair, Flow* flow) {
+void ReqType::onResponseReceived(Pair *pair, Flow* flow) {
 }
 
 void ReqType::onTimerExpired() {

@@ -1,16 +1,15 @@
 #ifndef __EVENT_MANAGER_H__
 #define __EVENT_MANAGER_H__
 
-#include "newFlowReceived.hpp"
-#include "flowUpdate.hpp"
-#include "requestReceived.hpp"
-#include "responseReceived.hpp"
-#include "timerExpired.hpp"
-#include "intervalExpired.hpp"
-#include "analysisEnded.hpp"
+class NewFlowReceived;
+class FlowUpdate;
+class RequestReceived;
+class ResponseReceived;
+class TimerExpired;
+class IntervalExpired;
+class AnalysisEnded;
 
-class EventManager 
-{
+class EventManager {
     public:
         EventManager();
 
@@ -22,5 +21,13 @@ class EventManager
         IntervalExpired* intervalExpired;
         AnalysisEnded* analysisEnded;
 };
+
+#include "newFlowReceived.hpp"
+#include "flowUpdate.hpp"
+#include "requestReceived.hpp"
+#include "responseReceived.hpp"
+#include "timerExpired.hpp"
+#include "intervalExpired.hpp"
+#include "analysisEnded.hpp"
 
 #endif

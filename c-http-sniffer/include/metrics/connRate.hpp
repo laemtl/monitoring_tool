@@ -12,12 +12,12 @@
 class ConnRate: public MetricAvg
 {
 	public:
-		ConnRate(Analysis* analysis);
+		ConnRate(Protocol* protocol, Analysis* analysis);
 		void subscribe(EventManager* em);
     	void onNewFlowReceived(Flow* flow);
 		void onFlowUpdate(Flow* flow);
-		void onRequestReceived(pair_t *pair, Flow* flow);
-		void onResponseReceived(pair_t *pair, Flow* flow);
+		void onRequestReceived(Pair *pair, Flow* flow);
+		void onResponseReceived(Pair *pair, Flow* flow);
 		void onTimerExpired();
 
 		double getAvg();

@@ -2,8 +2,8 @@
 #include "metricAvg.hpp"
 #include <inttypes.h>
 
-MetricAvg::MetricAvg(Analysis* analysis, string name, string desc) 
-: Metric2(analysis, name, desc) {
+MetricAvg::MetricAvg(Protocol* protocol, Analysis* analysis, string name, string desc) 
+: Metric(protocol, analysis, name, desc) {
 	subtotal = new Value();
     total = new Value();
     subsum = new Value();

@@ -1,8 +1,10 @@
 #include "rspStatus.hpp"
+#include "http.hpp"
 
-RspStatus::RspStatus(Analysis* analysis)
-: MetricCumDistr(analysis, "rsp_status", "Response status"), rspTotal(0) {
-	rspStatusSize = sizeof(rspStatus)/sizeof(rspStatus[0]);
+RspStatus::RspStatus(Protocol* protocol, Analysis* analysis)
+: MetricCumDistr(protocol, analysis, "rsp_status", "Response status"), rspTotal(0) {
+	rspStatusSize = protocol->getStatusCount();
+	rspStatus = new int[rspStatusSize]{};
 }
 
 void RspStatus::subscribe(EventManager* em) {
@@ -25,12 +27,12 @@ void RspStatus::cflAdd(int index, int cnt) {
 	}
 }
 
-void RspStatus::onRequestReceived(pair_t *pair, Flow* flow) {
+void RspStatus::onRequestReceived(Pair *pair, Flow* flow) {
 }
 
 void RspStatus::onIntervalExpired() {
 	cflUpdate(rspStatus, rspStatusSize);
-	if(analysis->isServerMode()) sendMsg();
+	if(protocol->analysis->isServerMode()) sendMsg();
 	print();
 	cfl_delete(&cfl);
 }
@@ -44,11 +46,11 @@ void RspStatus::onNewFlowReceived(Flow* flow) {
 void RspStatus::onFlowUpdate(Flow* flow) {
 }
 
-void RspStatus::onResponseReceived(pair_t *pair, Flow* flow) {
+void RspStatus::onResponseReceived(Pair *pair, Flow* flow) {
 	rspTotal++;
     
     // Atomic increment
-    response_t *rsp = pair->response_header;					
+    _http::Response *rsp = (_http::Response*)pair->response_header;					
     int status = rsp->status;
 
     int* cnt = &(rspStatus[status]);

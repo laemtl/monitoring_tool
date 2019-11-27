@@ -12,11 +12,11 @@ class RspStatus : public MetricCumDistr
 	private:
 		int rspTotal;
         //int flow_tot;
-        int rspStatus[599] = {0};
+        int* rspStatus;
         int rspStatusSize;
 
 	public:
-		RspStatus(Analysis* analysis);
+		RspStatus(Protocol* protocol, Analysis* analysis);
         void subscribe(EventManager* em);
 
         void cflAdd(Hashable* elem, int cnt);
@@ -25,8 +25,8 @@ class RspStatus : public MetricCumDistr
 
         void onNewFlowReceived(Flow* flow);
 		void onFlowUpdate(Flow* flow);
-		void onRequestReceived(pair_t *pair, Flow* flow);
-		void onResponseReceived(pair_t *pair, Flow* flow);
+		void onRequestReceived(Pair *pair, Flow* flow);
+		void onResponseReceived(Pair *pair, Flow* flow);
 		void onTimerExpired();
         void onIntervalExpired();
 		void onAnalysisEnded();

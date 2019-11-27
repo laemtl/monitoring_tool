@@ -11,12 +11,12 @@ struct _seq_t{
 	packet_t 	*pkt;		/* packet */
 	u_int32_t	seq;		/* seq order */
 	u_int32_t	nxt_seq;	/* next in seq order */
-	BOOL		ack;		/* acknowledged */
+	bool		ack;		/* acknowledged */
 	u_int8_t	th_flags;	/* TCP flags of packet */
 	time_t		cap_sec;
 	time_t		cap_usec;
 	seq_t		*next;		/* next in seq order */
-	BOOL		processed;
+	bool		processed;
 	u_int32_t	size;
 };
 
@@ -28,7 +28,7 @@ struct _order_t {
 	seq_t		*last_src;	/* last in src queue inserted */
 	seq_t		*last_dst;	/* last in dst queue inserted */
 	u_int32_t	num;		/* number of packet in queue */
-	BOOL		rst;		/* reset */
+	bool		rst;		/* reset */
 	//pthread_mutex_t mutex;
 };
 

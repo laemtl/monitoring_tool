@@ -8,12 +8,12 @@
 class Rst: public MetricAvg
 {
   public:
-    Rst(Analysis* analysis);
+    Rst(Protocol* protocol, Analysis* analysis);
     void subscribe(EventManager* em);
     void onNewFlowReceived(Flow* flow);
     void onFlowUpdate(Flow* flow);
-    void onRequestReceived(pair_t *pair, Flow* flow);
-    void onResponseReceived(pair_t *pair, Flow* flow);
+    void onRequestReceived(Pair *pair, Flow* flow);
+    void onResponseReceived(Pair *pair, Flow* flow);
     void onTimerExpired();
 };
 

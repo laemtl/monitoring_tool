@@ -1,97 +1,74 @@
-/*
- * queue.c
- *
- *  Created on: Mar 16, 2012
- *      Author: front
- */
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
-#include <string.h>
-#include <assert.h>
-#include <sys/time.h>
-#include <unistd.h>
+#include "flowQueue.hpp"
 
-#include "util.h"
-#include "flow.hpp"
+FlowQueue::FlowQueue() : first(NULL), last(NULL), qlen(0) {
+	pthread_mutex_init(&mutex, NULL);
+}
 
-class FlowQueue {
-	public:
-		pthread_mutex_t mutex;
-        Flow *first;
-        Flow *last;
-        int qlen;	/* flow queue length */
+int FlowQueue::enq(Flow *flow) {
+	pthread_mutex_lock(&mutex);
 
-		FlowQueue::FlowQueue() : first(NULL), last(NULL), qlen(0) {
-			pthread_mutex_init(&mutex, NULL);
-		}
+	if (qlen == 0){
+		first = flow;
+		last = flow;
+		last->next = NULL;
+		qlen++;
+		pthread_mutex_unlock(&mutex);
+		return 0;
+	}
 
-		int FlowQueue::enq(Flow *flow) {
-			pthread_mutex_lock(&mutex);
+	last->next = flow;
+	last = flow;
+	last->next = NULL;
+	qlen++;
 
-			if (qlen == 0){
-				first = flow;
-				last = flow;
-				last->next = NULL;
-				qlen++;
-				pthread_mutex_unlock(&mutex);
-				return 0;
-			}
+	pthread_mutex_unlock(&mutex);
+	return 0;
+}
 
-			last->next = flow;
-			last = flow;
-			last->next = NULL;
-			qlen++;
+Flow* FlowQueue::deq() {
+	pthread_mutex_lock(&mutex);
+	Flow *f = NULL;
+	if(qlen == 0){
+		pthread_mutex_unlock(&mutex);
+		return NULL;
+	}else if(qlen == 1){
+		last = NULL;
+	}
 
-			pthread_mutex_unlock(&mutex);
-			return 0;
-		}
+	f = first;
 
-		Flow* FlowQueue::deq() {
-			pthread_mutex_lock(&mutex);
-			Flow *f = NULL;
-			if(qlen == 0){
-				pthread_mutex_unlock(&mutex);
-				return NULL;
-			}else if(qlen == 1){
-				last = NULL;
-			}
+	if(first != NULL) {
+		first = first->next;
+		qlen--;
+	}
 
-			f = first;
+	pthread_mutex_unlock(&mutex);
+	return f;
+}
 
-			if(first != NULL) {
-				first = first->next;
-				qlen--;
-			}
+int FlowQueue::clear() {
+	pthread_mutex_lock(&mutex);
 
-			pthread_mutex_unlock(&mutex);
-			return f;
-		}
+	Flow *f;
 
-		int FlowQueue::clear() {
-			pthread_mutex_lock(&mutex);
+	while(qlen > 0){
+		f = first;
+		first = first->next;
+		delete f;
+		qlen--;
+	}
+	first =  NULL;
+	last = NULL;
+	qlen = 0;
 
-			Flow *f;
+	pthread_mutex_unlock(&mutex);
+	return 0;
+}
 
-			while(qlen > 0){
-				f = first;
-				first = first->next;
-				delete f;
-				qlen--;
-			}
-			first =  NULL;
-			last = NULL;
-			qlen = 0;
+int FlowQueue::len() {
+	return qlen;
+}
 
-			pthread_mutex_unlock(&mutex);
-			return 0;
-		}
-
-		int FlowQueue::len() {
-			return qlen;
-		}
-
-		void FlowQueue::print() {
-			printf("(Flow queue length)%d\n", len());
-		}
-};
+void FlowQueue::print() {
+	printf("(Flow queue length)%d\n", len());
+}

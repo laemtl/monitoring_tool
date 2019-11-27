@@ -86,7 +86,9 @@ void connection_handler(Config* config) {
 				printf ("netInt: %s\n\n", init->netint[i]);
 				
 				Analysis* analysis = new Analysis(config->socket, init->netint[i], init->interval, init->duration, true, config->debug);
-				analysis->activeMetrics(init->activemetric);
+				Http* http = new Http(analysis);
+				http->activeMetrics(init->activemetric);
+				analysis->protocols.push_back(http);
 
 				if(init->has_clientip) {
 					analysis->setClientIp(init->clientip);
@@ -238,7 +240,7 @@ void start_server(void* debug) {
  *  Following code opens socket on given IP address and port to send
  *  packets to be logged. It will connect to the remote node, then
  *  pass the file descriptor to the given function in the
- *  src/io.c file, where the http pairs of each flow will have their information
+ *  src/io.c file, where the pairs of each flow will have their information
  *  extracted, parsed into string, and sent.
 **/
 void start_log(char* ipaddress) {

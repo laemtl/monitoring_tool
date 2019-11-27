@@ -15,6 +15,7 @@
 #include "analysis.pb-c.h"
 #include "analysis.hpp"
 #include "timer.h"
+#include "http.hpp"
 
 class Config {
     public:

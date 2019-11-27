@@ -22,11 +22,11 @@ static seq_t *tcp_cont_seq(seq_t *lst)
 /*
  * reorder the TCP packets
  */
-int tcp_order(order_t *ord, seq_t *new_seq, BOOL src){
+int tcp_order(order_t *ord, seq_t *new_seq, bool src){
 	seq_t **plist=NULL, **plist_last=NULL, *pre=NULL, *cp=NULL, *aft=NULL;
 	u_int32_t fr=0, bk=0;
 
-	if(src == TRUE){
+	if(src == true){
 		plist = &(ord->src);
 		plist_last = &(ord->last_src);
 	}else{
@@ -187,7 +187,7 @@ int tcp_order_check(order_t *order){
 	}
 
 	if(src_check == 1 && dst_check == 1){
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }

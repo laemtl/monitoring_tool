@@ -57,7 +57,7 @@ bool PacketQueue::clr(void) {
 	pkt_last = NULL;
 	que_len = 0;
 	pthread_mutex_unlock(&mutex);
-	return TRUE;
+	return true;
 }
 
 unsigned int PacketQueue::len() {

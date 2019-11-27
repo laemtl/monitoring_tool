@@ -25,7 +25,7 @@ printCheck(lib_path, 'pthread')
 printCheck(lib_path, 'pcap')
 printCheck(lib_path, 'json-c')
 libs = Glob('.[ao]') + ['pthread', 'pcap', 'json-c', 'rt']
-cpp_path=['../include', '../include/metrics', '../include/events', '/usr/include', '/usr/local/include']
+cpp_path = ['../include', '../include/protocols', '../include/metrics', '../include/events', '/usr/include', '/usr/local/include']
 
  
 # Flag debug to decide if NFM libs are used to compile program

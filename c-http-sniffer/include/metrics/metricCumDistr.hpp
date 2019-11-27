@@ -4,21 +4,20 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-#include <iostream>
 #include <string>
 #include <stdio.h>
-
+#include <iostream>
 #include "util.h"
 #include "hashTable.hpp"
 #include "cf_list.h"
+#include "analysis.hpp"
 #include "metric.hpp"
 #include "server.h"
-#include "analysis.hpp"
 
 #define CFL_SIZE 100
 #define MIN_FREQ (double)1/CFL_SIZE
 
-class MetricCumDistr: public Metric2, public Observer
+class MetricCumDistr: public Metric, public Observer
 {
 	protected:
         Hash ht;
@@ -26,7 +25,7 @@ class MetricCumDistr: public Metric2, public Observer
 
     public:
 		void subscribe(EventManager* em);
-		MetricCumDistr(Analysis* analysis, string name, string desc);
+		MetricCumDistr(Protocol* protocol, Analysis* analysis, string name, string desc);
 		~MetricCumDistr();
 		void cflUpdate(Hash* ht);
 		void cflUpdate(int* array, int size);

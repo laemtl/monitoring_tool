@@ -11,20 +11,19 @@
 #include "reqType.hpp"
 #include "rspStatus.hpp"
 
-MetricManager::MetricManager(Analysis* analysis) {
-    metrics.push_back(new Rst(analysis));
-    metrics.push_back(new ReqRate(analysis));
-    metrics.push_back(new ErrRate(analysis));
-    metrics.push_back(new Tp(analysis));
-    metrics.push_back(new TpRev(analysis));
-    metrics.push_back(new ConnRate(analysis));
+MetricManager::MetricManager(Protocol* protocol, Analysis* analysis) {
+    metrics.push_back(new Rst(protocol, analysis));
+    metrics.push_back(new ReqRate(protocol, analysis));
+    metrics.push_back(new ErrRate(protocol, analysis));
+    metrics.push_back(new Tp(protocol, analysis));
+    metrics.push_back(new TpRev(protocol, analysis));
+    metrics.push_back(new ConnRate(protocol, analysis));
 
-    metrics.push_back(new Client(analysis));
-    metrics.push_back(new ReqPath(analysis));
-    metrics.push_back(new ReqMethod(analysis));
-    metrics.push_back(new ReqType(analysis));
-    metrics.push_back(new RspStatus(analysis));
+    metrics.push_back(new Client(protocol, analysis));
+    metrics.push_back(new ReqPath(protocol, analysis));
+    metrics.push_back(new ReqMethod(protocol, analysis));
+    metrics.push_back(new ReqType(protocol, analysis));
+    metrics.push_back(new RspStatus(protocol, analysis));
 }
 
-void MetricManager::getMetrics() {
-}
+//void MetricManager::getMetrics() {}

@@ -8,7 +8,6 @@
 #include <assert.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include <iostream>
 
 #include "util.h"
 

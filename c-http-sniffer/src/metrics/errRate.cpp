@@ -1,7 +1,8 @@
 #include "errRate.hpp"
+#include "http.hpp"
 
-ErrRate::ErrRate(Analysis* analysis) 
-: MetricAvg(analysis, "err_rate", "Error rate"){
+ErrRate::ErrRate(Protocol* protocol, Analysis* analysis) 
+: MetricAvg(protocol, analysis, "err_rate", "Error rate"){
 }
 
 double ErrRate::getRate() {
@@ -16,12 +17,12 @@ void ErrRate::subscribe(EventManager* em) {
 	em->intervalExpired->add(this);
 }
 
-void ErrRate::onResponseReceived(pair_t *pair, Flow* flow) {
+void ErrRate::onResponseReceived(Pair *pair, Flow* flow) {
 	// total number of received response
 	subtotal->add(1);
 	total->add(1);
 
-	response_t *rsp = pair->response_header;					
+	_http::Response *rsp = (_http::Response*)pair->response_header;					
 	int status = rsp->status;
 	
 	// Extract first digit of status code
@@ -48,5 +49,5 @@ void ErrRate::onNewFlowReceived(Flow* flow) {
 void ErrRate::onFlowUpdate(Flow* flow) {
 }
 
-void ErrRate::onRequestReceived(pair_t *pair, Flow* flow) {
+void ErrRate::onRequestReceived(Pair *pair, Flow* flow) {
 }

@@ -1,8 +1,8 @@
 #include "reqMethod.hpp"
+#include "http.hpp"
 
-
-ReqMethod::ReqMethod(Analysis* analysis) 
-: MetricCumDistr(analysis, "req_method", "Request methods"), reqTotal(0) {
+ReqMethod::ReqMethod(Protocol* protocol, Analysis* analysis) 
+: MetricCumDistr(protocol, analysis, "req_method", "Request methods"), reqTotal(0) {
 	ht = new Hash();
 }
 
@@ -25,9 +25,9 @@ void ReqMethod::cflAdd(Hashable* elem, int cnt) {
 void ReqMethod::cflAdd(int i, int cnt) {
 }
 
-void ReqMethod::onRequestReceived(pair_t *pair, Flow* flow) {
+void ReqMethod::onRequestReceived(Pair *pair, Flow* flow) {
 	reqTotal++;
-	const char *uri = pair->request_header->uri;
+	const char *uri = ((_http::Request*)pair->request_header)->uri;
 	char* reqPath = extractReqMethod(uri);
 	StringHash* str = new StringHash(reqPath);
 	ht->add(str);
@@ -66,7 +66,7 @@ void ReqMethod::onNewFlowReceived(Flow* flow) {
 void ReqMethod::onFlowUpdate(Flow* flow) {
 }
 
-void ReqMethod::onResponseReceived(pair_t *pair, Flow* flow) {
+void ReqMethod::onResponseReceived(Pair *pair, Flow* flow) {
 }
 
 void ReqMethod::onTimerExpired() {

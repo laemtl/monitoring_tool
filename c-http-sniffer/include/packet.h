@@ -91,9 +91,9 @@ struct _packet_t
 	u_int16_t 	tcp_win;	/* TCP window size */
 	u_int8_t 	tcp_hl;		/* Bytes: TCP header length */
 	u_int16_t	tcp_dl;		/* Bytes: TCP payload length */
-#define HTTP_REQ	0x01
-#define HTTP_RSP	0x10
-	u_int8_t	http;		/* is_http or is_request or is_response */
+#define REQ	0x01
+#define RSP	0x10
+	u_int8_t	type;		/* is_request or is_response */
 	char		*tcp_odata;	/* Orignal TCP payload */
 	char		*tcp_data;	/* Real useful data */
 	packet_t	*next;		/* Next packet in packet queue */

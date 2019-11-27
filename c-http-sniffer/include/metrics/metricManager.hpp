@@ -2,21 +2,24 @@
 #define __METRIC_MANAGER_H__
 
 #include <vector> 
-#include <iostream>
-//#include "analysis2.hpp"
-#include "eventManager.hpp"
-#include "metric.hpp"
+#include "protocol.hpp"
 
 using namespace std;
 
 class Analysis;
-class MetricManager 
-{
+class EventManager;
+class Metric;
+
+class MetricManager {
     public:
-        MetricManager(Analysis* analysis);    
+        MetricManager(Protocol* protocol, Analysis* analysis);    
         void registerMetrics(vector<bool> status, EventManager* em);
-        void getMetrics();
-        vector<Metric2*> metrics;
+        //void getMetrics();
+        vector<Metric*> metrics;
 };
+
+#include "analysis.hpp"
+#include "eventManager.hpp"
+#include "metric.hpp"
 
 #endif

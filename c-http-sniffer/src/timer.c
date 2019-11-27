@@ -17,10 +17,9 @@
 #define CLOCKID CLOCK_REALTIME
 #define SIG SIGRTMIN
 
-
 void stop_analysis(void* a) {
 	Analysis* analysis = (Analysis*) a;
-	analysis->eventManager->analysisEnded->notify();
+	analysis->stop();
 	pthread_exit(NULL);
 }
 
@@ -28,14 +27,19 @@ void processData(void* a) {
 	Analysis* analysis = (Analysis*) a;
 	analysis->int_step++;
 
-	// The completed flow are processed by extract_data every seconds
-	// We process the ones in the hash table using the following function 	
-	analysis->flowHashProcess();
-	analysis->eventManager->timerExpired->notify();
+	for (auto protocol = begin (analysis->protocols); protocol != end (analysis->protocols); ++protocol) {
+		// The completed flow are processed by extract_data every seconds
+		// We process the ones in the hash table using the following function 	
+		(*protocol)->flowHashProcess();
+		(*protocol)->eventManager->timerExpired->notify();
+	}
 	 
 	if(analysis->int_step < analysis->interval) return;
 
-	analysis->eventManager->intervalExpired->notify();
+	for (auto protocol = begin (analysis->protocols); protocol != end (analysis->protocols); ++protocol) {
+		(*protocol)->eventManager->intervalExpired->notify();
+	}
+
 	analysis->int_step = 0;
 }
 

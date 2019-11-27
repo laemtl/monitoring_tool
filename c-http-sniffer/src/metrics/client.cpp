@@ -13,8 +13,8 @@ u_int32_t Addr2::hash() {
     return *(u_int32_t*)value;
 }
 
-Client::Client(Analysis* analysis) 
-:MetricCumDistr(analysis, "clients", "Clients"), reqTotal(0) {
+Client::Client(Protocol* protocol, Analysis* analysis) 
+:MetricCumDistr(protocol, analysis, "clients", "Clients"), reqTotal(0) {
 	ht = new Hash();
 }
 
@@ -36,10 +36,10 @@ void Client::cflAdd(Hashable* elem, int cnt) {
 void Client::cflAdd(int i, int cnt) {
 }
 
-void Client::onRequestReceived(pair_t *pair, Flow* flow) {
+void Client::onRequestReceived(Pair *pair, Flow* flow) {
 	reqTotal++;
 
-	//request_t *req = pair->request_header;
+	//Request *req = pair->request_header;
 	u_int32_t* addr_ = CALLOC(u_int32_t, 1);
 	*addr_ = flow->socket.saddr;
 	Addr2* addr = new Addr2(addr_);
@@ -63,7 +63,7 @@ void Client::onNewFlowReceived(Flow* flow) {
 void Client::onFlowUpdate(Flow* flow) {
 }
 
-void Client::onResponseReceived(pair_t *pair, Flow* flow) {
+void Client::onResponseReceived(Pair *pair, Flow* flow) {
 }
 
 void Client::onTimerExpired() {

@@ -1,7 +1,7 @@
 #include "tp.hpp"
 
-Tp::Tp(Analysis* analysis) 
-: MetricAvg(analysis, "tp", "Throughput"), timerRef(0), intervalRef(0) {
+Tp::Tp(Protocol* protocol, Analysis* analysis) 
+: MetricAvg(protocol, analysis, "tp", "Throughput"), timerRef(0), intervalRef(0) {
 }
 
 double Tp::getAvg() {
@@ -24,10 +24,10 @@ void Tp::onFlowUpdate(Flow* flow) {
 	total->set(payload);
 }
 
-void Tp::onRequestReceived(pair_t *pair, Flow* flow) {
+void Tp::onRequestReceived(Pair *pair, Flow* flow) {
 }
 
-void Tp::onResponseReceived(pair_t *pair, Flow* flow) {
+void Tp::onResponseReceived(Pair *pair, Flow* flow) {
 }
 
 void Tp::onTimerExpired() {

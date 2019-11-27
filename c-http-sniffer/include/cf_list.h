@@ -13,7 +13,7 @@ struct _cf_item {
 
 typedef struct _cf_list cf_list;
 struct _cf_list {
-	cf_item list[CFL_SIZE];
+	cf_item list[CFL_SIZE] = {0};
     pthread_mutex_t mutex;
     int size;
     int count;

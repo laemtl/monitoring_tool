@@ -54,8 +54,8 @@ void MCDList::print() {
 /*MetricCumDistr::~MetricCumDistr() {
 }*/
 
-MetricCumDistr::MetricCumDistr(Analysis* analysis, string name, string desc) 
-: Metric2(analysis, name, desc) {
+MetricCumDistr::MetricCumDistr(Protocol* protocol, Analysis* analysis, string name, string desc) 
+: Metric(protocol, analysis, name, desc) {
 	cfl_init(&cfl);
 }
 

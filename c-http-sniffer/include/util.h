@@ -9,19 +9,6 @@
 #define MALLOC(type, num)  (type *) check_malloc((num) * sizeof(type))
 #define CALLOC(type, num)  (type *) check_calloc((num) * sizeof(type))
 
-#ifndef BOOL
-#define BOOL int
-#endif /* BOOL */
-
-#ifndef TRUE
-#define TRUE 1
-#endif	/* TRUE */
-
-#ifndef FALSE
-#define FALSE 0
-#endif	/* FALSE */
-
-
 /**********************Functions*****************************/
 
 void *check_malloc(unsigned long size);

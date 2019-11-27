@@ -2,6 +2,7 @@
 #define __TP_H__
 
 #include "metricAvg.hpp"
+#include "flow.hpp"
 
 class Tp: public MetricAvg
 {
@@ -10,12 +11,12 @@ class Tp: public MetricAvg
     u_int32_t intervalRef;
     
     public:
-      Tp(Analysis* analysis);
+      Tp(Protocol* protocol, Analysis* analysis);
       void subscribe(EventManager* em);
       void onNewFlowReceived(Flow* flow);
       void onFlowUpdate(Flow* flow);
-      void onRequestReceived(pair_t *pair, Flow* flow);
-      void onResponseReceived(pair_t *pair, Flow* flow);
+      void onRequestReceived(Pair *pair, Flow* flow);
+      void onResponseReceived(Pair *pair, Flow* flow);
       void onTimerExpired();
       
       void reset();

@@ -3,28 +3,25 @@
 
 #include <pthread.h>
 #include <sys/types.h>
-
-#include "packet.h"
-#include "order.h"
-#include "http.h"
-#include "util.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <assert.h>
 #include <sys/time.h>
 #include <unistd.h>
-
 #include "util.h"
 #include "tcp.h"
-
-#include "queue.hpp"
+#include "packet.h"
+#include "order.h"
+#include "util.h"
+#include "protocol.hpp"
 
 #define CLIENT_CLOSE	0x01
 #define SERVER_CLOSE	0x02
 #define FORCED_CLOSE	0x04
 
+class Flow;
+class FlowHashTable;
+typedef struct _hash_mb_t hash_mb_t;
 
 /**
  * flow socket
@@ -36,23 +33,6 @@ struct _flow_s
 	u_int32_t	daddr;
 	u_int16_t	sport;
 	u_int16_t	dport;
-};
-
-/**
- * Hash management block
- */
-
-class Flow;
-class FlowHashTable;
-
-typedef struct _hash_mb_t hash_mb_t;
-
-struct _hash_mb_t
-{
-	Flow	*first;
-	Flow	*last;
-	pthread_mutex_t mutex;
-	int		elm_cnt;
 };
 
 class Flow {
@@ -86,10 +66,9 @@ class Flow {
             time_t		lb_usec;	    /* last byte time of flow payload in usec */
             u_int32_t	payload_src;	/* bytes of payload sent from source to destination */
             u_int32_t 	payload_dst;	/* bytes of payload sent from destination to source */
-        /* HTTP info*/
-            bool		http;		    /* carrying www ? */
-            pair_t		*pair_f;	    /* front of pair queue */
-            pair_t		*pair_e;	    /* end of pair queue */
+        
+            Pair		*pair_f;	    /* front of pair queue */
+            Pair		*pair_e;	    /* end of pair queue */
         /* Control */
             time_t		last_action_sec;	/* latest modified time to the flow in seconds */
             time_t		last_action_usec;	/* latest modified time to the flow in microseconds */
@@ -108,11 +87,11 @@ class Flow {
 		int cal_packet(packet_t *packet, bool src);
 		int compare_sequence_time(seq_t *seq1, seq_t *seq2);
 		int flow_socket_cmp(flow_s *fs);
-		int add_http(pair_t *h);
+		int add_pair(Pair *h);
 		int add_packet(packet_t *packet, register bool src);
-		int extract_http(bool closed);
 };
 
 #include "flowHashTable.hpp"
+#include "queue.hpp"
 
-#endif /* FLOW_H_ */
+#endif

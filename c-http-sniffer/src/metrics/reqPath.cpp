@@ -1,7 +1,8 @@
 #include "reqPath.hpp"
+#include "http.hpp"
 
-ReqPath::ReqPath(Analysis* analysis) 
-: MetricCumDistr(analysis, "req_path", "Requests path"), reqTotal(0) {
+ReqPath::ReqPath(Protocol* protocol, Analysis* analysis) 
+: MetricCumDistr(protocol, analysis, "req_path", "Requests path"), reqTotal(0) {
 	ht = new Hash();
 }
 
@@ -26,9 +27,9 @@ void ReqPath::cflAdd(Hashable* elem, int cnt) {
 void ReqPath::cflAdd(int i, int cnt) {
 }
 
-void ReqPath::onRequestReceived(pair_t *pair, Flow* flow) {
+void ReqPath::onRequestReceived(Pair *pair, Flow* flow) {
 	reqTotal++;
-	const char *uri = pair->request_header->uri;
+	const char *uri = ((_http::Request*)pair->request_header)->uri;
 	
 	// URI is NULL when req->method == HTTP_MT_NONE
 	if(uri != NULL) {
@@ -74,7 +75,7 @@ void ReqPath::onNewFlowReceived(Flow* flow) {
 void ReqPath::onFlowUpdate(Flow* flow) {
 }
 
-void ReqPath::onResponseReceived(pair_t *pair, Flow* flow) {
+void ReqPath::onResponseReceived(Pair *pair, Flow* flow) {
 }
 
 void ReqPath::onTimerExpired() {

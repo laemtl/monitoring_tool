@@ -3,8 +3,9 @@
 
 #include "event.hpp"
 #include "observer.hpp"
-#include "flow.hpp"
+//#include "flow.hpp"
 
+class Flow;
 class NewFlowReceived: public Event {
     public:
         void notify(Flow *flow);
