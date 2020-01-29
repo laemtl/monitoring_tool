@@ -1,5 +1,5 @@
-/#ifndef __CACHE_H__
-#define __CACHE_H__
+#ifndef __MEMCACHED_H__
+#define __MEMCACHED_H__
 
 #include <sys/types.h>
 #include <time.h>
@@ -11,68 +11,68 @@
 #include <stdio.h>
 #include <assert.h>
 #include <map>
-
 #include "protocol.hpp"
 
+namespace _memcached {
+    enum Status {
+        VALUE,
+        OK,
+        END,
+        STORED,
+        NOT_STORED,
+        EXISTS,
+        NOT_FOUND,
+        ERROR,
+        CLIENT_ERROR,
+        SERVER_ERROR,
+        DELETED,
+        TOUCHED,
+        BUSY,
+        BADCLASS,
+        NOTFULL,
+        UNSAFE,
+        SAME,
+        STAT,
+        VERSION,
+        CACHE_ST_NONE
+    };
 
-namespace _cache {
-    enum Status 
-{
-VALUE,
-OK,
-END,
-STORED,
-NOT_STORED,
-EXISTS,
-NOT_FOUND,
-ERROR,
-CLIENT_ERROR,
-SERVER_ERROR,
-DELETED,
-TOUCHED,
-BUSY,
-BADCLASS,
-NOTFULL,
-UNSAFE,
-SAME,
-STAT,
-VERSION,
-CACHE_ST_NONE
-};
-static std::map<const char*, Status> statusCode;
-enum Method {
+    static std::map<const char*, Status> statusCode;
+    
+    enum Method {
+        get,
+        set,
+        add,
+        replace,
+        append,
+        prepend,
+        deletem,
+        flush_all,
+        quit,
+        incr,
+        decr,
+        touch,
+        gat,
+        gats,
+        slabs,
+        lru,
+        watch,
+        stats,
+        version,
+        misbehave,
+        CACHE_MT_NONE
+    };
 
-get,
-set,
-add,
-replace,
-append,
-prepend,
-deletem,
-flush_all,
-quit,
-incr,
-decr,
-touch,
-gat,
-gats,
-slabs,
-lru,
-watch,
-stats,
-version,
-misbehave,
-CACHE_MT_NONE
-};
-Status parseStatus(const char *line, int len);
-Method parseMethod(const char *data, int linelen);  
- class Cache : public _protocol::Protocol {
+    Status parseStatus(const char *line, int len);
+    Method parseMethod(const char *data, int linelen);  
+
+    class MemCached : public _protocol::Protocol {
         public:
             std::vector<int> ports;
             vector<char*> methodName;
             
-           Cache(Analysis* analysis);
-           
+            MemCached(Analysis* analysis);
+            
             bool isPacketOf(u_int16_t sport, u_int16_t dport);	/* If the packet carries HTTP(request or response) data */
             bool isHeaderPacket(const char *ptr, const int datalen);
             char* isRequest(const char *p, const int datalen);	    /* If the packet carries HTTP request data */
@@ -85,7 +85,8 @@ Method parseMethod(const char *data, int linelen);
             int getMethodCount();
             int getStatusCount();
     };
- class Request : public _protocol::Request {
+
+    class Request : public _protocol::Request {
         public:
             
             Method method;
@@ -109,7 +110,7 @@ Method parseMethod(const char *data, int linelen);
         public:
             Status      status;
             long	acknowledgement;
-            vector<char*> keys;
+            vector<const char*> keys;
             u_int8_t  flags;
             u_int32_t bodylen;
             Response();
@@ -119,6 +120,5 @@ Method parseMethod(const char *data, int linelen);
     };
 }
 
-using namespace _cache;
-
+using namespace _memcached;
 #endif
