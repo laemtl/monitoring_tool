@@ -17,7 +17,7 @@
 #include "flowHashTable.hpp"
 #include "timer.h"
 #include "http.hpp"
-
+#include <iostream>
 
 int pak = 0;
 int req_n = 0;
@@ -451,6 +451,7 @@ int main(int argc, char *argv[]){
 		Http* http = new Http(analysis);
 		http->activeMetrics(std::numeric_limits<int>::max());
 		analysis->protocols.push_back(http);
+
 		start_analysis(ipaddress, analysis);
 	}
 

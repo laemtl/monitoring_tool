@@ -1,5 +1,7 @@
 #include "http.hpp"
 
+#include <iostream>
+
 /*
  * From xplico.
  * Get HTTP request method by parsing header line.
@@ -247,7 +249,6 @@ char* Http::isResponse(const char *ptr, const int datalen) {
 }
 
 Http::Http(Analysis* analysis) : Protocol(analysis) {
-    //reqType = new int[statusCode.size()]{};
     ports.insert(ports.end(), {80, 8080, 8000});
 
     methodName = {
@@ -293,6 +294,64 @@ Http::Http(Analysis* analysis) : Protocol(analysis) {
         "ICY",
         "NONE"
     };
+
+    statusCode[100] = HTTP_ST_100;
+    statusCode[101] = HTTP_ST_101;
+    statusCode[102] = HTTP_ST_102;
+    statusCode[199] = HTTP_ST_199;
+
+    statusCode[200] = HTTP_ST_200;
+    statusCode[201] = HTTP_ST_201;
+    statusCode[202] = HTTP_ST_202;
+    statusCode[203] = HTTP_ST_203;
+    statusCode[204] = HTTP_ST_204;
+    statusCode[205] = HTTP_ST_205;
+    statusCode[206] = HTTP_ST_206;
+    statusCode[207] = HTTP_ST_207;
+    statusCode[299] = HTTP_ST_299;
+
+    statusCode[300] = HTTP_ST_300;
+    statusCode[301] = HTTP_ST_301;
+    statusCode[302] = HTTP_ST_302;
+    statusCode[303] = HTTP_ST_303;
+    statusCode[304] = HTTP_ST_304;
+    statusCode[305] = HTTP_ST_305;
+    statusCode[307] = HTTP_ST_307;
+    statusCode[399] = HTTP_ST_399;
+
+    statusCode[400] = HTTP_ST_400;
+    statusCode[401] = HTTP_ST_401;
+    statusCode[402] = HTTP_ST_402;
+    statusCode[403] = HTTP_ST_403;
+    statusCode[404] = HTTP_ST_404;
+    statusCode[405] = HTTP_ST_405;
+    statusCode[406] = HTTP_ST_406;
+    statusCode[407] = HTTP_ST_407;
+    statusCode[408] = HTTP_ST_408;
+    statusCode[409] = HTTP_ST_409;
+    statusCode[410] = HTTP_ST_410;
+    statusCode[411] = HTTP_ST_411;
+    statusCode[412] = HTTP_ST_412;
+    statusCode[413] = HTTP_ST_413;
+    statusCode[414] = HTTP_ST_414;
+    statusCode[415] = HTTP_ST_415;
+    statusCode[416] = HTTP_ST_416;
+    statusCode[417] = HTTP_ST_417;
+    statusCode[422] = HTTP_ST_422;
+    statusCode[423] = HTTP_ST_423;
+    statusCode[424] = HTTP_ST_424;
+    statusCode[499] = HTTP_ST_499;
+
+    statusCode[500] = HTTP_ST_500;
+    statusCode[501] = HTTP_ST_501;
+    statusCode[502] = HTTP_ST_502;
+    statusCode[503] = HTTP_ST_503;
+    statusCode[504] = HTTP_ST_504;
+    statusCode[505] = HTTP_ST_505;
+    statusCode[507] = HTTP_ST_507;
+    statusCode[599] = HTTP_ST_599;
+
+    metricManager = new MetricManager(this, analysis);
 }
 
 bool Http::isPacketOf(u_int16_t sport, u_int16_t dport) {
@@ -514,11 +573,11 @@ char* Http::getMethodName(int m) {
 }
 
 int Http::getMethodCount() {
-    return static_cast<int>(methodName.size());
+    return methodName.size();
 }
 
 int Http::getStatusCount() {
-    return static_cast<int>(statusCode.size());
+    return statusCode.size();
 }
 
 /*
@@ -569,69 +628,11 @@ _http::Request::Request(const char *data, const char *dataend, char *time, u_int
 	}
 }
 
-_http::Response::Response() {
-    statusCode[100] = HTTP_ST_100;
-    statusCode[101] = HTTP_ST_101;
-    statusCode[102] = HTTP_ST_102;
-    statusCode[199] = HTTP_ST_199;
-
-    statusCode[200] = HTTP_ST_200;
-    statusCode[201] = HTTP_ST_201;
-    statusCode[202] = HTTP_ST_202;
-    statusCode[203] = HTTP_ST_203;
-    statusCode[204] = HTTP_ST_204;
-    statusCode[205] = HTTP_ST_205;
-    statusCode[206] = HTTP_ST_206;
-    statusCode[207] = HTTP_ST_207;
-    statusCode[299] = HTTP_ST_299;
-
-    statusCode[300] = HTTP_ST_300;
-    statusCode[301] = HTTP_ST_301;
-    statusCode[302] = HTTP_ST_302;
-    statusCode[303] = HTTP_ST_303;
-    statusCode[304] = HTTP_ST_304;
-    statusCode[305] = HTTP_ST_305;
-    statusCode[307] = HTTP_ST_307;
-    statusCode[399] = HTTP_ST_399;
-
-    statusCode[400] = HTTP_ST_400;
-    statusCode[401] = HTTP_ST_401;
-    statusCode[402] = HTTP_ST_402;
-    statusCode[403] = HTTP_ST_403;
-    statusCode[404] = HTTP_ST_404;
-    statusCode[405] = HTTP_ST_405;
-    statusCode[406] = HTTP_ST_406;
-    statusCode[407] = HTTP_ST_407;
-    statusCode[408] = HTTP_ST_408;
-    statusCode[409] = HTTP_ST_409;
-    statusCode[410] = HTTP_ST_410;
-    statusCode[411] = HTTP_ST_411;
-    statusCode[412] = HTTP_ST_412;
-    statusCode[413] = HTTP_ST_413;
-    statusCode[414] = HTTP_ST_414;
-    statusCode[415] = HTTP_ST_415;
-    statusCode[416] = HTTP_ST_416;
-    statusCode[417] = HTTP_ST_417;
-    statusCode[422] = HTTP_ST_422;
-    statusCode[423] = HTTP_ST_423;
-    statusCode[424] = HTTP_ST_424;
-    statusCode[499] = HTTP_ST_499;
-
-    statusCode[500] = HTTP_ST_500;
-    statusCode[501] = HTTP_ST_501;
-    statusCode[502] = HTTP_ST_502;
-    statusCode[503] = HTTP_ST_503;
-    statusCode[504] = HTTP_ST_504;
-    statusCode[505] = HTTP_ST_505;
-    statusCode[507] = HTTP_ST_507;
-    statusCode[599] = HTTP_ST_599;
-}
-
 /*
  * Extract response message from data.
  * But only the header fields are extracted.
  */
-_http::Response::Response(const char *data, const char *dataend, long ack) : Response() {
+_http::Response::Response(const char *data, const char *dataend, long ack) {
 	char *eoh, *eol, *linesp, *lineep;
 	int line_cnt = 0, lnl = 0, hdl = 0;
 	

@@ -3,7 +3,7 @@
 
 ReqType::ReqType(Protocol* protocol, Analysis* analysis) 
 : MetricCumDistr(protocol, analysis, "req_type", "Request type"), reqTotal(0) {
-	reqTypeSize = protocol->getMethodCount();
+	reqTypeSize = ((Http*)protocol)->getMethodCount();
 	reqType = new int[reqTypeSize]{};
 }
 

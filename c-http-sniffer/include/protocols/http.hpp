@@ -135,7 +135,6 @@ namespace _http {
             vector<char*> methodName;
             
             Http(Analysis* analysis);
-            //Http();
             bool isPacketOf(u_int16_t sport, u_int16_t dport);	/* If the packet carries HTTP(request or response) data */
             bool isHeaderPacket(const char *ptr, const int datalen);
             char* isRequest(const char *p, const int datalen);	    /* If the packet carries HTTP request data */

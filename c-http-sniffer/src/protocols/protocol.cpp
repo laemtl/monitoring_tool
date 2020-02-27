@@ -1,4 +1,5 @@
 #include "protocol.hpp"
+#include <iostream>
 
 int	Pair::addRequest(Request *req) {
     if(request_header == NULL){
@@ -21,16 +22,10 @@ Request::Request() : time(NULL), hdlen(0), processed(false) {
 Request::Request(const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq) : Request() {
 }
 
-Request::~Request() {
-}
-
 Response::Response() : hdlen(0), processed(false) {
 }
            
 Response::Response(const char *data, const char *dataend, long ack) : Response() {           
-}
-
-Response::~Response() {
 }
 
 int Pair::addResponse(Response *rsp) {
@@ -44,7 +39,6 @@ int Pair::addResponse(Response *rsp) {
 
 Protocol::Protocol(Analysis* analysis) : analysis(analysis) {
     eventManager = new EventManager();
-    metricManager = new MetricManager(this, analysis);
     
     /* Initialization of packet and flow data structures */
     pq = new Queue();
@@ -135,15 +129,6 @@ void Protocol::extractData(Flow* flow){
             pair = pair->next;
         }
     }
-}
-
-char* Protocol::getMethodName(int m) {
-}
-
-int Protocol::getMethodCount() {
-}
-
-int Protocol::getStatusCount() {
 }
 
 void Protocol::activeMetrics(int activeMetrics) {
