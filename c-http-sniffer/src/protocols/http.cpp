@@ -577,7 +577,7 @@ int Http::getMethodCount() {
 }
 
 int Http::getStatusCount() {
-    return statusCode.size();
+    return 600;
 }
 
 /*
