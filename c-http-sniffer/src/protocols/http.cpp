@@ -4,7 +4,7 @@
  * From xplico.
  * Get HTTP request method by parsing header line.
  */
-Method _http::parseMethod(const char *data, int linelen)
+int _http::Request::parseMethod(const char *data, int linelen)
 {
     const char *ptr;
     int	index = 0;
@@ -40,169 +40,14 @@ Method _http::parseMethod(const char *data, int linelen)
         }
     }
 
-    /* Check the methods that have same length */
-    switch (index) {
-    case 3:
-        if (strncmp(data, "GET", index) == 0) {
-            return HTTP_MT_GET;
+    for (std::size_t i = 0; i != methodsName.size(); ++i) {
+        if (strcmp(data, methodsName[i]) == 0) {
+            return i;
         }
-        else if (strncmp(data, "PUT", index) == 0) {
-            return HTTP_MT_PUT;
-        }
-#if 0
-	else if (strncmp(data, "ICY", index) == 0) {
-            return HTTP_MT_ICY;
-        }
-#endif
-        break;
-
-    case 4:
-        if (strncmp(data, "COPY", index) == 0) {
-            return HTTP_MT_COPY;
-        }
-        else if (strncmp(data, "HEAD", index) == 0) {
-            return HTTP_MT_HEAD;
-        }
-        else if (strncmp(data, "LOCK", index) == 0) {
-            return HTTP_MT_LOCK;
-        }
-        else if (strncmp(data, "MOVE", index) == 0) {
-            return HTTP_MT_MOVE;
-        }
-        else if (strncmp(data, "POLL", index) == 0) {
-            return HTTP_MT_POLL;
-        }
-        else if (strncmp(data, "POST", index) == 0) {
-            return HTTP_MT_POST;
-        }
-        break;
-
-    case 5:
-        if (strncmp(data, "BCOPY", index) == 0) {
-            return HTTP_MT_BCOPY;
-        }
-        else if (strncmp(data, "BMOVE", index) == 0) {
-            return HTTP_MT_BMOVE;
-        }
-        else if (strncmp(data, "MKCOL", index) == 0) {
-            return HTTP_MT_MKCOL;
-        }
-        else if (strncmp(data, "TRACE", index) == 0) {
-            return HTTP_MT_TRACE;
-        }
-        else if (strncmp(data, "LABEL", index) == 0) {  /* RFC 3253 8.2 */
-            return HTTP_MT_LABEL;
-        }
-        else if (strncmp(data, "MERGE", index) == 0) {  /* RFC 3253 11.2 */
-            return HTTP_MT_MERGE;
-        }
-        break;
-
-    case 6:
-        if (strncmp(data, "DELETE", index) == 0) {
-            return HTTP_MT_DELETE;
-        }
-        else if (strncmp(data, "SEARCH", index) == 0) {
-            return HTTP_MT_SEARCH;
-        }
-        else if (strncmp(data, "UNLOCK", index) == 0) {
-            return HTTP_MT_UNLOCK;
-        }
-        else if (strncmp(data, "REPORT", index) == 0) {  /* RFC 3253 3.6 */
-            return HTTP_MT_REPORT;
-        }
-        else if (strncmp(data, "UPDATE", index) == 0) {  /* RFC 3253 7.1 */
-            return HTTP_MT_UPDATE;
-        }
-        else if (strncmp(data, "NOTIFY", index) == 0) {
-            return HTTP_MT_NOTIFY;
-        }
-        break;
-
-    case 7:
-        if (strncmp(data, "BDELETE", index) == 0) {
-            return HTTP_MT_BDELETE;
-        }
-        else if (strncmp(data, "CONNECT", index) == 0) {
-            return HTTP_MT_CONNECT;
-        }
-        else if (strncmp(data, "OPTIONS", index) == 0) {
-            return HTTP_MT_OPTIONS;
-        }
-        else if (strncmp(data, "CHECKIN", index) == 0) {  /* RFC 3253 4.4, 9.4 */
-            return HTTP_MT_CHECKIN;
-        }
-        break;
-
-    case 8:
-        if (strncmp(data, "PROPFIND", index) == 0) {
-            return HTTP_MT_PROPFIND;
-        }
-        else if (strncmp(data, "CHECKOUT", index) == 0) { /* RFC 3253 4.3, 9.3 */
-            return HTTP_MT_CHECKOUT;
-        }
-        /*
-        else if (strncmp(data, "CCM_POST", index) == 0) {
-            return HTTP_MT_CCM_POST;
-        }
-        */
-        break;
-
-    case 9:
-        if (strncmp(data, "SUBSCRIBE", index) == 0) {
-            return HTTP_MT_SUBSCRIBE;
-        }
-        else if (strncmp(data, "PROPPATCH", index) == 0) {
-            return HTTP_MT_PROPPATCH;
-        }
-        else  if (strncmp(data, "BPROPFIND", index) == 0) {
-            return HTTP_MT_BPROPFIND;
-        }
-        break;
-
-    case 10:
-        if (strncmp(data, "BPROPPATCH", index) == 0) {
-            return HTTP_MT_BPROPPATCH;
-        }
-        else if (strncmp(data, "UNCHECKOUT", index) == 0) {  /* RFC 3253 4.5 */
-            return HTTP_MT_UNCHECKOUT;
-        }
-        else if (strncmp(data, "MKACTIVITY", index) == 0) {  /* RFC 3253 13.5 */
-            return HTTP_MT_MKACTIVITY;
-        }
-        break;
-
-    case 11:
-        if (strncmp(data, "MKWORKSPACE", index) == 0) {  /* RFC 3253 6.3 */
-            return HTTP_MT_MKWORKSPACE;
-        }
-        else if (strncmp(data, "UNSUBSCRIBE", index) == 0) {
-            return HTTP_MT_UNSUBSCRIBE;
-        }
-        /*
-        else if (strncmp(data, "RPC_CONNECT", index) == 0) {
-            return HTTP_MT_RPC_CONNECT;
-        }
-        */
-        break;
-
-    case 15:
-        if (strncmp(data, "VERSION-CONTROL", index) == 0) {  /* RFC 3253 3.5 */
-            return HTTP_MT_VERSION_CONTROL;
-        }
-        break;
-
-    case 16:
-        if (strncmp(data, "BASELINE-CONTROL", index) == 0) {  /* RFC 3253 12.6 */
-            return HTTP_MT_BASELINE_CONTROL;
-        }
-        break;
-
-    default:
         break;
     }
 
-    return HTTP_MT_NONE;
+    return 0;
 }
 
 /*
@@ -210,14 +55,14 @@ Method _http::parseMethod(const char *data, int linelen)
  * If it's true, the head end char pointer will be returned, else NULL.
  */
 char* Http::isRequest(const char *ptr, const int datalen) {
-	Method method = HTTP_MT_NONE;
+	int methodCode = 0;
 	char *head_end = NULL;
 
-	method = parseMethod(ptr, datalen);
-	if (method == HTTP_MT_NONE){
+    _http::Request* req = new _http::Request();
+	methodCode = req->parseMethod(ptr, datalen);
+	if (methodCode == 0){
 		return NULL;
-	}
-	else{
+	} else {
 		int line_cnt = 0;
 		head_end = Protocol::find_header_end(ptr, (ptr+datalen-1), &line_cnt);
 		return head_end;
@@ -238,8 +83,7 @@ char* Http::isResponse(const char *ptr, const int datalen) {
 	version = Response::parseVersion(ptr, datalen);
 	if (version == HTTP_VER_NONE){
 		return NULL;
-	}
-	else{
+	} else {
 		int line_cnt = 0;
 		head_end = Protocol::find_header_end(ptr, (ptr+datalen-1), &line_cnt);
 		return head_end;
@@ -249,50 +93,6 @@ char* Http::isResponse(const char *ptr, const int datalen) {
 Http::Http(Analysis* analysis) : Protocol(analysis) {
     //reqType = new int[statusCode.size()]{};
     ports.insert(ports.end(), {80, 8080, 8000});
-
-    methodName = {
-        "OPTIONS",
-        "GET",
-        "HEAD",
-        "POST",
-        "PUT",
-        "DELETE",
-        "TRACE",
-        "CONNECT",
-        "PATCH",
-        "LINK",
-        "UNLINK",
-        "PROPFIND",
-        "MKCOL",
-        "COPY",
-        "MOVE",
-        "LOCK",
-        "UNLOCK",
-        "POLL",
-        "BCOPY",
-        "BMOVE",
-        "SEARCH",
-        "BDELETE",
-        "PROPPATCH",
-        "BPROPFIND",
-        "BPROPPATCH",
-        "LABEL",
-        "MERGE",
-        "REPORT",
-        "UPDATE",
-        "CHECKIN",
-        "CHECKOUT",
-        "UNCHECKOUT",
-        "MKACTIVITY",
-        "MKWORKSPACE",
-        "VERSION-CONTROL",
-        "BASELINE-CONTROL",
-        "NOTIFY",
-        "SUBSCRIBE",
-        "UNSUBSCRIBE",
-        "ICY",
-        "NONE"
-    };
 }
 
 bool Http::isPacketOf(u_int16_t sport, u_int16_t dport) {
@@ -371,6 +171,17 @@ _http::Response::~Response() {
         free(content_length);
     if(age != NULL)
         free(age);
+}
+
+
+bool _http::Response::hasErrorStatus() {
+    // Extract first digit of status code
+	int i = statusCode;
+	while (i>=10) i=i/10;  
+	if (i>3) {
+		return true;
+	}
+    return false;
 }
 
 /*
@@ -464,41 +275,41 @@ Version _http::Response::parseVersion(const char *line, int len) {
  * From xplico.
  * Get the HTTP response status code by parsing header line.
  */
-Status _http::parseStatus(const char *line, int len) {
+int _http::Response::parseStatus(const char *line, int len) {
     const char *next_token;
     const char *lineend;
-    Status status;
+    int statusCode;
     int tokenlen, val;
     
     lineend = line + len;
-    status = HTTP_ST_NONE;
+    statusCode = 0;
 
     /* The first token is the protocol and version */
     tokenlen = Protocol::get_token_len(line, lineend, &next_token);
     if (tokenlen == 0 || line[tokenlen] != ' ') {
-        return status;
+        return statusCode;
     }
 
     line = next_token;
     /* The next token is status value. */
     tokenlen = Protocol::get_token_len(line, lineend, &next_token);
     if (tokenlen == 0 || (line[tokenlen] != ' ' && line[tokenlen] != '\r' && line[tokenlen] != '\n')) {
-        return status;
+        return statusCode;
     }
 
     /*
      * Parse response status value.
      */
     if (sscanf(line, "%i", &val) != 1) {
-		return status;
+		return statusCode;
 	}
 
     /* search enum */
-    map<int, Status>::iterator it;
-    it = statusCode.find(val);
-    if (it != statusCode.end()) status = it->second;
-
-    return status;
+    vector<int>::iterator it;
+    it = find(status.begin(), status.end(), val);
+    if (it != status.end()) statusCode = distance(status.begin(), it);
+    
+    return statusCode;
 }
 
 _protocol::Request* Http::getRequest(const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq) {
@@ -509,16 +320,52 @@ _protocol::Response* Http::getResponse(const char *data, const char *dataend, lo
     return new Response(data, dataend, ack);
 }
 
-char* Http::getMethodName(int m) {
-    return methodName[m];
-}
+_http::Request::Request() {
+    methodsName.push_back("OPTIONS");           /* RFC2616 */
+    methodsName.push_back("GET");
+    methodsName.push_back("HEAD");
+    methodsName.push_back("POST");
+    methodsName.push_back("PUT");
+    methodsName.push_back("DELETE");
+    methodsName.push_back("TRACE");
+    methodsName.push_back("CONNECT");
+    methodsName.push_back("PATCH");
+    methodsName.push_back("LINK");
+    methodsName.push_back("UNLINK");
+    methodsName.push_back("PROPFIND");          /* RFC2518 */
+    methodsName.push_back("MKCOL");
+    methodsName.push_back("COPY");
+    methodsName.push_back("MOVE");
+    methodsName.push_back("LOCK");
+    methodsName.push_back("UNLOCK");
+    methodsName.push_back("POLL");              /* Outlook Web Access */
+    methodsName.push_back("BCOPY");
+    methodsName.push_back("BMOVE");
+    methodsName.push_back("SEARCH");
+    methodsName.push_back("BDELETE");
+    methodsName.push_back("PROPPATCH");
+    methodsName.push_back("BPROPFIND");
+    methodsName.push_back("BPROPPATCH");
+    methodsName.push_back("LABEL");             /* RFC 3253 8.2 */
+    methodsName.push_back("MERGE");             /* RFC 3253 11.2 */
+    methodsName.push_back("REPORT");            /* RFC 3253 3.6 */
+    methodsName.push_back("UPDATE");            /* RFC 3253 7.1 */
+    methodsName.push_back("CHECKIN");           /* RFC 3253 4.4"); 9.4 */
+    methodsName.push_back("CHECKOUT");          /* RFC 3253 4.3"); 9.3 */
+    methodsName.push_back("UNCHECKOUT");        /* RFC 3253 4.5 */
+    methodsName.push_back("MKACTIVITY");        /* RFC 3253 13.5 */
+    methodsName.push_back("MKWORKSPACE");       /* RFC 3253 6.3 */
+    methodsName.push_back("VERSION_CONTROL");   /* RFC 3253 3.5 */
+    methodsName.push_back("BASELINE_CONTROL");  /* RFC 3253 12.6 */
+    methodsName.push_back("NOTIFY");            /* uPnP forum */
+    methodsName.push_back("SUBSCRIBE");
+    methodsName.push_back("UNSUBSCRIBE");
+    methodsName.push_back("ICY");               /* Shoutcast client (forse) */
+    methodsName.push_back("NONE");
 
-int Http::getMethodCount() {
-    return static_cast<int>(methodName.size());
-}
-
-int Http::getStatusCount() {
-    return static_cast<int>(statusCode.size());
+    for (std::size_t i = 0; i != methodsName.size(); ++i) {
+        methods[i];
+    }
 }
 
 /*
@@ -526,7 +373,7 @@ int Http::getStatusCount() {
  * But only the header fields are extracted.
  */
 
-_http::Request::Request(const char *data, const char *dataend, char *time, u_int32_t seq, u_int32_t nxt_seq) {
+_http::Request::Request(const char *data, const char *dataend, char *time, u_int32_t seq, u_int32_t nxt_seq) : Request() {
 	char *eoh, *eol, *linesp, *lineep;
 	int line_cnt = 0, lnl = 0, hdl = 0;
 
@@ -545,8 +392,8 @@ _http::Request::Request(const char *data, const char *dataend, char *time, u_int
 	linesp = (char*) data;
 	lineep = Protocol::find_line_end(linesp, eoh, &eol);
 	lnl = lineep - linesp + 1;
-	method = parseMethod(linesp, lnl);
-	if ( method == HTTP_MT_NONE){
+	methodCode = parseMethod(linesp, lnl);
+	if (methodsName[methodCode] == "NONE"){
         return;
 	}
 
@@ -562,7 +409,7 @@ _http::Request::Request(const char *data, const char *dataend, char *time, u_int
 	accept_charset = Protocol::header_param(data, hdl, "Accept-Charset:");
 	cookie = Protocol::header_param(data, hdl, "Cookie:");
 
-	if (method == HTTP_MT_POST ){
+	if (methodsName[methodCode] == "POST"){
 		content_type = Protocol::header_param(data, hdl, "Content-Type:");
 		content_encoding = Protocol::header_param(data, hdl, "Content-Encoding:");
 		content_length = Protocol::header_param(data, hdl, "Content-Length:");
@@ -570,61 +417,62 @@ _http::Request::Request(const char *data, const char *dataend, char *time, u_int
 }
 
 _http::Response::Response() {
-    statusCode[100] = HTTP_ST_100;
-    statusCode[101] = HTTP_ST_101;
-    statusCode[102] = HTTP_ST_102;
-    statusCode[199] = HTTP_ST_199;
+    status[0];
+    status[100];
+    status[101];
+    status[102];
+    status[199];
 
-    statusCode[200] = HTTP_ST_200;
-    statusCode[201] = HTTP_ST_201;
-    statusCode[202] = HTTP_ST_202;
-    statusCode[203] = HTTP_ST_203;
-    statusCode[204] = HTTP_ST_204;
-    statusCode[205] = HTTP_ST_205;
-    statusCode[206] = HTTP_ST_206;
-    statusCode[207] = HTTP_ST_207;
-    statusCode[299] = HTTP_ST_299;
+    status[200];
+    status[201];
+    status[202];
+    status[203];
+    status[204];
+    status[205];
+    status[206];
+    status[207];
+    status[299];
 
-    statusCode[300] = HTTP_ST_300;
-    statusCode[301] = HTTP_ST_301;
-    statusCode[302] = HTTP_ST_302;
-    statusCode[303] = HTTP_ST_303;
-    statusCode[304] = HTTP_ST_304;
-    statusCode[305] = HTTP_ST_305;
-    statusCode[307] = HTTP_ST_307;
-    statusCode[399] = HTTP_ST_399;
+    status[300];
+    status[301];
+    status[302];
+    status[303];
+    status[304];
+    status[305];
+    status[307];
+    status[399];
 
-    statusCode[400] = HTTP_ST_400;
-    statusCode[401] = HTTP_ST_401;
-    statusCode[402] = HTTP_ST_402;
-    statusCode[403] = HTTP_ST_403;
-    statusCode[404] = HTTP_ST_404;
-    statusCode[405] = HTTP_ST_405;
-    statusCode[406] = HTTP_ST_406;
-    statusCode[407] = HTTP_ST_407;
-    statusCode[408] = HTTP_ST_408;
-    statusCode[409] = HTTP_ST_409;
-    statusCode[410] = HTTP_ST_410;
-    statusCode[411] = HTTP_ST_411;
-    statusCode[412] = HTTP_ST_412;
-    statusCode[413] = HTTP_ST_413;
-    statusCode[414] = HTTP_ST_414;
-    statusCode[415] = HTTP_ST_415;
-    statusCode[416] = HTTP_ST_416;
-    statusCode[417] = HTTP_ST_417;
-    statusCode[422] = HTTP_ST_422;
-    statusCode[423] = HTTP_ST_423;
-    statusCode[424] = HTTP_ST_424;
-    statusCode[499] = HTTP_ST_499;
+    status[400];
+    status[401];
+    status[402];
+    status[403];
+    status[404];
+    status[405];
+    status[406];
+    status[407];
+    status[408];
+    status[409];
+    status[410];
+    status[411];
+    status[412];
+    status[413];
+    status[414];
+    status[415];
+    status[416];
+    status[417];
+    status[422];
+    status[423];
+    status[424];
+    status[499];
 
-    statusCode[500] = HTTP_ST_500;
-    statusCode[501] = HTTP_ST_501;
-    statusCode[502] = HTTP_ST_502;
-    statusCode[503] = HTTP_ST_503;
-    statusCode[504] = HTTP_ST_504;
-    statusCode[505] = HTTP_ST_505;
-    statusCode[507] = HTTP_ST_507;
-    statusCode[599] = HTTP_ST_599;
+    status[500];
+    status[501];
+    status[502];
+    status[503];
+    status[504];
+    status[505];
+    status[507];
+    status[599];
 }
 
 /*
@@ -649,8 +497,8 @@ _http::Response::Response(const char *data, const char *dataend, long ack) : Res
 	lineep = Protocol::find_line_end(linesp, eoh, &eol);
 	lnl = lineep - linesp + 1;
 
-	status = parseStatus(linesp, lnl);
-	if (status == HTTP_ST_NONE){
+	statusCode = parseStatus(linesp, lnl);
+	if (statusCode == 0){
 		return;
 	}
 

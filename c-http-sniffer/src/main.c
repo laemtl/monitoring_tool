@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <signal.h> 
 #include <inttypes.h>
+#include <iostream>
 #include <limits>
 
 #include "raw_packet.h"
@@ -17,6 +18,7 @@
 #include "flowHashTable.hpp"
 #include "timer.h"
 #include "http.hpp"
+#include "memcached.hpp"
 
 
 int pak = 0;
@@ -29,12 +31,10 @@ int raw_rsp = 0;
 int flow_req = 0;
 int flow_rsp = 0;
 
-//int GP_CAP_FIN = 0; /* Flag for offline PCAP sniffing */
-
 void
 debugging_print(Analysis* analysis){
 	while(1){
-		if (analysis->status < 0) {
+		if (analysis->isStopped()) {
 			break;
 		} else {
 			for (auto protocol = begin (analysis->protocols); protocol != end (analysis->protocols); ++protocol) {
@@ -237,7 +237,7 @@ process_flow_queue(Analysis* analysis){
 		for (auto protocol = begin (analysis->protocols); protocol != end (analysis->protocols); ++protocol) {
 			flow = (*protocol)->fq->deq();
 
-			if (analysis->status < 0) {
+			if (analysis->isStopped()) {
 				break;
 			} else if(flow != NULL){
 				(*protocol)->extractPair(flow, true);
@@ -287,16 +287,15 @@ capture_main(void* a){
 	
 	Analysis* analysis = (Analysis*) a;
 	const char* interface = analysis->interface;
-	int livemode = analysis->livemode;
-
+	
 	const u_char *raw = NULL;
 	struct pcap_pkthdr pkthdr;
 	//packet_t *packet = NULL;
-	//extern int GP_CAP_FIN;
 	
-	if ( livemode==1 ) {
+	if ( analysis->livemode == 1 ) {
 		cap = pcap_open_live(interface, 65535, 0, 1000, errbuf);
 	} else {
+		cout << "Offline mode" << endl;
 		cap = pcap_open_offline(interface, errbuf);
 	}
 
@@ -317,8 +316,7 @@ capture_main(void* a){
 		// 4 bytes CRC is stripped
 		if(len < 54) continue;
 
-		if ( livemode == 0 || analysis->status < 0) {
-			//GP_CAP_FIN = 1;
+		if (analysis->isStopped()) {
 			break;
 		} else if( NULL != raw){
 			pkt2 = MALLOC(raw_pkt, 1);
@@ -330,6 +328,9 @@ capture_main(void* a){
 
 			analysis->rpq->enq(pkt2);
 			pak++;
+		} else if(analysis->livemode == 0) {
+			// last packet of the tracefile was read, end the analysis
+			analysis->stop();
 		} else {
 			nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
 		}
@@ -356,8 +357,6 @@ void start_analysis(char* ipaddress, Analysis* analysis) {
 	pthread_t job_debug_p;
 #endif
 
-	analysis->livemode = 1;
-	
 	printf("Http-sniffer started: %s", ctime(&start));
 
 	/* Start packet receiving thread */
@@ -418,6 +417,7 @@ void sigintHandler(int sig_num) {
 int main(int argc, char *argv[]){
 	char* interface = NULL;
 	char* ipaddress = NULL;
+    char* tracefile = NULL;
 	int opt;
 	bool debug = false;
 
@@ -435,20 +435,34 @@ int main(int argc, char *argv[]){
 				ipaddress = optarg; break;
 			case 'd':
 				debug = true; break;
+			case 'f':
+			    tracefile = optarg; break;
 		}
 	}
     
     // Interface is NULL - RUN in server mode	
-	if (interface == NULL){
+	if (interface == NULL && tracefile == NULL){
 		/* Start server thread */
 		pthread_t job_server;
 		pthread_create(&job_server, NULL, (void*)start_server, &debug);
 		pthread_join(job_server, NULL);
 	
 	// Interface is provided - RUN in app mode
-	} else {		
-		Analysis* analysis = new Analysis(-1, interface, 5, 600, false, debug);
-		Http* http = new Http(analysis);
+	} else {
+		Analysis* analysis;
+
+		// If both interface and tracefile are provided, default behaviour is to use the interface        
+        if (interface == NULL) {
+			analysis = new Analysis(-1, tracefile, 5, 600);
+			analysis->livemode = 0;
+		} else {
+			analysis = new Analysis(-1, interface, 5, 600);
+			analysis->livemode = 1;
+		}
+
+		analysis->serverMode = false;
+		analysis->debug = debug;
+		MemCached* http = new MemCached(analysis);
 		http->activeMetrics(std::numeric_limits<int>::max());
 		analysis->protocols.push_back(http);
 		start_analysis(ipaddress, analysis);

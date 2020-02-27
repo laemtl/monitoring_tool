@@ -3,37 +3,13 @@
 MemCached::MemCached(Analysis* analysis) : Protocol(analysis) {
     //reqType = new int[statusCode.size()]{};
     ports.insert(ports.end(), {11211});
-
-    methodName = {
-        "get",
-        "set",
-        "add",
-        "replace",
-        "append",
-        "prepend",
-        "delete",
-        "flush_all",
-        "quit",
-        "incr",
-        "decr",
-        "touch",
-        "gat",
-        "gats",
-        "slabs",
-        "lru",
-        "watch",
-        "stats",
-        "version",
-        "misbehave",
-        "NONE"
-    };
 }
 
 /*
  * From xplico.
  * Get Cache request method by parsing header line.
  */
-Method _memcached::parseMethod(const char *data, int linelen)
+int _memcached::Request::parseMethod(const char *data, int linelen)
 {
     const char *ptr;
     int	index = 0;
@@ -48,84 +24,14 @@ Method _memcached::parseMethod(const char *data, int linelen)
         }
     }
 
-    /* Check the methods that have same length */
-    switch (index) {
-        case 3:
-            if (strncmp(data, "get", index) == 0) {
-                //totalGet++;
-                return get;
-            } else if (strncmp(data, "set", index) == 0) {
-                //totalSet++;
-                return set;
-            } else if (strncmp(data, "add", index) == 0) {
-                return add;
-            } else if (strncmp(data, "gat", index) == 0) {
-                return gat;
-            } else if (strncmp(data, "lru", index) == 0) {
-                return lru;
-            }
-
-            break;
-
-            case 4:
-                if (strncmp(data, "quit", index) == 0) {
-                    return quit;
-                } else if (strncmp(data, "incr", index) == 0) { 
-                    return incr;
-                } else if (strncmp(data, "decr", index) == 0) {
-                    return decr;
-                } else if (strncmp(data, "gats", index) == 0) {
-                    return gats;
-                }
-                
-                break;
-
-            case 5:
-                if (strncmp(data, "touch", index) == 0) {
-                    return touch;
-                } else if (strncmp(data, "slabs", index) == 0) {
-                    return slabs;
-                } else if (strncmp(data, "watch", index) == 0) {
-                    return watch;
-                } else if (strncmp(data, "stats", index) == 0) {  
-                    return stats;
-                }
-                
-                break;
-
-            case 6:
-                if (strncmp(data, "append", index) == 0) {
-                    return append;
-                } else if (strncmp(data, "delete", index) == 0) {
-                    return deletem;
-                }
-                
-                break;
-
-            case 7:
-                if (strncmp(data, "replace", index) == 0) {
-                    return replace;
-                } else if (strncmp(data, "prepend", index) == 0) {   
-                    return prepend;
-                } else if (strncmp(data, "version", index) == 0) {  
-                    return version;
-                }
-                
-                break;
-
-            case 9:
-                if (strncmp(data, "flush_all", index) == 0) {
-                    return flush_all;
-                } else if (strncmp(data, "misbehave", index) == 0) {
-                    return misbehave;
-                }
-                
-                break;
-
-            default:
-                break;
+    for (std::size_t i = 0; i != methodsName.size(); ++i) {
+        if (strcmp(data, methodsName[i]) == 0) {
+            return i;
         }
-        return CACHE_MT_NONE;
+        break;
+    }
+
+    return 0;
 }
 
 
@@ -134,42 +40,44 @@ Method _memcached::parseMethod(const char *data, int linelen)
  * If it's true, the head end char pointer will be returned, else NULL.
  */
 char* MemCached::isRequest(const char *ptr, const int datalen) {
-	Method method = CACHE_MT_NONE;
+	int methodCode = 0;
 	char *eol,*linesp,*head_end = NULL;
-        int lnl;
-        linesp = (char*) ptr;
+    int lnl;
+    
+    linesp = (char*) ptr;
 	head_end = Protocol::find_line_end(linesp, datalen, &eol);
 	lnl = head_end - linesp + 1;
-	method = parseMethod(linesp, lnl);
-	if (method == CACHE_MT_NONE){
+	
+    _memcached::Request* req = new _memcached::Request();
+    methodCode = req->parseMethod(linesp, lnl);
+	if (methodCode == 0){
 		return NULL;
-	}
-	else{
+	} else {
 		return head_end;
 	}
 }
 
-Status _memcached::parseStatus(const char *line, int len) {
+int _memcached::Response::parseStatus(const char *line, int len) {
     const char *next_token;
     const char *lineend;
     const char *st;
-    Status status;
+    int statusCode;
     int tokenlen;
     
     lineend = line + len;
-    status = CACHE_ST_NONE;
+    statusCode = 0;
 
     /* The first token is the protocol and version */
     tokenlen = Protocol::get_token_len(line, lineend, &next_token);
     if (tokenlen == 0 || line[tokenlen] != ' ') {
-        return status;
+        return statusCode;
     }
 
     line = next_token;
     /* The next token is status value. */
     tokenlen = Protocol::get_token_len(line, lineend, &next_token);
     if (tokenlen == 0 || (line[tokenlen] != ' ' && line[tokenlen] != '\r' && line[tokenlen] != '\n')) {
-        return status;
+        return statusCode;
     }
 
     /*
@@ -182,12 +90,32 @@ Status _memcached::parseStatus(const char *line, int len) {
     }
     
     /* search enum */
-    map<const char*, Status>::iterator it;
-    it = statusCode.find(st);
-    if (it != statusCode.end()) status = it->second;
+    vector<const char*>::iterator it;
+    it = find(statusName.begin(), statusName.end(), st);
+    if (it != statusName.end()) statusCode = distance(statusName.begin(), it);
     free(st);
 
-    return status;
+    return statusCode;
+}
+
+bool _memcached::Response::hasErrorStatus() {
+    statusName.push_back("ERROR");
+    statusName.push_back("CLIENT_ERROR");
+    statusName.push_back("SERVER_ERROR");
+    statusName.push_back("BADCLASS");
+    
+    
+    
+    statusName.push_back("DELETED");
+    statusName.push_back("TOUCHED");
+    statusName.push_back("BUSY");
+    statusName.push_back("NOTFULL");
+    statusName.push_back("UNSAFE");
+    statusName.push_back("SAME");
+    statusName.push_back("STAT");
+    statusName.push_back("VERSION");
+
+    return false;
 }
 
 /*
@@ -197,13 +125,16 @@ Status _memcached::parseStatus(const char *line, int len) {
 char* MemCached::isResponse(const char *ptr, const int datalen) {
 	char *eol, *linesp, *head_end = NULL;
     int lnl;
-    Status status = CACHE_ST_NONE;
+    int statusCode = 0;
+
     linesp = (char*) ptr;
 	head_end = Protocol::find_line_end(linesp, datalen, &eol);
 	lnl = head_end - linesp + 1;
-	status = parseStatus(linesp, lnl);
+
+    _memcached::Response* rsp = new _memcached::Response();
+	statusCode = rsp->parseStatus(linesp, lnl);
     
-    if (status = CACHE_ST_NONE){
+    if (rsp->statusName[statusCode] == "NONE"){
 		return NULL;
 	} else {
 		return head_end;
@@ -253,16 +184,28 @@ _protocol::Response* MemCached::getResponse(const char *data, const char *dataen
     return new Response(data, dataend, ack);
 }
 
-char* MemCached::getMethodName(int m) {
-    return methodName[m];
-}
-
-int MemCached::getMethodCount() {
-    return static_cast<int>(methodName.size());
-}
-
-int MemCached::getStatusCount() {
-    return static_cast<int>(statusCode.size());
+_memcached::Request::Request() {
+    methodsName.push_back("none");
+    methodsName.push_back("get");
+    methodsName.push_back("set");
+    methodsName.push_back("add");
+    methodsName.push_back("replace");
+    methodsName.push_back("append");
+    methodsName.push_back("prepend");
+    methodsName.push_back("delete");
+    methodsName.push_back("flush_all");
+    methodsName.push_back("quit");
+    methodsName.push_back("incr");
+    methodsName.push_back("decr");
+    methodsName.push_back("touch");
+    methodsName.push_back("gat");
+    methodsName.push_back("gats");
+    methodsName.push_back("slabs");
+    methodsName.push_back("lru");
+    methodsName.push_back("watch");
+    methodsName.push_back("stats");
+    methodsName.push_back("version");
+    methodsName.push_back("misbehave");
 }
 
 /*
@@ -270,11 +213,11 @@ int MemCached::getStatusCount() {
  * But only the header fields are extracted.
  */
 
-_memcached::Request::Request(const char *data, const char *dataend, char *time, u_int32_t seq, u_int32_t nxt_seq) {
+_memcached::Request::Request(const char *data, const char *dataend, char *time, u_int32_t seq, u_int32_t nxt_seq) : Request() {
 	char *eoh, *eol, *linesp, *lineep;
 	int tokenlen = 0, hdl = 0;
-        const char *next_token, *key;
-        unsigned int val;
+    char *next_token, *key;
+    unsigned int val;
 
     seq = seq;
     nxt_seq = nxt_seq;
@@ -285,12 +228,12 @@ _memcached::Request::Request(const char *data, const char *dataend, char *time, 
 	time = strdup(time);
 	/* Parse first line of cache request */
 	linesp = (char*) data;
-	method = parseMethod(linesp, hdl);
-	if ( method == CACHE_MT_NONE){
+	methodCode = parseMethod(linesp, hdl);
+	if (methodCode == 0){
         return;
 	}
     
-    if(method == get /*|| method == gets*/) {
+    if(methodsName[methodCode] == "get" /*|| method == gets*/) {
         tokenlen = Protocol::get_token_len(linesp, eoh, &next_token);
         while (tokenlen != 0 && linesp[tokenlen] == ' ' ) {
             key = MALLOC(char, tokenlen+1);
@@ -299,10 +242,10 @@ _memcached::Request::Request(const char *data, const char *dataend, char *time, 
                 //key[tokenlen] = '\0';
                 keys.push_back(key);
                             }
-            linesp=next_token;
+            linesp = next_token;
             tokenlen = Protocol::get_token_len(linesp, eoh, &next_token);     
         }
-    } else if (method==deletem || method==incr ||method==decr || method==touch) {
+    } else if (methodsName[methodCode] == "delete" || methodsName[methodCode] == "incr" ||methodsName[methodCode] == "decr" || methodsName[methodCode] == "touch") {
         tokenlen = Protocol::get_token_len(linesp, eoh, &next_token);
         if (tokenlen != 0 && (linesp[tokenlen] == ' ' || linesp[tokenlen]== '\r' )) {
             key = MALLOC(char, tokenlen+1);
@@ -312,8 +255,8 @@ _memcached::Request::Request(const char *data, const char *dataend, char *time, 
                 keys.push_back(key);
             }
 
-            if (method == touch) {
-                linesp=next_token;
+            if (methodsName[methodCode] == "touch") {
+                linesp = next_token;
                 tokenlen = Protocol::get_token_len(linesp,eoh, &next_token);
                 if (tokenlen != 0 && (linesp[tokenlen] == ' ' || linesp[tokenlen] == '\r')) {
                     if (sscanf(linesp, "%u", &val) != 1) {
@@ -322,7 +265,7 @@ _memcached::Request::Request(const char *data, const char *dataend, char *time, 
                 }
             }
         }
-    } else if (method == gat || method == gats) {
+    } else if (methodsName[methodCode] == "gat" || methodsName[methodCode] == "gats") {
         tokenlen = Protocol::get_token_len(linesp,eoh, &next_token);
         if (tokenlen != 0 && (linesp[tokenlen] == ' ' || linesp[tokenlen] == '\r')) {
             if (sscanf(linesp, "%u", &val) != 1) {
@@ -330,7 +273,7 @@ _memcached::Request::Request(const char *data, const char *dataend, char *time, 
             }
 
             while (tokenlen != 0 && linesp[tokenlen] == ' ' ) {
-                linesp=next_token;
+                linesp = next_token;
                 tokenlen = Protocol::get_token_len(linesp, eoh, &next_token);
                 key = MALLOC(char, tokenlen+1);
                 if (key != NULL) {
@@ -344,26 +287,32 @@ _memcached::Request::Request(const char *data, const char *dataend, char *time, 
 }
 
 _memcached::Response::Response() {
-    statusCode["VALUE"]=VALUE;
-    statusCode["OK"]=OK;
-    statusCode["END"]=END;
-    statusCode["STORED"]=STORED;
-    statusCode["NOT_STORED"]=NOT_STORED;
-    statusCode["EXISTS"]=EXISTS;
-    statusCode["NOT_FOUND"]=NOT_FOUND;
-    statusCode["ERROR"]=ERROR;
-    statusCode["CLIENT_ERROR"]=CLIENT_ERROR;
-    statusCode["SERVER_ERROR"]=SERVER_ERROR;
-    statusCode["DELETED"]=DELETED;
-    statusCode["TOUCHED"]=TOUCHED;
-    statusCode["BUSY"]=BUSY;
-    statusCode["BADCLASS"]=BADCLASS;
-    statusCode["NOTFULL"]=NOTFULL;
-    statusCode["UNSAFE"]=UNSAFE;
-    statusCode["SAME"]=SAME;
-    statusCode["STAT"]=STAT;
-    statusCode["VERSION"]=VERSION;
+    statusName.push_back("NONE");
+    statusName.push_back("VALUE");
+    statusName.push_back("OK");
+    statusName.push_back("END");
+    statusName.push_back("STORED");
+    statusName.push_back("NOT_STORED");
+    statusName.push_back("EXISTS");
+    statusName.push_back("NOT_FOUND");
+    statusName.push_back("ERROR");
+    statusName.push_back("CLIENT_ERROR");
+    statusName.push_back("SERVER_ERROR");
+    statusName.push_back("DELETED");
+    statusName.push_back("TOUCHED");
+    statusName.push_back("BUSY");
+    statusName.push_back("BADCLASS");
+    statusName.push_back("NOTFULL");
+    statusName.push_back("UNSAFE");
+    statusName.push_back("SAME");
+    statusName.push_back("STAT");
+    statusName.push_back("VERSION");
+    
+    for (std::size_t i = 0; i != statusName.size(); ++i) {
+        status[i];
+    }
 }
+
 
 /*
  * Extract response message from data.
@@ -372,7 +321,7 @@ _memcached::Response::Response() {
 _memcached::Response::Response(const char *data, const char *dataend, long ack) : Response() {
 	char *eoh, *eol, *linesp;
 	int line_cnt = 0, hdl = 0,tokenlen=0;
-    const char *next_token,*key;
+    char *next_token, *key;
     unsigned int val;
     unsigned char Flgs;
         
@@ -387,13 +336,13 @@ _memcached::Response::Response(const char *data, const char *dataend, long ack) 
 
 	/* first line */
 	linesp = (char*) data;
-	status = parseStatus(linesp, hdl);
+	statusCode = parseStatus(linesp, hdl);
 	
-    if (status == CACHE_ST_NONE){
+    if (statusName[statusCode] == "NONE"){
 		return;
 	}
     
-    if (status==VALUE)
+    if (statusName[statusCode] == "VALUE")
     {
         tokenlen = Protocol::get_token_len(linesp, eoh, &next_token);
         if (tokenlen != 0 && linesp[tokenlen] == ' ' ) {
@@ -404,20 +353,20 @@ _memcached::Response::Response(const char *data, const char *dataend, long ack) 
                 keys.push_back(key);
             }
         }
-        linesp=next_token;
+        linesp = next_token;
         tokenlen = Protocol::get_token_len(linesp, eoh, &next_token);
         
         if (tokenlen != 0 && linesp[tokenlen] == ' ' ) {
             if (sscanf(linesp, "%hhu", &Flgs) != 1) {
-                flags=Flgs;
+                flags = Flgs;
             }
         }
             
-        linesp=next_token;
+        linesp = next_token;
         tokenlen = Protocol::get_token_len(linesp, eoh, &next_token);
         if (tokenlen != 0 && (linesp[tokenlen] == ' ' ||linesp[tokenlen] == '\r')) {
             if (sscanf(linesp, "%u", &val) != 1) {
-                bodylen=val;
+                bodylen = val;
             }
         }
     }	

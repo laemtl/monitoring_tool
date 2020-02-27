@@ -11,7 +11,6 @@ class RspStatus : public MetricCumDistr
 {
 	private:
 		int rspTotal;
-        //int flow_tot;
         int* rspStatus;
         int rspStatusSize;
 

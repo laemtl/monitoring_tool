@@ -8,6 +8,8 @@
 #include <string.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <iostream>
+
 #include "util.h"
 #include "tcp.h"
 #include "packet.h"

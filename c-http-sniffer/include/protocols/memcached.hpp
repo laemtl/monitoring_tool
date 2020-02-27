@@ -12,65 +12,14 @@
 #include <assert.h>
 #include <map>
 #include "protocol.hpp"
+#include "ResponseStatus.hpp"
+#include "RequestMethod.hpp"
 
 namespace _memcached {
-    enum Status {
-        VALUE,
-        OK,
-        END,
-        STORED,
-        NOT_STORED,
-        EXISTS,
-        NOT_FOUND,
-        ERROR,
-        CLIENT_ERROR,
-        SERVER_ERROR,
-        DELETED,
-        TOUCHED,
-        BUSY,
-        BADCLASS,
-        NOTFULL,
-        UNSAFE,
-        SAME,
-        STAT,
-        VERSION,
-        CACHE_ST_NONE
-    };
-
-    static std::map<const char*, Status> statusCode;
-    
-    enum Method {
-        get,
-        set,
-        add,
-        replace,
-        append,
-        prepend,
-        deletem,
-        flush_all,
-        quit,
-        incr,
-        decr,
-        touch,
-        gat,
-        gats,
-        slabs,
-        lru,
-        watch,
-        stats,
-        version,
-        misbehave,
-        CACHE_MT_NONE
-    };
-
-    Status parseStatus(const char *line, int len);
-    Method parseMethod(const char *data, int linelen);  
 
     class MemCached : public _protocol::Protocol {
         public:
             std::vector<int> ports;
-            vector<char*> methodName;
-            
             MemCached(Analysis* analysis);
             
             bool isPacketOf(u_int16_t sport, u_int16_t dport);	/* If the packet carries HTTP(request or response) data */
@@ -81,15 +30,10 @@ namespace _memcached {
             int extractPair(Flow* flow, bool closed);
             _protocol::Request* getRequest(const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq);
             _protocol::Response* getResponse(const char *data, const char *dataend, long ack);
-            char* getMethodName(int m);
-            int getMethodCount();
-            int getStatusCount();
     };
 
-    class Request : public _protocol::Request {
+    class Request : public _protocol::Request, public RequestMethod  {
         public:
-            
-            Method method;
             u_int32_t   seq;
             u_int32_t   nxt_seq;
             vector<const char*> keys;
@@ -100,23 +44,24 @@ namespace _memcached {
             Request();
             Request(const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq);   /* Parse the packet and store in a Request object */
             ~Request();
-            
+            int parseMethod(const char *data, int linelen);
     };
 
     /*
     * Cache response header
     */
-    class Response : public _protocol::Response {
+    class Response : public _protocol::Response, public ResponseStatus {
         public:
-            Status      status;
-            long	acknowledgement;
+            long acknowledgement;
             vector<const char*> keys;
             u_int8_t  flags;
             u_int32_t bodylen;
+
             Response();
             Response(const char *data, const char *dataend, long ack);	/* Parse the packet and store in a Response object */
             ~Response();
-            
+            int parseStatus(const char *line, int len);
+            bool hasErrorStatus();
     };
 }
 

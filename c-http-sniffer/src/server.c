@@ -85,7 +85,8 @@ void connection_handler(Config* config) {
 			for (unsigned i = 0; i < init->n_netint; i++) { // Iterate through all repeated string
 				printf ("netInt: %s\n\n", init->netint[i]);
 				
-				Analysis* analysis = new Analysis(config->socket, init->netint[i], init->interval, init->duration, true, config->debug);
+				Analysis* analysis = new Analysis(config->socket, init->netint[i], init->interval, init->duration);
+				analysis->debug = config->debug;
 				Http* http = new Http(analysis);
 				http->activeMetrics(init->activemetric);
 				analysis->protocols.push_back(http);

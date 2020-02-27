@@ -1,10 +1,8 @@
 #include "rspStatus.hpp"
-#include "http.hpp"
+#include "ResponseStatus.hpp"
 
 RspStatus::RspStatus(Protocol* protocol, Analysis* analysis)
-: MetricCumDistr(protocol, analysis, "rsp_status", "Response status"), rspTotal(0) {
-	rspStatusSize = protocol->getStatusCount();
-	rspStatus = new int[rspStatusSize]{};
+: MetricCumDistr(protocol, analysis, "rsp_status", "Response status"), rspTotal(0), rspStatus(NULL) {
 }
 
 void RspStatus::subscribe(EventManager* em) {
@@ -31,6 +29,8 @@ void RspStatus::onRequestReceived(Pair *pair, Flow* flow) {
 }
 
 void RspStatus::onIntervalExpired() {
+	if(rspStatus == NULL) return;
+
 	cflUpdate(rspStatus, rspStatusSize);
 	if(protocol->analysis->isServerMode()) sendMsg();
 	print();
@@ -48,11 +48,16 @@ void RspStatus::onFlowUpdate(Flow* flow) {
 
 void RspStatus::onResponseReceived(Pair *pair, Flow* flow) {
 	rspTotal++;
-    
-    // Atomic increment
-    _http::Response *rsp = (_http::Response*)pair->response_header;					
-    int status = rsp->status;
+	
+	ResponseStatus* rsp = (ResponseStatus*)pair->response_header;
 
+	if(rspStatus == NULL) {
+		rspStatusSize = rsp->getStatusCount();
+		rspStatus = new int[rspStatusSize]{};
+	}
+
+    // Atomic increment
+    int status = rsp->statusCode;				
     int* cnt = &(rspStatus[status]);
 	__atomic_fetch_add(cnt, 1, __ATOMIC_SEQ_CST);
 }

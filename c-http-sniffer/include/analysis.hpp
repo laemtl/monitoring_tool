@@ -39,7 +39,7 @@ class Analysis {
         // raw packet queue
         Queue* rpq;
 
-        Analysis(int socket, const char* netInt, uint32_t interval, uint32_t duration, bool serverMode, bool debug); 
+        Analysis(int socket, const char* netInt, uint32_t interval, uint32_t duration); 
 
         bool isServerMode();
         void setClientIp(u_int32_t ip);

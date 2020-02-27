@@ -1,5 +1,5 @@
 #include "errRate.hpp"
-#include "http.hpp"
+#include "ResponseStatus.hpp"
 
 ErrRate::ErrRate(Protocol* protocol, Analysis* analysis) 
 : MetricAvg(protocol, analysis, "err_rate", "Error rate"){
@@ -22,13 +22,9 @@ void ErrRate::onResponseReceived(Pair *pair, Flow* flow) {
 	subtotal->add(1);
 	total->add(1);
 
-	_http::Response *rsp = (_http::Response*)pair->response_header;					
-	int status = rsp->status;
-	
-	// Extract first digit of status code
-	int i = status;
-	while (i>=10) i=i/10;  
-	if (i>3) {
+	ResponseStatus *rsp = (ResponseStatus*)pair->response_header;				
+	int status = rsp->statusCode;				
+	if(rsp->hasErrorStatus()) {
 		subsum->add(1);
 		sum->add(1);
 	}
