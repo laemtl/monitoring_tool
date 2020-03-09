@@ -19,10 +19,10 @@ void Rst::onResponseReceived(Pair *pair, Flow* flow) {
 	_http::Response *rsp = (_http::Response*)pair->response_header;
 	_http::Request *req = (_http::Request*)pair->request_header;
 
-	if(rst < 0 ) {
-		printf("req nxt seq: %" PRIu32 "\n", req->nxt_seq);
-		printf("aknowledgment: %ld \n", rsp->acknowledgement);
-	}
+	//if(rst < 0 ) {
+	//	printf("req nxt seq: %" PRIu32 "\n", req->nxt_seq);
+	//	printf("aknowledgment: %ld \n", rsp->acknowledgement);
+	//}
 	
 	total->add(1);
 	sum->add(rst);
