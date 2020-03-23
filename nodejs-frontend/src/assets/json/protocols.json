@@ -1,0 +1,79 @@
+{
+    "metrics": {
+        "rst": {
+            "label": "Request service time",
+            "type": "line",
+            "max": 0.5,
+            "active": true
+        },
+        "req_rate": {
+            "label": "Request rate",
+            "type": "line",
+            "max": 10,
+            "active": true
+        },
+        "err_rate": {
+            "label": "Error rate",
+            "type": "line",
+            "max": 1.1,
+            "active": true
+        },
+        "tp": {
+            "label": "Throughput (C->S)",
+            "type": "line",
+            "max": 1000,
+            "active": false
+        },
+        "tp_rev": {
+            "label": "Throughput (S->C)",
+            "type": "line",
+            "max": 1000,
+            "active": false
+        },
+        "conn_rate": {
+            "label": "Connection rate",
+            "type": "line",
+            "max": 2,
+            "active": true
+        },
+        "clients": {
+            "label": "Clients",
+            "type": "area",
+            "max": 1.1,
+            "active": true
+        },
+        "req_path": {
+            "label": "Request paths",
+            "type": "area",
+            "max": 1.1,
+            "active": true
+        },
+        "req_method": {
+            "label": "Request methods",
+            "type": "area",
+            "max": 1.1,
+            "active": true
+        },
+        "req_type": {
+            "label": "Request type",
+            "type": "area",
+            "max": 1.1,
+            "active": true
+        },
+        "rsp_status": {
+            "label": "Response status",
+            "type": "area",
+            "max": 1.1,
+            "active": true
+        }
+    },
+
+    "protocols": {
+        "HTTP": {
+            "metrics": ["rst", "req_rate", "err_rate", "tp", "tp_rev", "conn_rate", "clients", "req_path", "req_method", "req_type", "rsp_status" ]
+        },
+        "MEMCACHED": {
+            "metrics": ["rst", "err_rate", "tp", "tp_rev", "req_type", "rsp_status"]
+        }
+    }
+}

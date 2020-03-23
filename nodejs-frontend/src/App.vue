@@ -2,22 +2,47 @@
   <v-app>
     <v-content class="blue-grey lighten-5">
       <v-container fluid grid-list-lg>
+        {{$root.netInts}}
         <v-layout row wrap>
-          <SystemForm v-bind:statistics="statistics" />
+          <SystemForm />
           <v-flex xs12>
-            <span> Analysis {{ status }} </span>
-            <v-layout class="pa-2" row wrap>
-              <SystemResultGraph
-                v-for="(stat, id) in statistics"
-                v-if="id != 'tp_rev'"            
-                v-bind:graph="{
-                  stat: stat,
-                  id: id,
-                  netInt: netInt,
-                  interval: interval
-                }"
-              />
-            </v-layout>
+              <span> Analysis {{ status }} </span>
+              <v-tabs
+                background-color="cyan"
+                dark
+                show-arrows
+                v-model="tab"
+              >
+                <v-tabs-slider color="yellow"></v-tabs-slider>
+                <div v-for="i in $root.netInts.length">   
+                  <v-tab
+                    v-for="j in $root.netInts[i - 1].protocols.length"
+                    :key="i + j"
+                  >
+                    {{$root.netInts[i - 1].id }} - {{$root.netInts[i - 1].protocols[j - 1].id }}
+                  </v-tab>
+                </div>
+              </v-tabs>
+              
+              <v-tabs-items v-model="tab">
+                <div v-for="i in $root.netInts.length">   
+                  <v-tab-item
+                    v-for="j in $root.netInts[i - 1].protocols.length"
+                    :key="i + j"
+                  >
+                    <v-layout class="pa-2" row wrap>
+                      <SystemResultGraph 
+                        v-for="(metric, id) in $root.netInts[i - 1].protocols[j - 1].metrics"
+                        :data="{
+                          netIntIndex: i - 1,
+                          protocolIndex: j - 1,
+                          metricId: id
+                        }"
+                      />
+                    </v-layout>
+                  </v-tab-item>
+                </div>
+              </v-tabs-items>            
           </v-flex>
         </v-layout>
       </v-container>
@@ -28,12 +53,9 @@
 <script>
 import SystemForm from "./components/SystemForm";
 import SystemResultGraph from "./components/SystemResultGraph";
-import { configBus } from "./main";
+import { bus } from "./main";
 
 require("./assets/main.scss");
-//var accurateInterval = require('accurate-interval');
-
-//console.log(process.env);
 
 export default {
   name: "App",
@@ -41,93 +63,11 @@ export default {
     SystemForm,
     SystemResultGraph
   },
-  props: {
-    statistics: {
-      type: Object,
-      default: function() {
-        var stats = {};
-        stats["rst"] = {
-          label: "Request service time",
-          type: "line",
-          active: true,
-          max: 0.5
-        };
-        stats["req_rate"] = {
-          label: "Request rate",
-          type: "line",
-          active: true,
-          max: 10
-        };
-        stats["err_rate"] = {
-          label: "Error rate",
-          type: "line",
-          active: true,
-          max: 1.1
-        };
-        stats["tp"] = {
-          label: "Throughput",
-          type: "line",
-          active: true,
-          max: 1000
-        };
-        stats["tp_rev"] = {
-          active: true,
-        };
-        stats["conn_rate"] = {
-          label: "Connection rate",
-          type: "line",
-          active: true,
-          max: 2
-        };
-        stats["clients"] = {
-          label: "Clients",
-          type: "area",
-          active: true,
-          max: 1.1
-        };
-        stats["req_path"] = {
-          label: "Request paths",
-          type: "area",
-          active: true,
-          max: 1.1
-        };
-        stats["req_method"] = {
-          label: "Request methods",
-          type: "area",
-          active: true,
-          max: 1.1
-        };
-        stats["req_type"] = {
-          label: "Request type",
-          type: "area",
-          active: true,
-          max: 1.1
-        };
-        stats["rsp_status"] = {
-          label: "Response status",
-          type: "area",
-          active: true,
-          max: 1.1
-        };
-
-        return stats;
-      }
-    }
-  },
   data() {
     return {
+      tab: 0,
       ws: null,
       status: "not started",
-      netInt: [],
-      interval: -1,
-      client: {
-        ip: null,
-        port: null
-      },
-      server: {
-        ip: null,
-        port: null
-      }
     };
   },
   methods: {
@@ -140,7 +80,6 @@ export default {
       );
     },
     openSocketListeners() {
-      console.log(process.env.VUE_APP_WS_URL);
       if(typeof process.env.VUE_APP_WS_URL !== 'string') return;
 
       this.ws = new WebSocket(process.env.VUE_APP_WS_URL);
@@ -149,9 +88,6 @@ export default {
       // event emmited when connected
       this.ws.onopen = function() {
         console.log("websocket is connected ...");
-
-        // sending a send event to websocket server
-        //el.ws.send('connected')
       };
 
       // event emmited when connected
@@ -167,33 +103,19 @@ export default {
           
           console.log(data);
 
-          if("tp" in data && "tp_rev" in data) {
-            data.tp.rev_avg = data.tp_rev.avg;
-            data.tp.rev_min = data.tp_rev.min;
-            data.tp.rev_max = data.tp_rev.max;
+          if(typeof el.selectedProtocols[data.name] === 'undefined') return;
 
-            delete data.tp_rev;
+          if(typeof data.metricAvg !== "undefined") {
+            bus.$emit(data.name, {
+              netInts: data.netInts,
+              data: data.metricAvg
+            });
+          } else if(typeof data.metricCumDistr !== "undefined") {
+            bus.$emit(data.name, {
+              netInts: data.netInts,
+              data: data.metricCumDistr
+            });
           }
-
-          //console.log(data);
-
-          //for (var id in data) {
-            //console.log(id);
-            //console.log(data[id]);
-          
-
-            if(typeof el.statistics[data.name] !== 'undefined' && typeof data.metricAvg !== "undefined") {
-              configBus.$emit(data.name, {
-                netInt: data.netInt,
-                data: data.metricAvg
-              });
-            } else if(typeof el.statistics[data.name] !== 'undefined' && typeof data.metricCumDistr !== "undefined") {
-              configBus.$emit(data.name, {
-                netInt: data.netInt,
-                data: data.metricCumDistr
-              });
-            }
-          //}
         } catch (e) {
           alert(e); // error in the above string (in this case, yes)!
         }
@@ -205,58 +127,65 @@ export default {
   },
   created() {
     // Using the server bus
-    configBus.$on("configSelected", (id, status) => {
-      this.statistics[id].active = status;
-    });
+    bus.$on("run", () => {
+      console.log("sending");
 
-    configBus.$on("run", params => {
       var el = this;
-      this.netInt = params.netInt;
-      this.interval = params.interval;
       this.status = "is running";
-      //var duration = parseInt(params.duration, 10) * 1000;
-
-      /*var timer = accurateInterval(function(scheduledTime) {        
-        el.closeSocketListeners();
-        el.status = 'is stopped';
-        timer.clear();
-      }, duration);*/
-
       this.openSocketListeners();
 
+      let netInts = [];
       this.ws.addEventListener("open", function() {
-        //console.log("opened");
+        for (let n of el.$root.netInts) {
+          let netInt = {
+            id: n.id,
+            protocols: []
+          };
+          
+          for (let p of n.protocols) {
+            let protocol = {
+              id: p.id,
+              active_metrics: 0,
+              client: {
+                ip: el.ip2int(p.client.ip),
+                ports: parseInt(p.client.ports)
+              },
+              server: {
+                ip:  el.ip2int(p.server.ip),
+                ports:  parseInt(p.server.ports),
+              }
+            };
 
-        let active_metric = 0;
-        let stats = Object.keys(el.statistics);
+            let i = 0;
+            for (let m in p.metrics) {
+              if (p.metrics[m].active) {
+                protocol.active_metrics |= 1 << i;
+              }
+              i++;
+            }
 
-        for (let id in el.statistics) {
-          if (el.statistics[id].active) {
-            let index = stats.indexOf(id);
-            active_metric |= 1 << index;
+            netInt.protocols.push(protocol);
           }
+
+          netInts.push(netInt);
         }
 
-        //console.log(params);
+        let msg = {
+          type: "Init",
+          net_ints: netInts,
+          interval: parseInt(el.$root.interval),
+          duration: parseInt(el.$root.duration)
+        };
+
+        console.log(msg);
 
         el.ws.send(
-          JSON.stringify({
-            type: "Init",
-            net_int: params.netInt,
-            interval: parseInt(params.interval),
-            duration: parseInt(params.duration),
-            top_client_cnt: parseInt(params.clientCnt),
-            active_metric: active_metric,
-            client_ip: el.ip2int(params.client.ip),
-            client_port: parseInt(params.client.port),
-            server_ip: el.ip2int(params.server.ip),
-            server_port: parseInt(params.server.port)
-          })
+          JSON.stringify(msg)
         );
       });
     });
 
-    configBus.$on("stop", () => {
+    bus.$on("stop", () => {
       console.log("stop");
       this.closeSocketListeners();
     });

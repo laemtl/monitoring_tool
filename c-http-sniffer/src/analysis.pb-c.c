@@ -7,6 +7,141 @@
 #endif
 
 #include "analysis.pb-c.h"
+void   analysis__ip__init
+                     (Analysis__IP         *message)
+{
+  static const Analysis__IP init_value = ANALYSIS__IP__INIT;
+  *message = init_value;
+}
+size_t analysis__ip__get_packed_size
+                     (const Analysis__IP *message)
+{
+  assert(message->base.descriptor == &analysis__ip__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
+}
+size_t analysis__ip__pack
+                     (const Analysis__IP *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &analysis__ip__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
+}
+size_t analysis__ip__pack_to_buffer
+                     (const Analysis__IP *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &analysis__ip__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
+}
+Analysis__IP *
+       analysis__ip__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (Analysis__IP *)
+     protobuf_c_message_unpack (&analysis__ip__descriptor,
+                                allocator, len, data);
+}
+void   analysis__ip__free_unpacked
+                     (Analysis__IP *message,
+                      ProtobufCAllocator *allocator)
+{
+  if(!message)
+    return;
+  assert(message->base.descriptor == &analysis__ip__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
+}
+void   analysis__protocol__init
+                     (Analysis__Protocol         *message)
+{
+  static const Analysis__Protocol init_value = ANALYSIS__PROTOCOL__INIT;
+  *message = init_value;
+}
+size_t analysis__protocol__get_packed_size
+                     (const Analysis__Protocol *message)
+{
+  assert(message->base.descriptor == &analysis__protocol__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
+}
+size_t analysis__protocol__pack
+                     (const Analysis__Protocol *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &analysis__protocol__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
+}
+size_t analysis__protocol__pack_to_buffer
+                     (const Analysis__Protocol *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &analysis__protocol__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
+}
+Analysis__Protocol *
+       analysis__protocol__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (Analysis__Protocol *)
+     protobuf_c_message_unpack (&analysis__protocol__descriptor,
+                                allocator, len, data);
+}
+void   analysis__protocol__free_unpacked
+                     (Analysis__Protocol *message,
+                      ProtobufCAllocator *allocator)
+{
+  if(!message)
+    return;
+  assert(message->base.descriptor == &analysis__protocol__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
+}
+void   analysis__net_int__init
+                     (Analysis__NetInt         *message)
+{
+  static const Analysis__NetInt init_value = ANALYSIS__NET_INT__INIT;
+  *message = init_value;
+}
+size_t analysis__net_int__get_packed_size
+                     (const Analysis__NetInt *message)
+{
+  assert(message->base.descriptor == &analysis__net_int__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
+}
+size_t analysis__net_int__pack
+                     (const Analysis__NetInt *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &analysis__net_int__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
+}
+size_t analysis__net_int__pack_to_buffer
+                     (const Analysis__NetInt *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &analysis__net_int__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
+}
+Analysis__NetInt *
+       analysis__net_int__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (Analysis__NetInt *)
+     protobuf_c_message_unpack (&analysis__net_int__descriptor,
+                                allocator, len, data);
+}
+void   analysis__net_int__free_unpacked
+                     (Analysis__NetInt *message,
+                      ProtobufCAllocator *allocator)
+{
+  if(!message)
+    return;
+  assert(message->base.descriptor == &analysis__net_int__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
+}
 void   analysis__init__init
                      (Analysis__Init         *message)
 {
@@ -95,51 +230,6 @@ void   analysis__data__free_unpacked
   if(!message)
     return;
   assert(message->base.descriptor == &analysis__data__descriptor);
-  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
-}
-void   analysis__metric_list__init
-                     (Analysis__MetricList         *message)
-{
-  static const Analysis__MetricList init_value = ANALYSIS__METRIC_LIST__INIT;
-  *message = init_value;
-}
-size_t analysis__metric_list__get_packed_size
-                     (const Analysis__MetricList *message)
-{
-  assert(message->base.descriptor == &analysis__metric_list__descriptor);
-  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
-}
-size_t analysis__metric_list__pack
-                     (const Analysis__MetricList *message,
-                      uint8_t       *out)
-{
-  assert(message->base.descriptor == &analysis__metric_list__descriptor);
-  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
-}
-size_t analysis__metric_list__pack_to_buffer
-                     (const Analysis__MetricList *message,
-                      ProtobufCBuffer *buffer)
-{
-  assert(message->base.descriptor == &analysis__metric_list__descriptor);
-  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
-}
-Analysis__MetricList *
-       analysis__metric_list__unpack
-                     (ProtobufCAllocator  *allocator,
-                      size_t               len,
-                      const uint8_t       *data)
-{
-  return (Analysis__MetricList *)
-     protobuf_c_message_unpack (&analysis__metric_list__descriptor,
-                                allocator, len, data);
-}
-void   analysis__metric_list__free_unpacked
-                     (Analysis__MetricList *message,
-                      ProtobufCAllocator *allocator)
-{
-  if(!message)
-    return;
-  assert(message->base.descriptor == &analysis__metric_list__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
 void   analysis__metric_msg__init
@@ -367,16 +457,195 @@ void   analysis__close__free_unpacked
   assert(message->base.descriptor == &analysis__close__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-static const ProtobufCFieldDescriptor analysis__init__field_descriptors[8] =
+static const ProtobufCFieldDescriptor analysis__ip__field_descriptors[2] =
 {
   {
-    "netInt",
+    "ip",
+    1,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_UINT32,
+    offsetof(Analysis__IP, has_ip),
+    offsetof(Analysis__IP, ip),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "ports",
+    2,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_UINT32,
+    offsetof(Analysis__IP, has_ports),
+    offsetof(Analysis__IP, ports),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
+static const unsigned analysis__ip__field_indices_by_name[] = {
+  0,   /* field[0] = ip */
+  1,   /* field[1] = ports */
+};
+static const ProtobufCIntRange analysis__ip__number_ranges[1 + 1] =
+{
+  { 1, 0 },
+  { 0, 2 }
+};
+const ProtobufCMessageDescriptor analysis__ip__descriptor =
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "analysis.IP",
+  "IP",
+  "Analysis__IP",
+  "analysis",
+  sizeof(Analysis__IP),
+  2,
+  analysis__ip__field_descriptors,
+  analysis__ip__field_indices_by_name,
+  1,  analysis__ip__number_ranges,
+  (ProtobufCMessageInit) analysis__ip__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
+static const ProtobufCFieldDescriptor analysis__protocol__field_descriptors[4] =
+{
+  {
+    "id",
+    1,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_STRING,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__Protocol, id),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "activeMetrics",
+    2,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_UINT32,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__Protocol, activemetrics),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "client",
+    3,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__Protocol, client),
+    &analysis__ip__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "server",
+    4,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__Protocol, server),
+    &analysis__ip__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
+static const unsigned analysis__protocol__field_indices_by_name[] = {
+  1,   /* field[1] = activeMetrics */
+  2,   /* field[2] = client */
+  0,   /* field[0] = id */
+  3,   /* field[3] = server */
+};
+static const ProtobufCIntRange analysis__protocol__number_ranges[1 + 1] =
+{
+  { 1, 0 },
+  { 0, 4 }
+};
+const ProtobufCMessageDescriptor analysis__protocol__descriptor =
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "analysis.Protocol",
+  "Protocol",
+  "Analysis__Protocol",
+  "analysis",
+  sizeof(Analysis__Protocol),
+  4,
+  analysis__protocol__field_descriptors,
+  analysis__protocol__field_indices_by_name,
+  1,  analysis__protocol__number_ranges,
+  (ProtobufCMessageInit) analysis__protocol__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
+static const ProtobufCFieldDescriptor analysis__net_int__field_descriptors[2] =
+{
+  {
+    "id",
+    1,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_STRING,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__NetInt, id),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "protocols",
+    2,
+    PROTOBUF_C_LABEL_REPEATED,
+    PROTOBUF_C_TYPE_MESSAGE,
+    offsetof(Analysis__NetInt, n_protocols),
+    offsetof(Analysis__NetInt, protocols),
+    &analysis__protocol__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
+static const unsigned analysis__net_int__field_indices_by_name[] = {
+  0,   /* field[0] = id */
+  1,   /* field[1] = protocols */
+};
+static const ProtobufCIntRange analysis__net_int__number_ranges[1 + 1] =
+{
+  { 1, 0 },
+  { 0, 2 }
+};
+const ProtobufCMessageDescriptor analysis__net_int__descriptor =
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "analysis.NetInt",
+  "NetInt",
+  "Analysis__NetInt",
+  "analysis",
+  sizeof(Analysis__NetInt),
+  2,
+  analysis__net_int__field_descriptors,
+  analysis__net_int__field_indices_by_name,
+  1,  analysis__net_int__number_ranges,
+  (ProtobufCMessageInit) analysis__net_int__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
+static const ProtobufCFieldDescriptor analysis__init__field_descriptors[3] =
+{
+  {
+    "netInts",
     1,
     PROTOBUF_C_LABEL_REPEATED,
-    PROTOBUF_C_TYPE_STRING,
-    offsetof(Analysis__Init, n_netint),
-    offsetof(Analysis__Init, netint),
-    NULL,
+    PROTOBUF_C_TYPE_MESSAGE,
+    offsetof(Analysis__Init, n_netints),
+    offsetof(Analysis__Init, netints),
+    &analysis__net_int__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
@@ -405,82 +674,16 @@ static const ProtobufCFieldDescriptor analysis__init__field_descriptors[8] =
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
-  {
-    "activeMetric",
-    5,
-    PROTOBUF_C_LABEL_REQUIRED,
-    PROTOBUF_C_TYPE_UINT32,
-    0,   /* quantifier_offset */
-    offsetof(Analysis__Init, activemetric),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-  {
-    "clientIP",
-    6,
-    PROTOBUF_C_LABEL_OPTIONAL,
-    PROTOBUF_C_TYPE_UINT32,
-    offsetof(Analysis__Init, has_clientip),
-    offsetof(Analysis__Init, clientip),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-  {
-    "clientPort",
-    7,
-    PROTOBUF_C_LABEL_OPTIONAL,
-    PROTOBUF_C_TYPE_UINT32,
-    offsetof(Analysis__Init, has_clientport),
-    offsetof(Analysis__Init, clientport),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-  {
-    "serverIP",
-    8,
-    PROTOBUF_C_LABEL_OPTIONAL,
-    PROTOBUF_C_TYPE_UINT32,
-    offsetof(Analysis__Init, has_serverip),
-    offsetof(Analysis__Init, serverip),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-  {
-    "serverPort",
-    9,
-    PROTOBUF_C_LABEL_OPTIONAL,
-    PROTOBUF_C_TYPE_UINT32,
-    offsetof(Analysis__Init, has_serverport),
-    offsetof(Analysis__Init, serverport),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
 };
 static const unsigned analysis__init__field_indices_by_name[] = {
-  3,   /* field[3] = activeMetric */
-  4,   /* field[4] = clientIP */
-  5,   /* field[5] = clientPort */
   2,   /* field[2] = duration */
   1,   /* field[1] = interval */
-  0,   /* field[0] = netInt */
-  6,   /* field[6] = serverIP */
-  7,   /* field[7] = serverPort */
+  0,   /* field[0] = netInts */
 };
-static const ProtobufCIntRange analysis__init__number_ranges[2 + 1] =
+static const ProtobufCIntRange analysis__init__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 5, 3 },
-  { 0, 8 }
+  { 0, 3 }
 };
 const ProtobufCMessageDescriptor analysis__init__descriptor =
 {
@@ -490,10 +693,10 @@ const ProtobufCMessageDescriptor analysis__init__descriptor =
   "Analysis__Init",
   "analysis",
   sizeof(Analysis__Init),
-  8,
+  3,
   analysis__init__field_descriptors,
   analysis__init__field_indices_by_name,
-  2,  analysis__init__number_ranges,
+  1,  analysis__init__number_ranges,
   (ProtobufCMessageInit) analysis__init__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
@@ -512,12 +715,12 @@ static const ProtobufCFieldDescriptor analysis__data__field_descriptors[28] =
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "netInt",
+    "netInts",
     2,
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Analysis__Data, netint),
+    offsetof(Analysis__Data, netints),
     NULL,
     NULL,
     0,             /* flags */
@@ -845,7 +1048,7 @@ static const unsigned analysis__data__field_indices_by_name[] = {
   9,   /* field[9] = errRateClient */
   8,   /* field[8] = errRateMax */
   7,   /* field[7] = errRateMin */
-  1,   /* field[1] = netInt */
+  1,   /* field[1] = netInts */
   10,   /* field[10] = reqRate */
   13,   /* field[13] = reqRateClient */
   12,   /* field[12] = reqRateMax */
@@ -886,24 +1089,6 @@ const ProtobufCMessageDescriptor analysis__data__descriptor =
   (ProtobufCMessageInit) analysis__data__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-#define analysis__metric_list__field_descriptors NULL
-#define analysis__metric_list__field_indices_by_name NULL
-#define analysis__metric_list__number_ranges NULL
-const ProtobufCMessageDescriptor analysis__metric_list__descriptor =
-{
-  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "analysis.MetricList",
-  "MetricList",
-  "Analysis__MetricList",
-  "analysis",
-  sizeof(Analysis__MetricList),
-  0,
-  analysis__metric_list__field_descriptors,
-  analysis__metric_list__field_indices_by_name,
-  0,  analysis__metric_list__number_ranges,
-  (ProtobufCMessageInit) analysis__metric_list__init,
-  NULL,NULL,NULL    /* reserved[123] */
-};
 static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[6] =
 {
   {
@@ -931,12 +1116,12 @@ static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[6]
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "netInt",
+    "netInts",
     3,
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Analysis__MetricMsg, netint),
+    offsetof(Analysis__MetricMsg, netints),
     NULL,
     NULL,
     0,             /* flags */
@@ -984,7 +1169,7 @@ static const unsigned analysis__metric_msg__field_indices_by_name[] = {
   4,   /* field[4] = metricAvg */
   5,   /* field[5] = metricCumDistr */
   0,   /* field[0] = name */
-  2,   /* field[2] = netInt */
+  2,   /* field[2] = netInts */
   1,   /* field[1] = time */
 };
 static const ProtobufCIntRange analysis__metric_msg__number_ranges[1 + 1] =

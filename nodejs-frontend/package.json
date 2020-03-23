@@ -24,7 +24,7 @@
     "rickshaw": "^1.6.6",
     "ucid": "^1.0.0",
     "vue": "^2.6.10",
-    "vuetify": "^1.5.14",
+    "vuetify": "^2.2.15",
     "ws": "^7.0.0"
   },
   "devDependencies": {

@@ -124,7 +124,7 @@ void MetricCumDistr::sendMsg() {
 	msg.metriccumdistr->freqs = freqs;
 	msg.metriccumdistr->n_freqs = cfl.count;
 
-	msg.netint = (char*)analysis->interface;
+	msg.netints = (char*)analysis->interface;
 
 	for(int i = 0; i < cfl.count; i++) {
 		Analysis__Freq* freq = MALLOC(Analysis__Freq, 1);

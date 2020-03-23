@@ -2,21 +2,32 @@ syntax = "proto2";
 
 package analysis;
 
+message IP {
+    optional uint32 ip = 1;
+    optional uint32 ports = 2;
+};
+
+message Protocol {
+    required string id = 1;
+    required uint32 activeMetrics = 2;
+    optional IP client = 3;
+    optional IP server = 4;
+};
+
+message NetInt {
+    required string id = 1;
+    repeated Protocol protocols = 2;
+};
+
 message Init {
-    repeated string netInt = 1;
+    repeated NetInt netInts = 1;
     required uint32 interval = 2;
     required uint32 duration = 3;
-    //required uint32 topClientCnt = 4;
-    required uint32 activeMetric = 5;
-    optional uint32 clientIP = 6;
-    optional uint32 clientPort = 7;
-    optional uint32 serverIP = 8;
-    optional uint32 serverPort = 9;
 };
 
 message Data {
     required int64 time = 1;
-    required string netInt = 2;
+    required string netInts = 2;
     
     optional double rstAvg = 3;
     optional double rstMin = 4;
@@ -37,8 +48,6 @@ message Data {
     optional double connRateMin = 16;
     optional double connRateMax = 17;
     
-    //repeated Conn conns = 19;
-
     repeated Freq client = 18;
     repeated Freq req_path = 19;
     repeated Freq req_method = 20;
@@ -54,19 +63,10 @@ message Data {
     optional double tpRevMax = 28;
 };
 
-/*message Conn {
-    required uint32 ip = 1;
-    required uint32 port = 2; 
-}*/
-
-message MetricList {
-
-}
-
 message MetricMsg {
     required string name = 1;    
     required int64 time = 2;
-    required string netInt = 3;
+    required string netInts = 3;
     required int64 clientId = 4;
 
     oneof values {

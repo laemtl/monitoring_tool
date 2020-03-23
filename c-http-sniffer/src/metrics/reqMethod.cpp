@@ -1,5 +1,4 @@
 #include "reqMethod.hpp"
-#include "http.hpp"
 
 ReqMethod::ReqMethod(Protocol* protocol, Analysis* analysis) 
 : MetricCumDistr(protocol, analysis, "req_method", "Request methods"), reqTotal(0) {

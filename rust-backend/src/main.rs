@@ -1,4 +1,6 @@
+#[macro_use]
 extern crate serde_derive;
+
 #[macro_use]
 extern crate actix;
 
@@ -7,7 +9,8 @@ extern crate log;
 mod analysis;
 mod codec;
 
-use crate::analysis::{Init, Data, MetricMsg, MetricAvgMsg, MetricCumDistrMsg};
+use crate::analysis::{NetInt, Init, MetricMsg};
+
 use protobuf::{
     CodedOutputStream, Message, RepeatedField
 };
@@ -17,7 +20,6 @@ use tokio_io::AsyncRead;
 use tokio_tcp::TcpStream;
 
 use std::str::FromStr;
-use serde::{Deserialize, Serialize};
 //use std::time::{Duration, Instant};
 use actix::prelude::*;
 use actix_files as fs;
@@ -29,7 +31,7 @@ use actix_web_actors::ws;
 use actix::Context;
 
 use std::net::{
-    ToSocketAddrs, IpAddr, SocketAddr
+    SocketAddr
 };
 use std::io;
 
@@ -81,15 +83,9 @@ struct Params {
 #[serde(tag = "type")]
 enum Msg {
     Init { 
-        net_int: Vec<String>,
+        net_ints: Vec<NetInt>,
         interval: u32,
-        duration: u32,
-        //top_client_cnt: u32,
-        active_metric: u32,
-        client_ip: ::std::option::Option<u32>,
-        client_port: ::std::option::Option<u32>,
-        server_ip: ::std::option::Option<u32>,
-        server_port: ::std::option::Option<u32>
+        duration: u32
     },
     Data {
         time: i64,
@@ -124,44 +120,20 @@ enum Msg {
         net_int: String,
         client_id: i64,
         #[serde(skip_serializing_if = "Option::is_none")]
-        metricAvg: std::option::Option<MetricAvg>,
+        metric_avg: std::option::Option<MetricAvg>,
         #[serde(skip_serializing_if = "Option::is_none")]
-        metricCumDistr: std::option::Option<CFreq>
+        metric_cum_distr: std::option::Option<CFreq>
     }
 }
 
 struct Ws {
-    // Client must send ping at least once per 10 seconds, otherwise we drop connection.
-    //hb: Instant
 }
 
 impl Ws {
     fn new() -> Self {
-        //Self { hb: Instant::now() }
         Self {}
     }
-
-    // helper method that sends ping to client every second.
-    // also this method checks heartbeats from client
-    /*fn hb(&self, ctx: &mut <Self as Actor>::Context) {
-        ctx.run_interval(HEARTBEAT_INTERVAL, |act, ctx| {
-            // check client heartbeats
-            if Instant::now().duration_since(act.hb) > CLIENT_TIMEOUT {
-                // heartbeat timed out
-                println!("Websocket Client heartbeat failed, disconnecting!");
-
-                // stop actor
-                ctx.stop();
-
-                // don't try to send a ping
-                return;
-            }
-
-            ctx.ping("");
-        });
-    }*/
 }
-
 
 impl Actor for Ws {
     type Context = ws::WebsocketContext<Self>;
@@ -197,7 +169,7 @@ impl StreamHandler<ws::Message, ws::ProtocolError> for Ws {
             ws::Message::Pong(_) => {
             }
             ws::Message::Text(text) => {
-                //println!("WS: {:?}", text);
+                println!("WS: {:?}", text);
                 
                 let m: Msg = match serde_json::from_str(&text){
                     Result::Ok(val) => {val},
@@ -207,42 +179,13 @@ impl StreamHandler<ws::Message, ws::ProtocolError> for Ws {
                 println!("{:?}", m);
 
                 match m {
-                    Msg::Init { net_int, interval, duration, active_metric, client_ip, client_port, server_ip, server_port } => {
+                    Msg::Init { net_ints, interval, duration } => {
                         let mut init = Init::new();
                         init.set_interval(interval);
                         init.set_duration(duration);
-                        init.set_activeMetric(active_metric);
                         
-                        match client_ip {
-                            Some(c_ip) => {
-                                init.set_clientIP(c_ip);
-
-                                match client_port {
-                                    Some(c_port) => {
-                                        init.set_clientPort(c_port);                                        
-                                    },
-                                    _ => {}
-                                }
-                            },
-                            _ => {}
-                        }
-
-                        match server_ip {
-                            Some(s_ip) => {
-                                init.set_serverIP(s_ip);
-
-                                match server_port {
-                                    Some(s_port) => {
-                                        init.set_serverPort(s_port);                                        
-                                    },
-                                    _ => {}
-                                }
-                            },
-                            _ => {}
-                        }
-                        
-                        let net_int = RepeatedField::from_vec(net_int);
-                        init.set_netInt(net_int);
+                        let n_ints = RepeatedField::from_vec(net_ints);
+                        init.set_netInts(n_ints);
 
                         println!("{:?}", init);
 
@@ -269,21 +212,21 @@ impl Handler<MetricMsg> for Ws {
     type Result = ();
 
     fn handle(&mut self, metric: MetricMsg, ctx: &mut Self::Context) {
-        let mut metricAvg = None;
-        if(metric.has_metricAvg()) {
-            let mAvg = metric.get_metricAvg();
-            metricAvg = Some(MetricAvg {
-                avg: mAvg.get_avg(),
-                min: mAvg.get_min(),
-                max: mAvg.get_max()
+        let mut metric_avg = None;
+        if metric.has_metricAvg() {
+            let m_avg = metric.get_metricAvg();
+            metric_avg = Some(MetricAvg {
+                avg: m_avg.get_avg(),
+                min: m_avg.get_min(),
+                max: m_avg.get_max()
             });
         }
         
-        let mut metricCumDistr = None;
-        if(metric.has_metricCumDistr()) {  
-            let mCumDistr = metric.get_metricCumDistr();
+        let mut metric_cum_distr = None;
+        if metric.has_metricCumDistr() {  
+            let m_cum_distr = metric.get_metricCumDistr();
             let mut v = Vec::new();
-            for freq in mCumDistr.get_freqs() {
+            for freq in m_cum_distr.get_freqs() {
                 let cfi = CFreqItem {
                     name: freq.get_name().to_string(),
                     freq: freq.get_freq()
@@ -295,16 +238,16 @@ impl Handler<MetricMsg> for Ws {
                 cfreq: v
             };
 
-            metricCumDistr = Some(cf)
+            metric_cum_distr = Some(cf)
         }
 
         let msg = Msg::Metric {
             name: metric.get_name().to_string(),    
             time: metric.get_time(),
-            net_int: metric.get_netInt().to_string(),
+            net_int: metric.get_netInts().to_string(),
             client_id: 0,
-            metricAvg: metricAvg,
-            metricCumDistr: metricCumDistr
+            metric_avg: metric_avg,
+            metric_cum_distr: metric_cum_distr
         };
 
         let serialized = serde_json::to_string(&msg).unwrap();
@@ -317,10 +260,6 @@ impl Handler<MetricMsg> for Ws {
 /// chat actors.
 struct SnifferServer {
     recipient: Recipient<MetricMsg>
-}
-
-fn resolve(host: &str) -> io::Result<Vec<IpAddr>> {
-    (host, 0).to_socket_addrs().map(|iter| iter.map(|socket_address| socket_address.ip()).collect())
 }
 
 impl SnifferServer {
@@ -336,8 +275,8 @@ impl SnifferServer {
                     //println!("Connected !!!");
 
                     let mut os = CodedOutputStream::new(&mut w);
-                    init.write_length_delimited_to(&mut os);
-                    os.flush();
+                    init.write_length_delimited_to(&mut os).expect("Could not write to the buffer.");
+                    os.flush().expect("Could not flush the buffer.");
                     
                     SnifferServer::create(|ctx| {
                         SnifferServer::add_stream(FramedRead::new(r, codec::SnifferCodec), ctx);

@@ -1,5 +1,4 @@
 #include "rspStatus.hpp"
-#include "http.hpp"
 
 RspStatus::RspStatus(Protocol* protocol, Analysis* analysis)
 : MetricCumDistr(protocol, analysis, "rsp_status", "Response status"), rspTotal(0) {

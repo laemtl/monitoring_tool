@@ -1,5 +1,4 @@
 #include "reqPath.hpp"
-#include "http.hpp"
 
 ReqPath::ReqPath(Protocol* protocol, Analysis* analysis) 
 : MetricCumDistr(protocol, analysis, "req_path", "Requests path"), reqTotal(0) {

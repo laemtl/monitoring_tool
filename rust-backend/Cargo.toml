@@ -4,6 +4,10 @@ version = "0.1.0"
 authors = ["Laetitia Fesselier <laetitia@leeroy.ca>"]
 edition = "2018"
 
+[features]
+default = ["with-serde"]
+with-serde = ["protobuf/with-serde"]
+
 [dependencies]
 actix = "0.8.2"
 actix-web = "1.0.0"
@@ -35,4 +39,4 @@ tokio-tcp = "0.1"
 chrono = "0.4"
 
 [build-dependencies]
-protoc-rust = "2.0"
+protoc-rust = "2.10.2"

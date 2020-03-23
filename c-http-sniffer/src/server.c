@@ -73,35 +73,46 @@ void connection_handler(Config* config) {
 			// display the message's fields.
 			printf("Received: interval: %d\n", init->interval);  // required field
 			printf("Received: duration: %d\n", init->duration);  // required field
-			//printf("Received: top_client_cnt: %d\n", init->topclientcnt);  // required field
-			printf("Received: active_metric: %d\n", init->activemetric);  // required field
-			printf("Received: client IP: %s\n", ip_ntos(init->clientip));
-			printf("Received: client port: %d\n", init->clientport);
+			
+			//printf("Received: active_metric: %d\n", init->activemetric);  // required field
+			//printf("Received: client IP: %s\n", ip_ntos(init->clientip));
+			//printf("Received: client port: %d\n", init->clientport);
 
-			printf("Received: server IP: %s\n", ip_ntos(init->serverip));
-			printf("Received: server port: %d\n", init->serverport);
+			//printf("Received: server IP: %s\n", ip_ntos(init->serverip));
+			//printf("Received: server port: %d\n", init->serverport);
 
 
-			for (unsigned i = 0; i < init->n_netint; i++) { // Iterate through all repeated string
-				printf ("netInt: %s\n\n", init->netint[i]);
+			for (unsigned i = 0; i < init->n_netints; i++) { // Iterate through all repeated netInt
+				printf ("netInt: %s\n\n", init->netints[i]->id);
 				
-				Analysis* analysis = new Analysis(config->socket, init->netint[i], init->interval, init->duration, true, config->debug);
-				Http* http = new Http(analysis);
-				http->activeMetrics(init->activemetric);
-				analysis->protocols.push_back(http);
-
-				if(init->has_clientip) {
-					analysis->setClientIp(init->clientip);
-					if(init->has_clientport) {
-						analysis->setClientPort(init->clientport);
+				Analysis* analysis = new Analysis(config->socket, init->netints[i]->id, init->interval, init->duration, true, config->debug);
+			
+				for (unsigned j = 0; j < init->netints[i]->protocols; j++) { // Iterate through all repeated protocols
+					
+					Protocol* protocol;
+					if(init->netints[i]->protocols[j]->id == "HTTP") {
+						protocol = new Http(analysis);
+					} else if(init->netints[i]->protocols[j]->id == "MEMCACHED") {
+						protocol = new MemCached(analysis);
 					}
-				}
+					
+					protocol->activeMetrics(init->netints[i]->protocols[j]->activemetrics);
+					analysis->protocols.push_back(protocol);
+					
+					if(init->netints[i]->protocols[j]->client->has_ip) {
+						analysis->setClientIp(init->netints[i]->protocols[j]->client->ip);
+					}
+					
+					if(init->netints[i]->protocols[j]->client->has_ports) {
+						analysis->setClientPort(init->netints[i]->protocols[j]->client->ports);
+					}
 
-				if(init->has_serverip) {
-					analysis->setServerIp(init->serverip);
-				
-					if(init->has_serverport) {
-						analysis->setServerPort(init->serverport);
+					if(init->netints[i]->protocols[j]->server->has_ip) {
+						analysis->setServerIp(init->netints[i]->protocols[j]->server->ip);
+					}
+					
+					if(init->netints[i]->protocols[j]->server->has_ports) {
+						analysis->setServerPort(init->netints[i]->protocols[j]->server->ports);
 					}
 				}
 

@@ -15,9 +15,11 @@ PROTOBUF_C__BEGIN_DECLS
 #endif
 
 
+typedef struct _Analysis__IP Analysis__IP;
+typedef struct _Analysis__Protocol Analysis__Protocol;
+typedef struct _Analysis__NetInt Analysis__NetInt;
 typedef struct _Analysis__Init Analysis__Init;
 typedef struct _Analysis__Data Analysis__Data;
-typedef struct _Analysis__MetricList Analysis__MetricList;
 typedef struct _Analysis__MetricMsg Analysis__MetricMsg;
 typedef struct _Analysis__MetricAvgMsg Analysis__MetricAvgMsg;
 typedef struct _Analysis__Freq Analysis__Freq;
@@ -30,36 +32,62 @@ typedef struct _Analysis__Close Analysis__Close;
 
 /* --- messages --- */
 
+struct  _Analysis__IP
+{
+  ProtobufCMessage base;
+  protobuf_c_boolean has_ip;
+  uint32_t ip;
+  protobuf_c_boolean has_ports;
+  uint32_t ports;
+};
+#define ANALYSIS__IP__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&analysis__ip__descriptor) \
+    , 0, 0, 0, 0 }
+
+
+struct  _Analysis__Protocol
+{
+  ProtobufCMessage base;
+  char *id;
+  uint32_t activemetrics;
+  Analysis__IP *client;
+  Analysis__IP *server;
+};
+#define ANALYSIS__PROTOCOL__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&analysis__protocol__descriptor) \
+    , NULL, 0, NULL, NULL }
+
+
+struct  _Analysis__NetInt
+{
+  ProtobufCMessage base;
+  char *id;
+  size_t n_protocols;
+  Analysis__Protocol **protocols;
+};
+#define ANALYSIS__NET_INT__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&analysis__net_int__descriptor) \
+    , NULL, 0,NULL }
+
+
 struct  _Analysis__Init
 {
   ProtobufCMessage base;
-  size_t n_netint;
-  char **netint;
+  size_t n_netints;
+  Analysis__NetInt **netints;
   uint32_t interval;
   uint32_t duration;
-  /*
-   *required uint32 topClientCnt = 4;
-   */
-  uint32_t activemetric;
-  protobuf_c_boolean has_clientip;
-  uint32_t clientip;
-  protobuf_c_boolean has_clientport;
-  uint32_t clientport;
-  protobuf_c_boolean has_serverip;
-  uint32_t serverip;
-  protobuf_c_boolean has_serverport;
-  uint32_t serverport;
 };
 #define ANALYSIS__INIT__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&analysis__init__descriptor) \
-    , 0,NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+    , 0,NULL, 0, 0 }
 
 
 struct  _Analysis__Data
 {
   ProtobufCMessage base;
   int64_t time;
-  char *netint;
+  char *netints;
   protobuf_c_boolean has_rstavg;
   double rstavg;
   protobuf_c_boolean has_rstmin;
@@ -118,15 +146,6 @@ struct  _Analysis__Data
     , 0, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,NULL, 0,NULL, 0,NULL, 0,NULL, 0,NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 
 
-struct  _Analysis__MetricList
-{
-  ProtobufCMessage base;
-};
-#define ANALYSIS__METRIC_LIST__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&analysis__metric_list__descriptor) \
-     }
-
-
 typedef enum {
   ANALYSIS__METRIC_MSG__VALUES__NOT_SET = 0,
   ANALYSIS__METRIC_MSG__VALUES_METRIC_AVG = 5,
@@ -139,7 +158,7 @@ struct  _Analysis__MetricMsg
   ProtobufCMessage base;
   char *name;
   int64_t time;
-  char *netint;
+  char *netints;
   int64_t clientid;
   Analysis__MetricMsg__ValuesCase values_case;
   union {
@@ -195,6 +214,63 @@ struct  _Analysis__Close
      }
 
 
+/* Analysis__IP methods */
+void   analysis__ip__init
+                     (Analysis__IP         *message);
+size_t analysis__ip__get_packed_size
+                     (const Analysis__IP   *message);
+size_t analysis__ip__pack
+                     (const Analysis__IP   *message,
+                      uint8_t             *out);
+size_t analysis__ip__pack_to_buffer
+                     (const Analysis__IP   *message,
+                      ProtobufCBuffer     *buffer);
+Analysis__IP *
+       analysis__ip__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data);
+void   analysis__ip__free_unpacked
+                     (Analysis__IP *message,
+                      ProtobufCAllocator *allocator);
+/* Analysis__Protocol methods */
+void   analysis__protocol__init
+                     (Analysis__Protocol         *message);
+size_t analysis__protocol__get_packed_size
+                     (const Analysis__Protocol   *message);
+size_t analysis__protocol__pack
+                     (const Analysis__Protocol   *message,
+                      uint8_t             *out);
+size_t analysis__protocol__pack_to_buffer
+                     (const Analysis__Protocol   *message,
+                      ProtobufCBuffer     *buffer);
+Analysis__Protocol *
+       analysis__protocol__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data);
+void   analysis__protocol__free_unpacked
+                     (Analysis__Protocol *message,
+                      ProtobufCAllocator *allocator);
+/* Analysis__NetInt methods */
+void   analysis__net_int__init
+                     (Analysis__NetInt         *message);
+size_t analysis__net_int__get_packed_size
+                     (const Analysis__NetInt   *message);
+size_t analysis__net_int__pack
+                     (const Analysis__NetInt   *message,
+                      uint8_t             *out);
+size_t analysis__net_int__pack_to_buffer
+                     (const Analysis__NetInt   *message,
+                      ProtobufCBuffer     *buffer);
+Analysis__NetInt *
+       analysis__net_int__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data);
+void   analysis__net_int__free_unpacked
+                     (Analysis__NetInt *message,
+                      ProtobufCAllocator *allocator);
 /* Analysis__Init methods */
 void   analysis__init__init
                      (Analysis__Init         *message);
@@ -232,25 +308,6 @@ Analysis__Data *
                       const uint8_t       *data);
 void   analysis__data__free_unpacked
                      (Analysis__Data *message,
-                      ProtobufCAllocator *allocator);
-/* Analysis__MetricList methods */
-void   analysis__metric_list__init
-                     (Analysis__MetricList         *message);
-size_t analysis__metric_list__get_packed_size
-                     (const Analysis__MetricList   *message);
-size_t analysis__metric_list__pack
-                     (const Analysis__MetricList   *message,
-                      uint8_t             *out);
-size_t analysis__metric_list__pack_to_buffer
-                     (const Analysis__MetricList   *message,
-                      ProtobufCBuffer     *buffer);
-Analysis__MetricList *
-       analysis__metric_list__unpack
-                     (ProtobufCAllocator  *allocator,
-                      size_t               len,
-                      const uint8_t       *data);
-void   analysis__metric_list__free_unpacked
-                     (Analysis__MetricList *message,
                       ProtobufCAllocator *allocator);
 /* Analysis__MetricMsg methods */
 void   analysis__metric_msg__init
@@ -349,14 +406,20 @@ void   analysis__close__free_unpacked
                       ProtobufCAllocator *allocator);
 /* --- per-message closures --- */
 
+typedef void (*Analysis__IP_Closure)
+                 (const Analysis__IP *message,
+                  void *closure_data);
+typedef void (*Analysis__Protocol_Closure)
+                 (const Analysis__Protocol *message,
+                  void *closure_data);
+typedef void (*Analysis__NetInt_Closure)
+                 (const Analysis__NetInt *message,
+                  void *closure_data);
 typedef void (*Analysis__Init_Closure)
                  (const Analysis__Init *message,
                   void *closure_data);
 typedef void (*Analysis__Data_Closure)
                  (const Analysis__Data *message,
-                  void *closure_data);
-typedef void (*Analysis__MetricList_Closure)
-                 (const Analysis__MetricList *message,
                   void *closure_data);
 typedef void (*Analysis__MetricMsg_Closure)
                  (const Analysis__MetricMsg *message,
@@ -379,9 +442,11 @@ typedef void (*Analysis__Close_Closure)
 
 /* --- descriptors --- */
 
+extern const ProtobufCMessageDescriptor analysis__ip__descriptor;
+extern const ProtobufCMessageDescriptor analysis__protocol__descriptor;
+extern const ProtobufCMessageDescriptor analysis__net_int__descriptor;
 extern const ProtobufCMessageDescriptor analysis__init__descriptor;
 extern const ProtobufCMessageDescriptor analysis__data__descriptor;
-extern const ProtobufCMessageDescriptor analysis__metric_list__descriptor;
 extern const ProtobufCMessageDescriptor analysis__metric_msg__descriptor;
 extern const ProtobufCMessageDescriptor analysis__metric_avg_msg__descriptor;
 extern const ProtobufCMessageDescriptor analysis__freq__descriptor;

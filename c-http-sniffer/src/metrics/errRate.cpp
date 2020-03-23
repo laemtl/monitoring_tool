@@ -1,5 +1,4 @@
 #include "errRate.hpp"
-#include "http.hpp"
 
 ErrRate::ErrRate(Protocol* protocol, Analysis* analysis) 
 : MetricAvg(protocol, analysis, "err_rate", "Error rate"){

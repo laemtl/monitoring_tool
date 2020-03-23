@@ -1,5 +1,4 @@
 #include "reqType.hpp"
-#include "http.hpp"
 
 ReqType::ReqType(Protocol* protocol, Analysis* analysis) 
 : MetricCumDistr(protocol, analysis, "req_type", "Request type"), reqTotal(0) {

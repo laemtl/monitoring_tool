@@ -7,14 +7,13 @@ Vue.config.productionTip = false;
 
 require("./assets/main.scss");
 
-export const configBus = new Vue();
+export const bus = new Vue();
 
 new Vue({
+  data: { 
+    netInts: [],
+    interval: 5,
+    duration: 30
+  },
   render: h => h(App)
 }).$mount("#app");
-
-/*Vue.use(Vuetify, {
-  iconfont: 'md'
-})*/
-
-var origin = new Date().getTime();

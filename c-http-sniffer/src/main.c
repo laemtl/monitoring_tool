@@ -16,7 +16,6 @@
 #include "server.h"
 #include "flowHashTable.hpp"
 #include "timer.h"
-#include "http.hpp"
 #include <iostream>
 
 int pak = 0;
