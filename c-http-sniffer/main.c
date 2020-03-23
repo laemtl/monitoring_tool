@@ -8,7 +8,6 @@
 #include <errno.h>
 #include <signal.h> 
 #include <inttypes.h>
-#include <iostream>
 #include <limits>
 
 #include "raw_packet.h"
@@ -28,17 +27,17 @@ int raw_rsp = 0;
 int flow_req = 0;
 int flow_rsp = 0;
 
+//int GP_CAP_FIN = 0; /* Flag for offline PCAP sniffing */
+
 void
 debugging_print(Analysis* analysis){
 	while(1){
-		if (analysis->isStopped()) {
+		if (analysis->status < 0) {
 			break;
 		} else {
-			for (auto protocol = begin (analysis->protocols); protocol != end (analysis->protocols); ++protocol) {
-				(*protocol)->pq->print();
-				(*protocol)->fht->print();
-				(*protocol)->fq->print();
-			}
+			analysis->pq->print();
+			analysis->fht->print();
+			analysis->fq->print();
 			sleep(1);
 		}
 	}
@@ -56,7 +55,8 @@ print_usage(const char* pro_name){
 /**
  * Parse packets' header information and return a packet_t object
  */
-void packet_preprocess(Analysis* analysis, char *raw_data, const struct pcap_pkthdr *pkthdr)
+packet_t*
+packet_preprocess(char *raw_data, const struct pcap_pkthdr *pkthdr)
 {
 	packet_t	*pkt = NULL;	/* new packet */
 	char 	*cp = raw_data;
@@ -117,64 +117,89 @@ void packet_preprocess(Analysis* analysis, char *raw_data, const struct pcap_pkt
 	pkt->tcp_win = tcp_hdr->th_win;
 	pkt->tcp_hl = tcp_hdr->th_off << 2;		/* bytes */
 	pkt->tcp_dl = pkt->ip_tol - pkt->ip_hl - pkt->tcp_hl;
-	pkt->type = 0; /* default */
+	pkt->http = 0; /* default */
 
-	bool keepPacket = false;
-	for (auto protocol = begin (analysis->protocols); protocol != end (analysis->protocols); ++protocol) {
-		/* Check the TCP ports to identify if the packet carries current protocol data */
-		if((*protocol)->isPacketOf(tcp_hdr->th_sport, tcp_hdr->th_dport)) {
-			keepPacket = true;
-			/* Process packets of flows which carry monitored protocol traffic */
-			if(pkt->tcp_dl != 0){
-				cp = cp + pkt->tcp_hl;
-				int i = 0;
-				if((*protocol)->isHeaderPacket(cp, pkt->tcp_dl)){
-					/* Yes, it's a packet of interest */
-					char *head_end = NULL;
-					head_end = (*protocol)->isRequest(cp, pkt->tcp_dl);
-					
-					if( head_end != NULL ){
-						/* First packet of request. */
-						req_n++;
-						pkt->type = REQ;
-					}
+	/* Check the TCP ports to identify if the packet carries HTTP data
+	   We only consider normal HTTP traffic without encryption */
+	if( !(tcp_hdr->th_sport == 80 || tcp_hdr->th_dport == 80 || \
+		tcp_hdr->th_sport == 8080 || tcp_hdr->th_dport == 8080 || \
+		tcp_hdr->th_sport == 8000 || tcp_hdr->th_dport == 8000)){
 
-					head_end = (*protocol)->isResponse(cp, pkt->tcp_dl);
-					if( head_end != NULL ){
-						/* First packet of response. */
-						pkt->type = RSP;
-						rsp_n++;
-					}
-					
-					if( head_end != NULL ){
-						/** Added functionality: Real TCP data length
-						 *  needed for logger that does own size calc
-						 *  or for individual packet size
-						**/
-						pkt->tcp_dl = pkt->raw_len - (pkt->ip_hl + pkt->tcp_hl + sizeof(ethhdr));
-					}
-					
-					/* Allocate memory to store HTTP header. */
-					pkt->tcp_odata = MALLOC(char, pkt->tcp_dl + 1);
-					pkt->tcp_data = pkt->tcp_odata;
-					memset(pkt->tcp_odata, 0, pkt->tcp_dl + 1);
-					memcpy(pkt->tcp_odata, cp, pkt->tcp_dl);
-				} else {
-					/* The packet doesn't contain a header, we erase the payload. */
-					pkt->tcp_odata = NULL;
-					pkt->tcp_data = pkt->tcp_odata;
-				}
-				(*protocol)->pq->enq(pkt);
-			}
-			break;
+		// 11211
+		
+		free_ethhdr(eth_hdr);
+		free_iphdr(ip_hdr);
+		free_tcphdr(tcp_hdr);
+		packet_free(pkt);
+		return NULL;
+	}
+
+	/* Process packets of flows which carry HTTP traffic */
+	if(pkt->tcp_dl != 0){
+		cp = cp + pkt->tcp_hl;
+		int i = 0;
+		
+		for (;i<pkt->raw_len-(pkt->ip_hl+pkt->tcp_hl+sizeof(ethhdr));i++){
+		//	printf("%c",cp[i]);
+			//fflush(stdout);
 		}
-	}	
-	
-	if(!keepPacket) packet_free(pkt);
+		if( !IsHttpPacket(cp, pkt->tcp_dl) ){
+			/* If the packet is not HTTP, we erase the payload. */
+			pkt->tcp_odata = NULL;
+			pkt->tcp_data = pkt->tcp_odata;
+			
+
+			/** Added functionality: still keep chunked packets.
+			 *  By default, if no header information, such as when packet is chunked
+			 *  then the payload data is erased. The following commented code makes it so
+			 *  the data is not erased. This is needed is using logger that
+			 *  does its own size calculation.
+			**/
+
+		}else{
+			/* Yes, it's HTTP packet */
+			char *head_end = NULL;
+			//int hdl = 0;
+			head_end = IsRequest(cp, pkt->tcp_dl);
+			
+			if( head_end != NULL ){
+				/* First packet of request. */
+				req_n++;
+				//hdl = head_end - cp + 1;
+				pkt->http = HTTP_REQ;
+		
+				/** Added functionality: Real TCP data length
+				 *  needed for logger that does own size calc
+				 *  or for individual packet size
+				**/
+				pkt->tcp_dl = pkt->raw_len-(pkt->ip_hl+pkt->tcp_hl+sizeof(ethhdr));
+			}
+			head_end = IsResponse(cp, pkt->tcp_dl);
+			if( head_end != NULL ){
+				/* First packet of response. */
+				//hdl = head_end - cp + 1;
+				pkt->http = HTTP_RSP;
+
+				rsp_n++;
+		
+				pkt->tcp_dl=pkt->raw_len-(pkt->ip_hl+pkt->tcp_hl+sizeof(ethhdr));
+			}
+			/* Allocate memory to store HTTP header. */
+			pkt->tcp_odata = MALLOC(char, pkt->tcp_dl + 1);
+			pkt->tcp_data = pkt->tcp_odata;
+			memset(pkt->tcp_odata, 0, pkt->tcp_dl + 1);
+			memcpy(pkt->tcp_odata, cp, pkt->tcp_dl);
+                     
+		}
+	}else{
+		pkt->tcp_odata = NULL;
+		pkt->tcp_data = pkt->tcp_odata;
+	}
 
 	free_ethhdr(eth_hdr);
 	free_iphdr(ip_hdr);
 	free_tcphdr(tcp_hdr);
+	return pkt;
 }
 
 void process_packet(Analysis* analysis) {
@@ -187,8 +212,12 @@ void process_packet(Analysis* analysis) {
 		if (analysis->isStopped() && rpkt == NULL) {
 			break;
 		} else if (rpkt != NULL){
-			packet_preprocess(analysis, rpkt->raw, &(rpkt->pkthdr));
+			packet = packet_preprocess(rpkt->raw, &(rpkt->pkthdr));
 			raw_packet_free(rpkt);
+
+			if (NULL != packet){
+				analysis->pq->enq(packet);
+			}
 			continue;
 		} else {
 			nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
@@ -205,18 +234,16 @@ process_packet_queue(Analysis* analysis){
 	packet_t *pkt = NULL;
 	
 	while(1){
-		for (auto protocol = begin (analysis->protocols); protocol != end (analysis->protocols); ++protocol) {
-			pkt = (*protocol)->pq->deq();
-			if (analysis->isStopped()) {
-				break;
-			} else if (pkt != NULL){
-				(*protocol)->fht->add_packet(pkt);
-				pak_deq++;
-				
-				continue;
-			} else {
-				nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
-			}
+		pkt = analysis->pq->deq();
+		if (analysis->isStopped()) {
+			break;
+		} else if (pkt != NULL){
+			analysis->fht->add_packet(pkt);
+			pak_deq++;
+			
+			continue;
+		} else {
+			nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
 		}
 	}
 	pthread_exit("Packet processing finished.\n");
@@ -231,19 +258,17 @@ process_flow_queue(Analysis* analysis){
 	Flow *flow = NULL;
 	
 	while(1){
-		for (auto protocol = begin (analysis->protocols); protocol != end (analysis->protocols); ++protocol) {
-			flow = (*protocol)->fq->deq();
+		flow = analysis->fq->deq();
 
-			if (analysis->isStopped()) {
-				break;
-			} else if(flow != NULL){
-				(*protocol)->extractPair(flow, true);
-				(*protocol)->extractData(flow);
-				delete flow;
-				continue;
-			} else {
-				nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
-			}
+		if (analysis->status < 0) {
+			break;
+		} else if(flow != NULL){
+			flow->extract_http(TRUE);
+			analysis->extractData(flow);
+			delete flow;
+			continue;
+		} else {
+			nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
 		}
 	}
 	pthread_exit("Flow processing finished.\n");
@@ -259,15 +284,13 @@ scrubbing_flow_htbl(Analysis* analysis){
 
 	while(1){
 		sleep(10);
-		for (auto protocol = begin (analysis->protocols); protocol != end (analysis->protocols); ++protocol) {
-			if (analysis->isStopped()){
-				num = (*protocol)->fht->flow_scrubber(-1); // cleanse all flows
-				printf("Cleaned: %d flows \n", num);
-				break;
-			} else {
-				num = (*protocol)->fht->flow_scrubber(60*10);	// flow timeout in seconds
-				printf("Cleaned: %d flows \n", num);
-			}
+		if (analysis->isStopped()){
+			num = analysis->fht->flow_scrubber(-1); // cleanse all flows
+			printf("Cleaned: %d flows \n", num);
+			break;
+		} else {
+			num = analysis->fht->flow_scrubber(60*10);	// flow timeout in seconds
+			printf("Cleaned: %d flows \n", num);
 		}
 	}
 	pthread_exit(NULL);
@@ -284,15 +307,16 @@ capture_main(void* a){
 	
 	Analysis* analysis = (Analysis*) a;
 	const char* interface = analysis->interface;
-	
+	int livemode = analysis->livemode;
+
 	const u_char *raw = NULL;
 	struct pcap_pkthdr pkthdr;
 	//packet_t *packet = NULL;
+	//extern int GP_CAP_FIN;
 	
-	if ( analysis->livemode == 1 ) {
+	if ( livemode==1 ) {
 		cap = pcap_open_live(interface, 65535, 0, 1000, errbuf);
 	} else {
-		cout << "Offline mode" << endl;
 		cap = pcap_open_offline(interface, errbuf);
 	}
 
@@ -313,7 +337,8 @@ capture_main(void* a){
 		// 4 bytes CRC is stripped
 		if(len < 54) continue;
 
-		if (analysis->isStopped()) {
+		if ( livemode == 0 || analysis->status < 0) {
+			//GP_CAP_FIN = 1;
 			break;
 		} else if( NULL != raw){
 			pkt2 = MALLOC(raw_pkt, 1);
@@ -325,9 +350,6 @@ capture_main(void* a){
 
 			analysis->rpq->enq(pkt2);
 			pak++;
-		} else if(analysis->livemode == 0) {
-			// last packet of the tracefile was read, end the analysis
-			analysis->stop();
 		} else {
 			nanosleep((const struct timespec[]){{0, 20000000L}}, NULL);
 		}
@@ -354,6 +376,8 @@ void start_analysis(char* ipaddress, Analysis* analysis) {
 	pthread_t job_debug_p;
 #endif
 
+	analysis->livemode = 1;
+	
 	printf("Http-sniffer started: %s", ctime(&start));
 
 	/* Start packet receiving thread */
@@ -391,6 +415,9 @@ void start_analysis(char* ipaddress, Analysis* analysis) {
 	
 	time(&end);
 	printf("Time elapsed: %d s\n", (int)(end - start));
+
+	analysis->fht->clear();
+	analysis->fht->reset();
 }
 
 void sigintHandler(int sig_num) { 
@@ -414,7 +441,6 @@ void sigintHandler(int sig_num) {
 int main(int argc, char *argv[]){
 	char* interface = NULL;
 	char* ipaddress = NULL;
-    char* tracefile = NULL;
 	int opt;
 	bool debug = false;
 
@@ -432,37 +458,20 @@ int main(int argc, char *argv[]){
 				ipaddress = optarg; break;
 			case 'd':
 				debug = true; break;
-			case 'f':
-			    tracefile = optarg; break;
 		}
 	}
     
     // Interface is NULL - RUN in server mode	
-	if (interface == NULL && tracefile == NULL){
+	if (interface == NULL){
 		/* Start server thread */
 		pthread_t job_server;
 		pthread_create(&job_server, NULL, (void*)start_server, &debug);
 		pthread_join(job_server, NULL);
 	
 	// Interface is provided - RUN in app mode
-	} else {
-		Analysis* analysis;
-
-		// If both interface and tracefile are provided, default behaviour is to use the interface        
-        if (interface == NULL) {
-			analysis = new Analysis(-1, tracefile, 5, 600);
-			analysis->livemode = 0;
-		} else {
-			analysis = new Analysis(-1, interface, 5, 600);
-			analysis->livemode = 1;
-		}
-
-		analysis->serverMode = false;
-		analysis->debug = debug;
-		MemCached* http = new MemCached(analysis);
-		http->activeMetrics(std::numeric_limits<int>::max());
-		analysis->protocols.push_back(http);
-
+	} else {		
+		Analysis* analysis = new Analysis(-1, interface, 5, 600, false, debug);
+		analysis->activeMetrics(std::numeric_limits<int>::max());
 		start_analysis(ipaddress, analysis);
 	}
 

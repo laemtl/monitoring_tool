@@ -85,8 +85,9 @@ void connection_handler(Config* config) {
 			for (unsigned i = 0; i < init->n_netints; i++) { // Iterate through all repeated netInt
 				printf ("netInt: %s\n\n", init->netints[i]->id);
 				
-				Analysis* analysis = new Analysis(config->socket, init->netints[i]->id, init->interval, init->duration, true, config->debug);
-			
+				Analysis* analysis = new Analysis(config->socket, init->netints[i]->id, init->interval, init->duration);
+				analysis->debug = config->debug;
+				
 				for (unsigned j = 0; j < init->netints[i]->protocols; j++) { // Iterate through all repeated protocols
 					
 					Protocol* protocol;

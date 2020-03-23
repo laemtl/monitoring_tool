@@ -181,11 +181,13 @@ int Flow::flow_socket_cmp(flow_s *fs){
 int Flow::add_pair(Pair *h){
     if(pair_f == NULL){
         pair_f = h;
-    }else{
+    } else {
         pair_e->next = h;
     }
+
     pair_e = h;
     pair_e->next = NULL;
+    
     return 0;
 }
 

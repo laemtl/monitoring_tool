@@ -28,12 +28,15 @@ void ReqMethod::onRequestReceived(Pair *pair, Flow* flow) {
 	reqTotal++;
 	const char *uri = ((_http::Request*)pair->request_header)->uri;
 	char* reqPath = extractReqMethod(uri);
+	if(reqPath == NULL) return;
 	StringHash* str = new StringHash(reqPath);
 	ht->add(str);
 }
 
 char* ReqMethod::extractReqMethod(const char* uri) {
-    char* reqMethod;
+    if(uri == NULL) return NULL;
+	
+	char* reqMethod;
 	string str(uri);
 
 	size_t query = str.find('?'); 

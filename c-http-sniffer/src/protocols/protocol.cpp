@@ -19,6 +19,7 @@ rsp_total_len(0), req_body_len(0), rsp_body_len(0), next(NULL) {
 Request::Request() : time(NULL), hdlen(0), processed(false) {
 }
 
+// override
 Request::Request(const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq) : Request() {
 }
 

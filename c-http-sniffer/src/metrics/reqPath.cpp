@@ -30,7 +30,7 @@ void ReqPath::onRequestReceived(Pair *pair, Flow* flow) {
 	reqTotal++;
 	const char *uri = ((_http::Request*)pair->request_header)->uri;
 	
-	// URI is NULL when req->method == HTTP_MT_NONE
+	// URI is NULL when req->method == NONE
 	if(uri != NULL) {
 		char* reqPath = extractReqPath(uri);
 		StringHash* path = new StringHash(reqPath);
