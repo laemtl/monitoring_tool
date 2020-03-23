@@ -363,10 +363,6 @@ _http::Request::Request() {
     methodsName.push_back("UNSUBSCRIBE");
     methodsName.push_back("ICY");               /* Shoutcast client (forse) */
     methodsName.push_back("NONE");
-
-    for (std::size_t i = 0; i != methodsName.size(); ++i) {
-        methods[i];
-    }
 }
 
 /*

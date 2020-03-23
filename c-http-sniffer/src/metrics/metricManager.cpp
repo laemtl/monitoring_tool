@@ -20,10 +20,8 @@ MetricManager::MetricManager(Protocol* protocol, Analysis* analysis) {
     metrics.push_back(new ConnRate(protocol, analysis));
 
     metrics.push_back(new Client(protocol, analysis));
-    //metrics.push_back(new ReqPath(protocol, analysis));
-    //metrics.push_back(new ReqMethod(protocol, analysis));
+    metrics.push_back(new ReqPath(protocol, analysis));
+    metrics.push_back(new ReqMethod(protocol, analysis));
     metrics.push_back(new ReqType(protocol, analysis));
     metrics.push_back(new RspStatus(protocol, analysis));
 }
-
-//void MetricManager::getMetrics() {}

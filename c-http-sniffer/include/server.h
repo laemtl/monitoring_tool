@@ -16,6 +16,7 @@
 #include "analysis.hpp"
 #include "timer.h"
 #include "http.hpp"
+#include "memcached.hpp"
 
 class Config {
     public:

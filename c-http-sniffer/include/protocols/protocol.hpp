@@ -99,14 +99,6 @@ namespace _protocol {
             virtual char* isResponse(const char *p, const int datalen) = 0;
             virtual Request* getRequest(const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq) = 0;
             virtual Response* getResponse(const char *data, const char *dataend, long ack) = 0;     
-<<<<<<< HEAD
-            virtual char* getMethodName(int m) = 0;
-            virtual int getMethodCount() = 0;
-            virtual int getStatusCount() = 0;
-
-=======
-            
->>>>>>> memcached
             void flowHashProcess();
             int extractPair(Flow* flow, bool closed);
             void extractData(Flow* flow);

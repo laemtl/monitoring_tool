@@ -5,7 +5,7 @@
 #include "metricCumDistr.hpp"
 #include <inttypes.h>
 #include <sys/types.h>
-//#include <vector>
+#include <map> 
 
 class Hashable;
 class Analysis;
@@ -16,10 +16,8 @@ class ReqType : public MetricCumDistr
 {
 	private:
 		int reqTotal;
-        //int flow_tot;
-        int* reqType;
-		int reqTypeSize;
-
+        map<char*, int> reqType;
+		map<char*, int>::iterator it;
 	public:
 		ReqType(Protocol* protocol, Analysis* analysis);
         void subscribe(EventManager* em);
@@ -37,5 +35,4 @@ class ReqType : public MetricCumDistr
 		void onAnalysisEnded();
 };
 
-#include "hashTable.hpp"
 #endif

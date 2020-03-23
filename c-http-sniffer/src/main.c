@@ -18,6 +18,9 @@
 #include "flowHashTable.hpp"
 #include "timer.h"
 
+#include "http.hpp"
+#include "memcached.hpp"
+
 int pak = 0;
 int req_n = 0;
 int rsp_n = 0;
