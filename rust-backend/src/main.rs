@@ -114,7 +114,9 @@ enum Msg {
     },
 
     Metric {
-        name: String,    
+        name: String,
+        protocol_name: String,
+        protocol_id: u32,    
         time: i64,
         net_int: String,
         client_id: i64,
@@ -240,7 +242,9 @@ impl Handler<MetricMsg> for Ws {
         }
 
         let msg = Msg::Metric {
-            name: metric.get_name().to_string(),    
+            name: metric.get_name().to_string(),
+            protocol_name: metric.get_protocolName().to_string(),   
+            protocol_id: metric.get_protocolId(),    
             time: metric.get_time(),
             net_int: metric.get_netInt().to_string(),
             client_id: 0,

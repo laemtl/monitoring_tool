@@ -1,0 +1,14 @@
+For development it may be useful to be able to replay TCP traffic (e.g. HTTP). The dump can be created using WireShark or tcpdump:
+$ tcpdump -s 0 port http -i en0 -w dump.pcap
+
+To generate data files that can be replayed through netcat we use tcptrace:
+$ tcptrace -e input.pcapng
+
+Finally replay the HTTP traffic using netcat to host 192.168.1.1 port 80
+$ cat a2b_contents.dat | nc -v 192.168.1.1 80
+
+If you need to replay the raw network traffic, we need to do some massaging using tcpprep and tcprewrite before using tcpreplay to replay the raw packages. Note that due to limitation of tcprewrite this will not replay any traffic to the network: http://tcpreplay.synfin.net/wiki/FAQ#Doestcpreplaysupportsendingtraffictoaserver.
+
+$ tcpprep --port --cachefile=dump.cache --pcap=dump.pcapng
+$ tcprewrite --portmap=80:8080 --endpoints=127.0.0.1:127.0.0.2 --cachefile=dump.cache --infile=dump.pcapng --outfile=transformed.pcapng
+$ tcpreplay -i en0 transformed.pcapng

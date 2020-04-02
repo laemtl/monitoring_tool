@@ -3,11 +3,13 @@
 
 #include <algorithm>
 #include <vector>
+#include "protocol.hpp"
 
-class RequestMethod {
+class RequestMethod : public _protocol::Request {
     public:
         std::vector<char*> methodsName;
-        int methodCode;    
+        int methodCode;  
+
         virtual int parseMethod(const char *data, int linelen) = 0;
 
         char* getMethodName(int methodsCode) {
@@ -17,6 +19,10 @@ class RequestMethod {
         
         int getMethodCount() {
             return static_cast<int>(methodsName.size());
+        }
+
+        int getMethodCode() {
+            return methodCode;
         }
 };
 

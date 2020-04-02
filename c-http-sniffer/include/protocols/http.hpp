@@ -9,9 +9,9 @@
 #include <stdio.h>
 #include <assert.h>
 #include <map>
+#include "protocol.hpp"
 #include "requestMethod.hpp"
 #include "responseStatus.hpp"
-#include "protocol.hpp"
 
 namespace _http { 
     
@@ -25,7 +25,7 @@ namespace _http {
 
     class Http : public _protocol::Protocol {
         public:
-            Http(Analysis* analysis);
+            Http(Analysis* analysis, char* protocolName);
             bool isHeaderPacket(const char *ptr, const int datalen);
             char* isRequest(const char *p, const int datalen);	    /* If the packet carries HTTP request data */
             char* isResponse(const char *p, const int datalen);	    /* If the packet carries HTTP response data */
@@ -35,7 +35,7 @@ namespace _http {
             _protocol::Response* getResponse(const char *data, const char *dataend, long ack);
     };
     
-    class Request : public _protocol::Request, RequestMethod {
+    class Request : public RequestMethod {
         public:
             Version 	 version;
             char*		 host;
@@ -66,7 +66,7 @@ namespace _http {
     /*
     * HTTP response header
     */
-    class Response : public _protocol::Response, ResponseStatus {
+    class Response : public _protocol::Response, public ResponseStatus {
         public:
             Version	        version;
             char*			server;

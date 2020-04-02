@@ -49,16 +49,8 @@ SQL_command _mysql::parseSqlCommand(const char *data, int len){
     }
 }
 
-MySQL::MySQL(Analysis* analysis) : Protocol(analysis) {
+MySQL::MySQL(Analysis* analysis, char* protocolName) : Protocol(analysis, protocolName) {
     ports.insert(ports.end(), {3306});
-}
-
-bool MySQL::isPacketOf(u_int16_t sport, u_int16_t dport) {
-    if(find(ports.begin(), ports.end(), sport) != ports.end()
-    || find(ports.begin(), ports.end(), dport) != ports.end()) {
-        return true;
-    }
-    return false;
 }
 
 bool MySQL::isHeaderPacket(const char *ptr, const int datalen) {

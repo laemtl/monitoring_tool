@@ -87,20 +87,30 @@ void connection_handler(Config* config) {
 				for (unsigned j = 0; j < init->netints[i]->n_protocols; j++) { // Iterate through all repeated protocols
 					
 					Protocol* protocol;
-					if(init->netints[i]->protocols[j]->id == "HTTP") {
-						protocol = new Http(analysis);
-					} else if(init->netints[i]->protocols[j]->id == "MEMCACHED") {
-						protocol = new MemCached(analysis);
+					char* protocolName = init->netints[i]->protocols[j]->id;
+
+					if(strcmp(protocolName, "HTTP") == 0) {
+						protocol = new Http(analysis, protocolName);
+					} else if(strcmp(protocolName, "MEMCACHED") == 0) {
+						protocol = new MemCached(analysis, protocolName);
+					} else {
+						error(strcat("Unrecognized protocol", protocolName));
 					}
 					
 					protocol->activeMetrics(init->netints[i]->protocols[j]->activemetrics);
 
-					protocol->setClientIp(init->netints[i]->protocols[j]->clientip);
+					if(protocol->hasClientIp) {
+						protocol->setClientIp(init->netints[i]->protocols[j]->clientip);
+					}
+					
 					for (unsigned k = 0; k < init->netints[i]->protocols[j]->n_clientports; k++) {
 						protocol->addClientPort(init->netints[i]->protocols[j]->clientports[k]);
 					}
 					
-					protocol->setServerIp(init->netints[i]->protocols[j]->serverip);
+					if(protocol->hasServerIp) {
+						protocol->setServerIp(init->netints[i]->protocols[j]->serverip);
+					}
+					
 					for (unsigned k = 0; k < init->netints[i]->protocols[j]->n_serverports; k++) {
 						protocol->addClientPort(init->netints[i]->protocols[j]->serverports[k]);
 					}

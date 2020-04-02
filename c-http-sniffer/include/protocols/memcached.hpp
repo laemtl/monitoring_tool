@@ -10,12 +10,14 @@
 #include <assert.h>
 #include <map>
 #include "protocol.hpp"
+#include "requestMethod.hpp"
+#include "responseStatus.hpp"
 
 namespace _memcached {
 
     class MemCached : public _protocol::Protocol {
         public:
-            MemCached(Analysis* analysis);
+            MemCached(Analysis* analysis, char* protocolName);
             
             bool isHeaderPacket(const char *ptr, const int datalen);
             char* isRequest(const char *p, const int datalen);	    /* If the packet carries HTTP request data */
@@ -26,7 +28,7 @@ namespace _memcached {
             _protocol::Response* getResponse(const char *data, const char *dataend, long ack);
     };
 
-    class Request : public _protocol::Request, public RequestMethod  {
+    class Request : public RequestMethod  {
         public:
             u_int32_t   seq;
             u_int32_t   nxt_seq;
@@ -61,8 +63,7 @@ namespace _memcached {
 
 #include "packet.h"
 #include "util.h"
-#include "responseStatus.hpp"
-#include "requestMethod.hpp"
+#include "protocol.hpp"
 
 using namespace _memcached;
 

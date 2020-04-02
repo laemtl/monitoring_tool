@@ -2206,6 +2206,8 @@ impl ::protobuf::reflect::ProtobufValue for Data {
 pub struct MetricMsg {
     // message fields
     name: ::protobuf::SingularField<::std::string::String>,
+    protocolName: ::protobuf::SingularField<::std::string::String>,
+    protocolId: ::std::option::Option<u32>,
     time: ::std::option::Option<i64>,
     netInt: ::protobuf::SingularField<::std::string::String>,
     clientId: ::std::option::Option<i64>,
@@ -2272,7 +2274,62 @@ impl MetricMsg {
         self.name.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
-    // required int64 time = 2;
+    // required string protocolName = 2;
+
+
+    pub fn get_protocolName(&self) -> &str {
+        match self.protocolName.as_ref() {
+            Some(v) => &v,
+            None => "",
+        }
+    }
+    pub fn clear_protocolName(&mut self) {
+        self.protocolName.clear();
+    }
+
+    pub fn has_protocolName(&self) -> bool {
+        self.protocolName.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_protocolName(&mut self, v: ::std::string::String) {
+        self.protocolName = ::protobuf::SingularField::some(v);
+    }
+
+    // Mutable pointer to the field.
+    // If field is not initialized, it is initialized with default value first.
+    pub fn mut_protocolName(&mut self) -> &mut ::std::string::String {
+        if self.protocolName.is_none() {
+            self.protocolName.set_default();
+        }
+        self.protocolName.as_mut().unwrap()
+    }
+
+    // Take field
+    pub fn take_protocolName(&mut self) -> ::std::string::String {
+        self.protocolName.take().unwrap_or_else(|| ::std::string::String::new())
+    }
+
+    // required uint32 protocolId = 3;
+
+
+    pub fn get_protocolId(&self) -> u32 {
+        self.protocolId.unwrap_or(0)
+    }
+    pub fn clear_protocolId(&mut self) {
+        self.protocolId = ::std::option::Option::None;
+    }
+
+    pub fn has_protocolId(&self) -> bool {
+        self.protocolId.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_protocolId(&mut self, v: u32) {
+        self.protocolId = ::std::option::Option::Some(v);
+    }
+
+    // required int64 time = 4;
 
 
     pub fn get_time(&self) -> i64 {
@@ -2291,7 +2348,7 @@ impl MetricMsg {
         self.time = ::std::option::Option::Some(v);
     }
 
-    // required string netInt = 3;
+    // required string netInt = 5;
 
 
     pub fn get_netInt(&self) -> &str {
@@ -2327,7 +2384,7 @@ impl MetricMsg {
         self.netInt.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
-    // required int64 clientId = 4;
+    // required int64 clientId = 6;
 
 
     pub fn get_clientId(&self) -> i64 {
@@ -2346,7 +2403,7 @@ impl MetricMsg {
         self.clientId = ::std::option::Option::Some(v);
     }
 
-    // optional .analysis.MetricAvgMsg metricAvg = 5;
+    // optional .analysis.MetricAvgMsg metricAvg = 7;
 
 
     pub fn get_metricAvg(&self) -> &MetricAvgMsg {
@@ -2395,7 +2452,7 @@ impl MetricMsg {
         }
     }
 
-    // optional .analysis.MetricCumDistrMsg metricCumDistr = 6;
+    // optional .analysis.MetricCumDistrMsg metricCumDistr = 8;
 
 
     pub fn get_metricCumDistr(&self) -> &MetricCumDistrMsg {
@@ -2450,6 +2507,12 @@ impl ::protobuf::Message for MetricMsg {
         if self.name.is_none() {
             return false;
         }
+        if self.protocolName.is_none() {
+            return false;
+        }
+        if self.protocolId.is_none() {
+            return false;
+        }
         if self.time.is_none() {
             return false;
         }
@@ -2480,29 +2543,39 @@ impl ::protobuf::Message for MetricMsg {
                     ::protobuf::rt::read_singular_string_into(wire_type, is, &mut self.name)?;
                 },
                 2 => {
+                    ::protobuf::rt::read_singular_string_into(wire_type, is, &mut self.protocolName)?;
+                },
+                3 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
-                    let tmp = is.read_int64()?;
-                    self.time = ::std::option::Option::Some(tmp);
-                },
-                3 => {
-                    ::protobuf::rt::read_singular_string_into(wire_type, is, &mut self.netInt)?;
+                    let tmp = is.read_uint32()?;
+                    self.protocolId = ::std::option::Option::Some(tmp);
                 },
                 4 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     let tmp = is.read_int64()?;
-                    self.clientId = ::std::option::Option::Some(tmp);
+                    self.time = ::std::option::Option::Some(tmp);
                 },
                 5 => {
+                    ::protobuf::rt::read_singular_string_into(wire_type, is, &mut self.netInt)?;
+                },
+                6 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_int64()?;
+                    self.clientId = ::std::option::Option::Some(tmp);
+                },
+                7 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
                     self.values = ::std::option::Option::Some(MetricMsg_oneof_values::metricAvg(is.read_message()?));
                 },
-                6 => {
+                8 => {
                     if wire_type != ::protobuf::wire_format::WireTypeLengthDelimited {
                         return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
                     }
@@ -2523,14 +2596,20 @@ impl ::protobuf::Message for MetricMsg {
         if let Some(ref v) = self.name.as_ref() {
             my_size += ::protobuf::rt::string_size(1, &v);
         }
+        if let Some(ref v) = self.protocolName.as_ref() {
+            my_size += ::protobuf::rt::string_size(2, &v);
+        }
+        if let Some(v) = self.protocolId {
+            my_size += ::protobuf::rt::value_size(3, v, ::protobuf::wire_format::WireTypeVarint);
+        }
         if let Some(v) = self.time {
-            my_size += ::protobuf::rt::value_size(2, v, ::protobuf::wire_format::WireTypeVarint);
+            my_size += ::protobuf::rt::value_size(4, v, ::protobuf::wire_format::WireTypeVarint);
         }
         if let Some(ref v) = self.netInt.as_ref() {
-            my_size += ::protobuf::rt::string_size(3, &v);
+            my_size += ::protobuf::rt::string_size(5, &v);
         }
         if let Some(v) = self.clientId {
-            my_size += ::protobuf::rt::value_size(4, v, ::protobuf::wire_format::WireTypeVarint);
+            my_size += ::protobuf::rt::value_size(6, v, ::protobuf::wire_format::WireTypeVarint);
         }
         if let ::std::option::Option::Some(ref v) = self.values {
             match v {
@@ -2553,24 +2632,30 @@ impl ::protobuf::Message for MetricMsg {
         if let Some(ref v) = self.name.as_ref() {
             os.write_string(1, &v)?;
         }
+        if let Some(ref v) = self.protocolName.as_ref() {
+            os.write_string(2, &v)?;
+        }
+        if let Some(v) = self.protocolId {
+            os.write_uint32(3, v)?;
+        }
         if let Some(v) = self.time {
-            os.write_int64(2, v)?;
+            os.write_int64(4, v)?;
         }
         if let Some(ref v) = self.netInt.as_ref() {
-            os.write_string(3, &v)?;
+            os.write_string(5, &v)?;
         }
         if let Some(v) = self.clientId {
-            os.write_int64(4, v)?;
+            os.write_int64(6, v)?;
         }
         if let ::std::option::Option::Some(ref v) = self.values {
             match v {
                 &MetricMsg_oneof_values::metricAvg(ref v) => {
-                    os.write_tag(5, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+                    os.write_tag(7, ::protobuf::wire_format::WireTypeLengthDelimited)?;
                     os.write_raw_varint32(v.get_cached_size())?;
                     v.write_to_with_cached_sizes(os)?;
                 },
                 &MetricMsg_oneof_values::metricCumDistr(ref v) => {
-                    os.write_tag(6, ::protobuf::wire_format::WireTypeLengthDelimited)?;
+                    os.write_tag(8, ::protobuf::wire_format::WireTypeLengthDelimited)?;
                     os.write_raw_varint32(v.get_cached_size())?;
                     v.write_to_with_cached_sizes(os)?;
                 },
@@ -2623,6 +2708,16 @@ impl ::protobuf::Message for MetricMsg {
                     |m: &MetricMsg| { &m.name },
                     |m: &mut MetricMsg| { &mut m.name },
                 ));
+                fields.push(::protobuf::reflect::accessor::make_singular_field_accessor::<_, ::protobuf::types::ProtobufTypeString>(
+                    "protocolName",
+                    |m: &MetricMsg| { &m.protocolName },
+                    |m: &mut MetricMsg| { &mut m.protocolName },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
+                    "protocolId",
+                    |m: &MetricMsg| { &m.protocolId },
+                    |m: &mut MetricMsg| { &mut m.protocolId },
+                ));
                 fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeInt64>(
                     "time",
                     |m: &MetricMsg| { &m.time },
@@ -2671,6 +2766,8 @@ impl ::protobuf::Message for MetricMsg {
 impl ::protobuf::Clear for MetricMsg {
     fn clear(&mut self) {
         self.name.clear();
+        self.protocolName.clear();
+        self.protocolId = ::std::option::Option::None;
         self.time = ::std::option::Option::None;
         self.netInt.clear();
         self.clientId = ::std::option::Option::None;
@@ -3517,18 +3614,19 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x05tpMax\x18\x19\x20\x01(\x01R\x05tpMax\x12\x1a\n\x08tpRevAvg\x18\x1a\
     \x20\x01(\x01R\x08tpRevAvg\x12\x1a\n\x08tpRevMin\x18\x1b\x20\x01(\x01R\
     \x08tpRevMin\x12\x1a\n\x08tpRevMax\x18\x1c\x20\x01(\x01R\x08tpRevMax\"\
-    \xf0\x01\n\tMetricMsg\x12\x12\n\x04name\x18\x01\x20\x02(\tR\x04name\x12\
-    \x12\n\x04time\x18\x02\x20\x02(\x03R\x04time\x12\x16\n\x06netInt\x18\x03\
-    \x20\x02(\tR\x06netInt\x12\x1a\n\x08clientId\x18\x04\x20\x02(\x03R\x08cl\
-    ientId\x126\n\tmetricAvg\x18\x05\x20\x01(\x0b2\x16.analysis.MetricAvgMsg\
-    H\0R\tmetricAvg\x12E\n\x0emetricCumDistr\x18\x06\x20\x01(\x0b2\x1b.analy\
-    sis.MetricCumDistrMsgH\0R\x0emetricCumDistrB\x08\n\x06values\"D\n\x0cMet\
-    ricAvgMsg\x12\x10\n\x03avg\x18\x05\x20\x02(\x01R\x03avg\x12\x10\n\x03min\
-    \x18\x06\x20\x02(\x01R\x03min\x12\x10\n\x03max\x18\x07\x20\x02(\x01R\x03\
-    max\".\n\x04Freq\x12\x12\n\x04name\x18\x01\x20\x02(\tR\x04name\x12\x12\n\
-    \x04freq\x18\x02\x20\x02(\x01R\x04freq\"9\n\x11MetricCumDistrMsg\x12$\n\
-    \x05freqs\x18\x01\x20\x03(\x0b2\x0e.analysis.FreqR\x05freqs\"\x07\n\x05C\
-    lose\
+    \xb4\x02\n\tMetricMsg\x12\x12\n\x04name\x18\x01\x20\x02(\tR\x04name\x12\
+    \"\n\x0cprotocolName\x18\x02\x20\x02(\tR\x0cprotocolName\x12\x1e\n\nprot\
+    ocolId\x18\x03\x20\x02(\rR\nprotocolId\x12\x12\n\x04time\x18\x04\x20\x02\
+    (\x03R\x04time\x12\x16\n\x06netInt\x18\x05\x20\x02(\tR\x06netInt\x12\x1a\
+    \n\x08clientId\x18\x06\x20\x02(\x03R\x08clientId\x126\n\tmetricAvg\x18\
+    \x07\x20\x01(\x0b2\x16.analysis.MetricAvgMsgH\0R\tmetricAvg\x12E\n\x0eme\
+    tricCumDistr\x18\x08\x20\x01(\x0b2\x1b.analysis.MetricCumDistrMsgH\0R\
+    \x0emetricCumDistrB\x08\n\x06values\"D\n\x0cMetricAvgMsg\x12\x10\n\x03av\
+    g\x18\x05\x20\x02(\x01R\x03avg\x12\x10\n\x03min\x18\x06\x20\x02(\x01R\
+    \x03min\x12\x10\n\x03max\x18\x07\x20\x02(\x01R\x03max\".\n\x04Freq\x12\
+    \x12\n\x04name\x18\x01\x20\x02(\tR\x04name\x12\x12\n\x04freq\x18\x02\x20\
+    \x02(\x01R\x04freq\"9\n\x11MetricCumDistrMsg\x12$\n\x05freqs\x18\x01\x20\
+    \x03(\x0b2\x0e.analysis.FreqR\x05freqs\"\x07\n\x05Close\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {

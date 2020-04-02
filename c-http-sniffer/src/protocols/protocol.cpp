@@ -37,7 +37,7 @@ int Pair::addResponse(Response *rsp) {
 	}
 }
 
-Protocol::Protocol(Analysis* analysis) : analysis(analysis), hasClientIp(false), hasServerIp(false) {
+Protocol::Protocol(Analysis* analysis, char* protocolName) : analysis(analysis), hasClientIp(false), hasServerIp(false), name(protocolName) {
     eventManager = new EventManager();
     
     /* Initialization of packet and flow data structures */
@@ -89,7 +89,7 @@ void Protocol::extractData(Flow* flow){
     // Need client/server value
     eventManager->flowUpdate->notify(flow);
 
-    if (flow->pair_f != NULL){        	
+    if (flow->pair_f != NULL){
         Pair *pair = flow->pair_f;
         while(pair != NULL) {
             if(pair->request_header != NULL) {
@@ -124,6 +124,8 @@ void Protocol::extractData(Flow* flow){
 }
 
 void Protocol::activeMetrics(int activeMetrics) {
+    if(metrics.empty()) return;
+
     for (int i = metrics.size() - 1; i >= 0; i--) {
         bool status = activeMetrics & (1<<i);
         
@@ -407,7 +409,6 @@ int Protocol::extractPair(Flow* flow, bool closed){
         while(flow->compare_sequence_time(seq, fin_seq) < 0){
             pkt = seq->pkt;
             if(pkt != NULL && pkt->type == REQ && !seq->processed){
-                 
                 seq->processed = true;
 
                 /* When a new HTTP request is found,
@@ -435,7 +436,6 @@ int Protocol::extractPair(Flow* flow, bool closed){
                  *  packet in pair->request->header when 
                  *  header is parsed. 
                 **/
-               
                 char time[20];
                 sprintf(time, "%ld", pkt->cap_usec);
                 req = getRequest(pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl, time, pkt->tcp_seq, pkt->tcp_seq+pkt->tcp_dl);
@@ -470,7 +470,7 @@ int Protocol::extractPair(Flow* flow, bool closed){
                     }
                 }
             }
-            
+
             /* Continue to next sequence.*/
             seq = seq->next;
             if(seq != NULL)
@@ -483,7 +483,6 @@ int Protocol::extractPair(Flow* flow, bool closed){
         while(seq != NULL){
             pkt = seq->pkt;
             if(pkt != NULL && pkt->type == REQ && !seq->processed){
-
                 seq->processed = true;
 
                 /* When a new HTTP request is found,
@@ -553,7 +552,7 @@ int Protocol::extractPair(Flow* flow, bool closed){
         }
     }
 
-    /* If no responses found, we treat the flow as invalid and stop parsing */
+    /* If no request found, we treat the flow as invalid and stop parsing */
     if(reqn == 0)
         return 1;
         

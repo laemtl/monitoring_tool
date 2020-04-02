@@ -462,7 +462,7 @@ int main(int argc, char *argv[]){
 
 		analysis->serverMode = false;
 		analysis->debug = debug;
-		MemCached* http = new MemCached(analysis);
+		MemCached* http = new MemCached(analysis, "MEMCACHED");
 		http->activeMetrics(std::numeric_limits<int>::max());
 		analysis->protocols.push_back(http);
 

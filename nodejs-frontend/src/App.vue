@@ -2,7 +2,6 @@
   <v-app>
     <v-content class="blue-grey lighten-5">
       <v-container fluid grid-list-lg>
-        {{$root.netInts}}
         <v-layout row wrap>
           <SystemForm />
           <v-flex xs12>
@@ -103,17 +102,17 @@ export default {
           
           console.log(data);
 
-          if(typeof el.selectedProtocols[data.name] === 'undefined') return;
-
-          if(typeof data.metricAvg !== "undefined") {
-            bus.$emit(data.name, {
-              netInts: data.netInts,
-              data: data.metricAvg
+          //if(typeof el.selectedProtocols[data.name] === 'undefined') return;
+          
+          if(typeof data.metric_avg !== "undefined") {
+            bus.$emit(data.protocol_id + '_' + data.name, {
+              //netInts: data.netInts,
+              data: data.metric_avg
             });
-          } else if(typeof data.metricCumDistr !== "undefined") {
-            bus.$emit(data.name, {
-              netInts: data.netInts,
-              data: data.metricCumDistr
+          } else if(typeof data.metric_cum_distr !== "undefined") {
+            bus.$emit(data.protocol_id + '_' + data.name, {
+              //netInts: data.netInts,
+              data: data.metric_cum_distr
             });
           }
         } catch (e) {

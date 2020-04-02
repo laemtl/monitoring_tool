@@ -1019,7 +1019,7 @@ const ProtobufCMessageDescriptor analysis__data__descriptor =
   (ProtobufCMessageInit) analysis__data__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[6] =
+static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[8] =
 {
   {
     "name",
@@ -1034,8 +1034,32 @@ static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[6]
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "time",
+    "protocolName",
     2,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_STRING,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__MetricMsg, protocolname),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "protocolId",
+    3,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_UINT32,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__MetricMsg, protocolid),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "time",
+    4,
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_INT64,
     0,   /* quantifier_offset */
@@ -1047,7 +1071,7 @@ static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[6]
   },
   {
     "netInt",
-    3,
+    5,
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
@@ -1059,7 +1083,7 @@ static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[6]
   },
   {
     "clientId",
-    4,
+    6,
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_INT64,
     0,   /* quantifier_offset */
@@ -1071,7 +1095,7 @@ static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[6]
   },
   {
     "metricAvg",
-    5,
+    7,
     PROTOBUF_C_LABEL_OPTIONAL,
     PROTOBUF_C_TYPE_MESSAGE,
     offsetof(Analysis__MetricMsg, values_case),
@@ -1083,7 +1107,7 @@ static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[6]
   },
   {
     "metricCumDistr",
-    6,
+    8,
     PROTOBUF_C_LABEL_OPTIONAL,
     PROTOBUF_C_TYPE_MESSAGE,
     offsetof(Analysis__MetricMsg, values_case),
@@ -1095,17 +1119,19 @@ static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[6]
   },
 };
 static const unsigned analysis__metric_msg__field_indices_by_name[] = {
-  3,   /* field[3] = clientId */
-  4,   /* field[4] = metricAvg */
-  5,   /* field[5] = metricCumDistr */
+  5,   /* field[5] = clientId */
+  6,   /* field[6] = metricAvg */
+  7,   /* field[7] = metricCumDistr */
   0,   /* field[0] = name */
-  2,   /* field[2] = netInt */
-  1,   /* field[1] = time */
+  4,   /* field[4] = netInt */
+  2,   /* field[2] = protocolId */
+  1,   /* field[1] = protocolName */
+  3,   /* field[3] = time */
 };
 static const ProtobufCIntRange analysis__metric_msg__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 0, 6 }
+  { 0, 8 }
 };
 const ProtobufCMessageDescriptor analysis__metric_msg__descriptor =
 {
@@ -1115,7 +1141,7 @@ const ProtobufCMessageDescriptor analysis__metric_msg__descriptor =
   "Analysis__MetricMsg",
   "analysis",
   sizeof(Analysis__MetricMsg),
-  6,
+  8,
   analysis__metric_msg__field_descriptors,
   analysis__metric_msg__field_indices_by_name,
   1,  analysis__metric_msg__number_ranges,

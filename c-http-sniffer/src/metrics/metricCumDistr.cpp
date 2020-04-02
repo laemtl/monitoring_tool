@@ -1,59 +1,5 @@
 #include "metricCumDistr.hpp"
 
-/*class MCDItem {
-	public:
-		char* name;
-    	double freq;
-};
-
-// Vector ??
-class MCDList {
-	public:
-		MCDItem list[CFL_SIZE];
-		pthread_mutex_t mutex;
-		int size;
-		int count;
-
-		MCDList();
-		void add(char* name, double freq);
-		void print();
-
-};*/
-
-/*MCDList::MCDList() 
-	: size(CFL_SIZE), count(0)
-{
-    pthread_mutex_init(&mutex, NULL);
-}
-
-void MCDList::add(char* name, double freq) {
-    pthread_mutex_lock(&mutex);
-    if(count >= size) {
-        pthread_mutex_unlock(&mutex);
-        return;
-    }
-    list[count].name = name;
-    list[count].freq = freq;
-    count++;
-    pthread_mutex_unlock(&mutex);
-}
-
-void MCDList::print() {
-    for(int i = 0; i < count; i++) {
-        printf("name: %s \n", list[i].name);
-        printf("freq: %f \n", list[i].freq);
-    }
-}*/
-
-/*void MCDList::delete() {
-    for(int i = 0; i < count; i++) {
-        free(list[i].name);
-    }
-}*/
-
-/*MetricCumDistr::~MetricCumDistr() {
-}*/
-
 MetricCumDistr::MetricCumDistr(_protocol::Protocol* protocol, Analysis* analysis, std::string name, std::string desc) 
 : Metric(protocol, analysis, name, desc) {
 	cfl_init(&cfl);
@@ -113,6 +59,8 @@ void MetricCumDistr::sendMsg() {
 	Analysis__MetricCumDistrMsg cumDistrMsg = ANALYSIS__METRIC_CUM_DISTR_MSG__INIT;
 	msg.metriccumdistr = &cumDistrMsg;
 	msg.name = (char*)name.c_str();
+	msg.protocolname = protocol->name;
+	msg.protocolid = 0;
 	msg.time = time(0);
 	Analysis__Freq **freqs = MALLOC(Analysis__Freq*, cfl.count); 
 	msg.metriccumdistr->freqs = freqs;
@@ -147,5 +95,5 @@ void MetricCumDistr::sendMsg() {
 
 	free(buf); // Free the allocated serialized buffer
 	for(int i = 0; i < cfl.count; i++) free(freqs[i]);
-	free(freqs);	
+	free(freqs);
 }
