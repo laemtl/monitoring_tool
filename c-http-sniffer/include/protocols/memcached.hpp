@@ -15,7 +15,7 @@ namespace _memcached {
 
     class MemCached : public _protocol::Protocol {
         public:
-            MemCached(Analysis* analysis);
+            MemCached(Analysis* analysis, char* protocolName);
             
             bool isHeaderPacket(const char *ptr, const int datalen);
             char* isRequest(const char *p, const int datalen);	    /* If the packet carries HTTP request data */

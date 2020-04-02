@@ -17,7 +17,10 @@ void ReqType::onRequestReceived(_protocol::Pair *pair, Flow* flow) {
 	reqTotal++;
 
 	RequestMethod* req = (RequestMethod*)pair->request_header;
+	
 	int methodCode = req->methodCode;	
+	printf("methodCode in reqType %d \n", req->getMethodCode());
+	
 	char* methodName = req->getMethodName(methodCode);
     if(methodName != NULL) ++reqType[methodName];
 }

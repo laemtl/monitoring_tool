@@ -45,7 +45,7 @@ export default {
   mounted() {
     this.initChart();
 
-    bus.$on(this.metric.id, message => {
+    bus.$on(this.data.protocolIndex + '_' + this.data.metricId, message => {
       this.processMessage(message);
     });
   },

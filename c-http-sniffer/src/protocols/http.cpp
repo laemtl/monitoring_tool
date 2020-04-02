@@ -43,10 +43,9 @@ int _http::Request::parseMethod(const char *data, int linelen)
     }
 
     for (std::size_t i = 0; i != methodsName.size(); ++i) {
-        if (strcmp(data, methodsName[i]) == 0) {
+        if (strncmp(data, methodsName[i], index) == 0) {
             return i;
         }
-        break;
     }
 
     return 0;
@@ -57,15 +56,15 @@ int _http::Request::parseMethod(const char *data, int linelen)
  * If it's true, the head end char pointer will be returned, else NULL.
  */
 char* Http::isRequest(const char *ptr, const int datalen) {
-	int methodCode = 0;
-	char *head_end = NULL;
+	int methodCode;
+    char *head_end = NULL;
 
     _http::Request* req = new _http::Request();
 	methodCode = req->parseMethod(ptr, datalen);
 	if (methodCode == 0){
 		return NULL;
 	} else {
-		int line_cnt = 0;
+        int line_cnt = 0;
 		head_end = Protocol::find_header_end(ptr, (ptr+datalen-1), &line_cnt);
 		return head_end;
 	}
@@ -92,7 +91,7 @@ char* Http::isResponse(const char *ptr, const int datalen) {
 	}
 }
 
-Http::Http(Analysis* analysis) : Protocol(analysis) {
+Http::Http(Analysis* analysis, char* protocolName) : _protocol::Protocol(analysis, protocolName) {
     serverPorts.insert(serverPorts.end(), {80, 8080, 8000});
 
     metrics.push_back(new Rst(this, analysis));
@@ -101,7 +100,6 @@ Http::Http(Analysis* analysis) : Protocol(analysis) {
     metrics.push_back(new Tp(this, analysis));
     metrics.push_back(new TpRev(this, analysis));
     metrics.push_back(new ConnRate(this, analysis));
-
     metrics.push_back(new Client(this, analysis));
     metrics.push_back(new ReqPath(this, analysis));
     metrics.push_back(new ReqMethod(this, analysis));
@@ -329,6 +327,7 @@ _protocol::Response* Http::getResponse(const char *data, const char *dataend, lo
 }
 
 _http::Request::Request() {
+    methodsName.push_back("NONE");
     methodsName.push_back("OPTIONS");           /* RFC2616 */
     methodsName.push_back("GET");
     methodsName.push_back("HEAD");
@@ -369,7 +368,6 @@ _http::Request::Request() {
     methodsName.push_back("SUBSCRIBE");
     methodsName.push_back("UNSUBSCRIBE");
     methodsName.push_back("ICY");               /* Shoutcast client (forse) */
-    methodsName.push_back("NONE");
 }
 
 /*
@@ -397,6 +395,7 @@ _http::Request::Request(const char *data, const char *dataend, char *time, u_int
 	lineep = Protocol::find_line_end(linesp, eoh, &eol);
 	lnl = lineep - linesp + 1;
 	methodCode = parseMethod(linesp, lnl);
+
 	if (methodsName[methodCode] == "NONE"){
         return;
 	}

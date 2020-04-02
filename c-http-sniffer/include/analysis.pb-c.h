@@ -140,8 +140,8 @@ struct  _Analysis__Data
 
 typedef enum {
   ANALYSIS__METRIC_MSG__VALUES__NOT_SET = 0,
-  ANALYSIS__METRIC_MSG__VALUES_METRIC_AVG = 5,
-  ANALYSIS__METRIC_MSG__VALUES_METRIC_CUM_DISTR = 6
+  ANALYSIS__METRIC_MSG__VALUES_METRIC_AVG = 7,
+  ANALYSIS__METRIC_MSG__VALUES_METRIC_CUM_DISTR = 8
     PROTOBUF_C__FORCE_ENUM_TO_BE_INT_SIZE(ANALYSIS__METRIC_MSG__VALUES)
 } Analysis__MetricMsg__ValuesCase;
 
@@ -149,6 +149,8 @@ struct  _Analysis__MetricMsg
 {
   ProtobufCMessage base;
   char *name;
+  char *protocolname;
+  uint32_t protocolid;
   int64_t time;
   char *netint;
   int64_t clientid;
@@ -160,7 +162,7 @@ struct  _Analysis__MetricMsg
 };
 #define ANALYSIS__METRIC_MSG__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&analysis__metric_msg__descriptor) \
-    , NULL, 0, NULL, 0, ANALYSIS__METRIC_MSG__VALUES__NOT_SET, {0} }
+    , NULL, NULL, 0, 0, NULL, 0, ANALYSIS__METRIC_MSG__VALUES__NOT_SET, {0} }
 
 
 struct  _Analysis__MetricAvgMsg

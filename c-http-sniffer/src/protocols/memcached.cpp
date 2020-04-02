@@ -1,6 +1,6 @@
 #include "memcached.hpp"
 
-MemCached::MemCached(Analysis* analysis) : Protocol(analysis) {
+MemCached::MemCached(Analysis* analysis, char* protocolName) : Protocol(analysis, protocolName) {
     serverPorts.push_back(11211);
 
     metrics.push_back(new Rst(this, analysis));

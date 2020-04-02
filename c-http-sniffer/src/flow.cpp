@@ -257,7 +257,6 @@ int Flow::add_packet(packet_t *packet, register bool src){
 
     /* other packets, without sequence number checked */
     if(src == true){
-        //if(pkts_src == 0){
         if(packet->tcp_flags == TH_SYN && pkts_src == 0){
             /* syn */
             syn_sec = packet->cap_sec;
@@ -285,7 +284,7 @@ int Flow::add_packet(packet_t *packet, register bool src){
                     hook_packet(packet, src);
                     cal_packet(packet,src);
                 }else{
-                    packet->type = 0;
+                    //packet->type = 0;
                     cal_packet(packet, src);
                     packet_free(packet);
                 }
@@ -300,7 +299,7 @@ int Flow::add_packet(packet_t *packet, register bool src){
             hook_packet(packet, src);
             cal_packet(packet, src);
         }else{
-            packet->type = 0;
+            //packet->type = 0;
             cal_packet(packet, src);
             packet_free(packet);
         }
