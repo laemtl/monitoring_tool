@@ -1,8 +1,4 @@
 #include "server.h"
-#include "analysis.hpp"
-#include <string.h>
-#include <inttypes.h>
-#include <unistd.h>
 
 int sfd = 0;
 extern int pak;
@@ -88,7 +84,7 @@ void connection_handler(Config* config) {
 				Analysis* analysis = new Analysis(config->socket, init->netints[i]->id, init->interval, init->duration);
 				analysis->debug = config->debug;
 				
-				for (unsigned j = 0; j < init->netints[i]->protocols; j++) { // Iterate through all repeated protocols
+				for (unsigned j = 0; j < init->netints[i]->n_protocols; j++) { // Iterate through all repeated protocols
 					
 					Protocol* protocol;
 					if(init->netints[i]->protocols[j]->id == "HTTP") {
@@ -98,23 +94,18 @@ void connection_handler(Config* config) {
 					}
 					
 					protocol->activeMetrics(init->netints[i]->protocols[j]->activemetrics);
-					analysis->protocols.push_back(protocol);
-					
-					if(init->netints[i]->protocols[j]->client->has_ip) {
-						analysis->setClientIp(init->netints[i]->protocols[j]->client->ip);
+
+					protocol->setClientIp(init->netints[i]->protocols[j]->clientip);
+					for (unsigned k = 0; k < init->netints[i]->protocols[j]->n_clientports; k++) {
+						protocol->addClientPort(init->netints[i]->protocols[j]->clientports[k]);
 					}
 					
-					if(init->netints[i]->protocols[j]->client->has_ports) {
-						analysis->setClientPort(init->netints[i]->protocols[j]->client->ports);
+					protocol->setServerIp(init->netints[i]->protocols[j]->serverip);
+					for (unsigned k = 0; k < init->netints[i]->protocols[j]->n_serverports; k++) {
+						protocol->addClientPort(init->netints[i]->protocols[j]->serverports[k]);
 					}
 
-					if(init->netints[i]->protocols[j]->server->has_ip) {
-						analysis->setServerIp(init->netints[i]->protocols[j]->server->ip);
-					}
-					
-					if(init->netints[i]->protocols[j]->server->has_ports) {
-						analysis->setServerPort(init->netints[i]->protocols[j]->server->ports);
-					}
+					analysis->protocols.push_back(protocol);
 				}
 
 				start_analysis(NULL, analysis);

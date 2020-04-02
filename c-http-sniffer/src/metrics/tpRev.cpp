@@ -1,7 +1,7 @@
 
 #include "tpRev.hpp"
 
-TpRev::TpRev(Protocol* protocol, Analysis* analysis)
+TpRev::TpRev(_protocol::Protocol* protocol, Analysis* analysis)
 : MetricAvg(protocol, analysis, "tp_rev", "Reverse Throughput"), timerRef(0), intervalRef(0) {
 }
 
@@ -24,10 +24,10 @@ void TpRev::subscribe(EventManager* em) {
 void TpRev::onNewFlowReceived(Flow* flow) {
 }
 
-void TpRev::onRequestReceived(Pair *pair, Flow* flow) {
+void TpRev::onRequestReceived(_protocol::Pair *pair, Flow* flow) {
 }
 
-void TpRev::onResponseReceived(Pair *pair, Flow* flow) {
+void TpRev::onResponseReceived(_protocol::Pair *pair, Flow* flow) {
 }
 
 void TpRev::onTimerExpired() {

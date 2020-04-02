@@ -13,14 +13,13 @@ u_int32_t Addr2::hash() {
     return *(u_int32_t*)value;
 }
 
-Client::Client(Protocol* protocol, Analysis* analysis) 
+Client::Client(_protocol::Protocol* protocol, Analysis* analysis) 
 :MetricCumDistr(protocol, analysis, "clients", "Clients"), reqTotal(0) {
 	ht = new Hash();
 }
 
 void Client::subscribe(EventManager* em) {
 	em->requestReceived->add(this);
-	//em->timerExpired->add(this);
 	em->intervalExpired->add(this);
 }
 
@@ -36,7 +35,7 @@ void Client::cflAdd(Hashable* elem, int cnt) {
 void Client::cflAdd(int i, int cnt) {
 }
 
-void Client::onRequestReceived(Pair *pair, Flow* flow) {
+void Client::onRequestReceived(_protocol::Pair *pair, Flow* flow) {
 	reqTotal++;
 
 	//Request *req = pair->request_header;
@@ -63,7 +62,7 @@ void Client::onNewFlowReceived(Flow* flow) {
 void Client::onFlowUpdate(Flow* flow) {
 }
 
-void Client::onResponseReceived(Pair *pair, Flow* flow) {
+void Client::onResponseReceived(_protocol::Pair *pair, Flow* flow) {
 }
 
 void Client::onTimerExpired() {

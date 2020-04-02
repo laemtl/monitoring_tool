@@ -178,7 +178,7 @@ int Flow::flow_socket_cmp(flow_s *fs){
 }
 
 /* Add a Pair object to flow's Pair chain */
-int Flow::add_pair(Pair *h){
+int Flow::add_pair(_protocol::Pair *h){
     if(pair_f == NULL){
         pair_f = h;
     } else {

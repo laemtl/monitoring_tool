@@ -54,7 +54,7 @@ void MCDList::print() {
 /*MetricCumDistr::~MetricCumDistr() {
 }*/
 
-MetricCumDistr::MetricCumDistr(Protocol* protocol, Analysis* analysis, string name, string desc) 
+MetricCumDistr::MetricCumDistr(_protocol::Protocol* protocol, Analysis* analysis, std::string name, std::string desc) 
 : Metric(protocol, analysis, name, desc) {
 	cfl_init(&cfl);
 }
@@ -71,9 +71,9 @@ void MetricCumDistr::subscribe(EventManager* em) {
 
 void MetricCumDistr::print() {
 	if(analysis->debug) {
-		cout << name << endl;
+		std::cout << name << std::endl;
 
-		cout << "count: " << cfl.count << endl;
+		std::cout << "count: " << cfl.count << std::endl;
 		for(int i = 0; i < cfl.count; i++) {
 			printf("name: %s \n", cfl.list[i].name);
 			printf("freq: %f \n", cfl.list[i].c_freq);
@@ -103,12 +103,6 @@ void MetricCumDistr::cflUpdate(Hash* ht) {
 	}
 }
 
-void MetricCumDistr::cflUpdate(int *array, int size) {
-	for(int i=0; i<size; i++){
-		cflAdd(i, array[i]);
-	}
-}
-
 void MetricCumDistr::sendMsg() {
 	uint8_t *buf;              // Buffer to store serialized data
 	uint64_t msg_len;          // Length of serialized data
@@ -124,7 +118,7 @@ void MetricCumDistr::sendMsg() {
 	msg.metriccumdistr->freqs = freqs;
 	msg.metriccumdistr->n_freqs = cfl.count;
 
-	msg.netints = (char*)analysis->interface;
+	msg.netint = (char*)analysis->interface;
 
 	for(int i = 0; i < cfl.count; i++) {
 		Analysis__Freq* freq = MALLOC(Analysis__Freq, 1);
@@ -146,7 +140,7 @@ void MetricCumDistr::sendMsg() {
 	
 	// send
 	if(send(analysis->socket, buf, varint_len_len + msg_len, MSG_NOSIGNAL) < 0) {
-		cout << "Error sending response for metric" << name << endl;
+		std::cout << "Error sending response for metric" << name << std::endl;
 		perror("\nError is: ");
 		error("Error sending response\n");
 	} 

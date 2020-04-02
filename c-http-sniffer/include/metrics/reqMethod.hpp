@@ -1,13 +1,10 @@
 #ifndef __REQ_METHOD_H__
 #define __REQ_METHOD_H__
 
-#include "hashTable.hpp"
-#include "cf_list.h"
-#include "metricCumDistr.hpp"
-#include "stringHash.hpp"
 #include <inttypes.h>
 #include <sys/types.h>
 #include <libgen.h>
+#include "metricCumDistr.hpp"
 
 class ReqMethod: public MetricCumDistr
 {
@@ -16,7 +13,7 @@ class ReqMethod: public MetricCumDistr
 		Hash* ht;
 
 	public:
-		ReqMethod(Protocol* protocol, Analysis* analysis);
+		ReqMethod(_protocol::Protocol* protocol, Analysis* analysis);
         void subscribe(EventManager* em);
         void cflAdd(Hashable* elem, int cnt);
 		void cflAdd(int i, int cnt);
@@ -24,11 +21,15 @@ class ReqMethod: public MetricCumDistr
 
         void onNewFlowReceived(Flow* flow);
 		void onFlowUpdate(Flow* flow);
-		void onRequestReceived(Pair *pair, Flow* flow);
-		void onResponseReceived(Pair *pair, Flow* flow);
+		void onRequestReceived(_protocol::Pair *pair, Flow* flow);
+		void onResponseReceived(_protocol::Pair *pair, Flow* flow);
 		void onTimerExpired();
         void onIntervalExpired();
 		void onAnalysisEnded();
 };
+
+#include "hashTable.hpp"
+#include "cf_list.h"
+#include "stringHash.hpp"
 
 #endif

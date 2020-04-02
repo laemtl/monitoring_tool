@@ -1,8 +1,8 @@
 #include "rspStatus.hpp"
-#include "ResponseStatus.hpp"
+#include "responseStatus.hpp"
 
-RspStatus::RspStatus(Protocol* protocol, Analysis* analysis)
-: MetricCumDistr(protocol, analysis, "rsp_status", "Response status"), rspTotal(0), rspStatus(NULL) {
+RspStatus::RspStatus(_protocol::Protocol* protocol, Analysis* analysis)
+: MetricCumDistr(protocol, analysis, "rsp_status", "Response status"), rspTotal(0) {
 }
 
 void RspStatus::subscribe(EventManager* em) {
@@ -13,25 +13,23 @@ void RspStatus::subscribe(EventManager* em) {
 void RspStatus::cflAdd(Hashable* elem, int cnt) {
 }
 
-void RspStatus::cflAdd(int index, int cnt) {
-	if(rspTotal <= 0) return;
-	double freq = (double) cnt / rspTotal;
-
-	if(freq > MIN_FREQ) {
-        // Item is freed on cfl_delete so we need a copy
-		char* status = CALLOC(char, 4);
-        sprintf(status, "%d", index);
-        cfl_add(status, freq, &cfl);	
-	}
-}
-
-void RspStatus::onRequestReceived(Pair *pair, Flow* flow) {
+void RspStatus::onRequestReceived(_protocol::Pair *pair, Flow* flow) {
 }
 
 void RspStatus::onIntervalExpired() {
-	if(rspStatus == NULL) return;
+	if(rspTotal <= 0) return;
+	
+	for ( it = rspStatus.begin(); it != rspStatus.end(); it++ ) {
+    	int cnt = it->second;
+		double freq = (double) cnt / rspTotal;
 
-	cflUpdate(rspStatus, rspStatusSize);
+		if(freq > MIN_FREQ) {
+			// Item is freed on cfl_delete so we need a copy
+			char* rspStatus = strdup((char*)it->first);
+			cfl_add(rspStatus, freq, &cfl);	
+		}
+	}
+
 	if(protocol->analysis->isServerMode()) sendMsg();
 	print();
 	cfl_delete(&cfl);
@@ -46,20 +44,13 @@ void RspStatus::onNewFlowReceived(Flow* flow) {
 void RspStatus::onFlowUpdate(Flow* flow) {
 }
 
-void RspStatus::onResponseReceived(Pair *pair, Flow* flow) {
+void RspStatus::onResponseReceived(_protocol::Pair *pair, Flow* flow) {
 	rspTotal++;
 	
 	ResponseStatus* rsp = (ResponseStatus*)pair->response_header;
-
-	if(rspStatus == NULL) {
-		rspStatusSize = rsp->getStatusCount();
-		rspStatus = new int[rspStatusSize]{};
-	}
-
-    // Atomic increment
-    int status = rsp->statusCode;				
-    int* cnt = &(rspStatus[status]);
-	__atomic_fetch_add(cnt, 1, __ATOMIC_SEQ_CST);
+    int statusCode = rsp->statusCode;
+	char* statusName = rsp->getStatusName(statusCode);
+	if(statusName != NULL) ++rspStatus[statusName];
 }
 
 void RspStatus::onTimerExpired() {

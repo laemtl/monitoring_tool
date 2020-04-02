@@ -3,12 +3,6 @@
 
 #include <sys/types.h>
 
-/*class Addr {
-    public:
-        u_int32_t	ip;
-	    u_int16_t	port;
-};*/
-
 typedef struct _addr Addr;
 struct _addr {
 	u_int32_t	ip;

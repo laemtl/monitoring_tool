@@ -1,6 +1,6 @@
 #include "reqMethod.hpp"
 
-ReqMethod::ReqMethod(Protocol* protocol, Analysis* analysis) 
+ReqMethod::ReqMethod(_protocol::Protocol* protocol, Analysis* analysis) 
 : MetricCumDistr(protocol, analysis, "req_method", "Request methods"), reqTotal(0) {
 	ht = new Hash();
 }
@@ -24,7 +24,7 @@ void ReqMethod::cflAdd(Hashable* elem, int cnt) {
 void ReqMethod::cflAdd(int i, int cnt) {
 }
 
-void ReqMethod::onRequestReceived(Pair *pair, Flow* flow) {
+void ReqMethod::onRequestReceived(_protocol::Pair *pair, Flow* flow) {
 	reqTotal++;
 	const char *uri = ((_http::Request*)pair->request_header)->uri;
 	char* reqPath = extractReqMethod(uri);
@@ -37,14 +37,14 @@ char* ReqMethod::extractReqMethod(const char* uri) {
     if(uri == NULL) return NULL;
 	
 	char* reqMethod;
-	string str(uri);
+	std::string str(uri);
 
 	size_t query = str.find('?'); 
-	if (query == string::npos) {
+	if (query == std::string::npos) {
 		reqMethod = CALLOC(char, str.length()+1);
   		strcpy(reqMethod, str.c_str());
 	} else {
-		string substr = str.substr(0, query);
+		std::string substr = str.substr(0, query);
 		reqMethod = CALLOC(char, substr.length()+1);
   		strcpy(reqMethod, substr.c_str());
 	}
@@ -68,7 +68,7 @@ void ReqMethod::onNewFlowReceived(Flow* flow) {
 void ReqMethod::onFlowUpdate(Flow* flow) {
 }
 
-void ReqMethod::onResponseReceived(Pair *pair, Flow* flow) {
+void ReqMethod::onResponseReceived(_protocol::Pair *pair, Flow* flow) {
 }
 
 void ReqMethod::onTimerExpired() {

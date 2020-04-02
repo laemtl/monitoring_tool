@@ -2,16 +2,13 @@ syntax = "proto2";
 
 package analysis;
 
-message IP {
-    optional uint32 ip = 1;
-    optional uint32 ports = 2;
-};
-
 message Protocol {
     required string id = 1;
     required uint32 activeMetrics = 2;
-    optional IP client = 3;
-    optional IP server = 4;
+    optional uint32 clientIp = 3;
+    repeated uint32 clientPorts = 4;
+    optional uint32 serverIp = 5;
+    repeated uint32 serverPorts = 6;
 };
 
 message NetInt {
@@ -27,7 +24,7 @@ message Init {
 
 message Data {
     required int64 time = 1;
-    required string netInts = 2;
+    required string netInt = 2;
     
     optional double rstAvg = 3;
     optional double rstMin = 4;
@@ -66,7 +63,7 @@ message Data {
 message MetricMsg {
     required string name = 1;    
     required int64 time = 2;
-    required string netInts = 3;
+    required string netInt = 3;
     required int64 clientId = 4;
 
     oneof values {

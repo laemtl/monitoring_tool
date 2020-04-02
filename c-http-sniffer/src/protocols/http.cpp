@@ -93,15 +93,20 @@ char* Http::isResponse(const char *ptr, const int datalen) {
 }
 
 Http::Http(Analysis* analysis) : Protocol(analysis) {
-    ports.insert(ports.end(), {80, 8080, 8000});
-}
+    serverPorts.insert(serverPorts.end(), {80, 8080, 8000});
 
-bool Http::isPacketOf(u_int16_t sport, u_int16_t dport) {
-    if(find(ports.begin(), ports.end(), sport) != ports.end()
-    || find(ports.begin(), ports.end(), dport) != ports.end()) {
-		return true;
-	}
-    return false;
+    metrics.push_back(new Rst(this, analysis));
+    metrics.push_back(new ReqRate(this, analysis));
+    metrics.push_back(new ErrRate(this, analysis));
+    metrics.push_back(new Tp(this, analysis));
+    metrics.push_back(new TpRev(this, analysis));
+    metrics.push_back(new ConnRate(this, analysis));
+
+    metrics.push_back(new Client(this, analysis));
+    metrics.push_back(new ReqPath(this, analysis));
+    metrics.push_back(new ReqMethod(this, analysis));
+    metrics.push_back(new ReqType(this, analysis));
+    metrics.push_back(new RspStatus(this, analysis));
 }
 
 bool Http::isHeaderPacket(const char *ptr, const int datalen) {
@@ -305,10 +310,12 @@ int _http::Response::parseStatus(const char *line, int len) {
 		return statusCode;
 	}
 
-    /* search enum */
-    vector<int>::iterator it;
-    it = find(status.begin(), status.end(), val);
-    if (it != status.end()) statusCode = distance(status.begin(), it);
+    for (auto &s : status) {
+        if (s.first == val) {
+            statusCode = s.first;
+            break;
+        }
+    }
     
     return statusCode;
 }
@@ -414,62 +421,62 @@ _http::Request::Request(const char *data, const char *dataend, char *time, u_int
 }
 
 _http::Response::Response() {
-    status[0];
-    status[100];
-    status[101];
-    status[102];
-    status[199];
+    status.insert({0, "None"});
+    status.insert({100, "100 Continue"});
+    status.insert({101, "101 Switching Protocols"});
+    status.insert({102, "102 Processing"});
+    status.insert({199, "199 Miscellaneous Warning"});
 
-    status[200];
-    status[201];
-    status[202];
-    status[203];
-    status[204];
-    status[205];
-    status[206];
-    status[207];
-    status[299];
+    status.insert({200, "200 OK"});
+    status.insert({201, "201 Created"});
+    status.insert({202, "202 Accepted"});
+    status.insert({203, "203 Non-Authoritative Information"});
+    status.insert({204, "204 No Content"});
+    status.insert({205, "205 Reset Content"});
+    status.insert({206, "206 Partial Content"});
+    status.insert({207, "207 Multi-Status"});
+    status.insert({299, "299 Miscellaneous Persistent Warning"});
 
-    status[300];
-    status[301];
-    status[302];
-    status[303];
-    status[304];
-    status[305];
-    status[307];
-    status[399];
+    status.insert({300, "300 Multiple Choices"});
+    status.insert({301, "301 Moved Permanently"});
+    status.insert({302, "302 Found"});
+    status.insert({303, "303 See Other"});
+    status.insert({304, "304 Not Modified"});
+    status.insert({305, "305 Use Proxy"});
+    status.insert({307, "307 Temporary Redirect"});
+    status.insert({399, "399"});
 
-    status[400];
-    status[401];
-    status[402];
-    status[403];
-    status[404];
-    status[405];
-    status[406];
-    status[407];
-    status[408];
-    status[409];
-    status[410];
-    status[411];
-    status[412];
-    status[413];
-    status[414];
-    status[415];
-    status[416];
-    status[417];
-    status[422];
-    status[423];
-    status[424];
-    status[499];
+    status.insert({400, "400 Bad Request"});
+    status.insert({401, "401 Unauthorized"});
+    status.insert({402, "402 Payment Required"});
+    status.insert({403, "403 Forbidden"});
+    status.insert({404, "404 Not Found"});
+    status.insert({405, "405 Method Not Allowed"});
+    status.insert({406, "406 Not Acceptable"});
+    status.insert({407, "407 Proxy Authentication Required"});
+    status.insert({408, "408 Request Timeout"});
+    status.insert({409, "409 Conflict"});
+    status.insert({410, "410 Gone"});
+    status.insert({411, "411 Length Required"});
+    status.insert({412, "412 Precondition Failed"});
+    status.insert({413, "413 Payload Too Large"});
+    status.insert({414, "414 URI Too Long"});
+    status.insert({415, "415 Unsupported Media Type"});
+    status.insert({416, "416 Range Not Satisfiable"});
+    status.insert({417, "417 Expectation Failed"});
+    status.insert({422, "422 Unprocessable Entity"});
+    status.insert({423, "423 Locked"});
+    status.insert({424, "424 Failed Dependency"});
+    status.insert({499, "499 Client Closed Request"});
 
-    status[500];
-    status[501];
-    status[502];
-    status[503];
-    status[504];
-    status[505];
-    status[507];
-    status[599];
+    status.insert({500, "500 Internal Server Error"});
+    status.insert({501, "501 Not Implemented"});
+    status.insert({502, "502 Bad Gateway"});
+    status.insert({503, "503 Service Unavailable"});
+    status.insert({504, "504 Gateway Timeout"});
+    status.insert({505, "505 HTTP Version Not Supported"});
+    status.insert({507, "507 Insufficient Storage"});
+    status.insert({599, "599 Network Connect Timeout Error"});
 }
 
 /*

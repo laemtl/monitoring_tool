@@ -1,6 +1,6 @@
 #include "connRate.hpp"
 
-ConnRate::ConnRate(Protocol* protocol, Analysis* analysis) 
+ConnRate::ConnRate(_protocol::Protocol* protocol, Analysis* analysis) 
 : MetricAvg(protocol, analysis, "conn_rate", "Connection rate") {
 }
 
@@ -32,8 +32,8 @@ void ConnRate::onTimerExpired() {
 void ConnRate::onFlowUpdate(Flow* flow) {
 }
 
-void ConnRate::onRequestReceived(Pair *pair, Flow* flow) {
+void ConnRate::onRequestReceived(_protocol::Pair *pair, Flow* flow) {
 }
 
-void ConnRate::onResponseReceived(Pair *pair, Flow* flow) {
+void ConnRate::onResponseReceived(_protocol::Pair *pair, Flow* flow) {
 }

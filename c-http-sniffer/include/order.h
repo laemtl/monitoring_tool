@@ -3,8 +3,7 @@
 
 #include <sys/types.h>
 
-#include "packet.h"
-#include "util.h"
+typedef struct _packet_t packet_t;
 
 typedef struct _seq_t seq_t;
 struct _seq_t{
@@ -37,5 +36,8 @@ void	seq_free(seq_t *seq);
 order_t *order_new(void);
 void	order_free(order_t *order);
 seq_t *seq_pkt(packet_t *p);
+
+#include "packet.h"
+#include "util.h"
 
 #endif	/* __ORDER_H__ */

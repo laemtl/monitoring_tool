@@ -9,8 +9,6 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include "util.h"
-
 class Flow;
 class FlowQueue {
 	public:
@@ -28,5 +26,6 @@ class FlowQueue {
 };
 
 #include "flow.hpp"
+#include "util.h"
 
 #endif

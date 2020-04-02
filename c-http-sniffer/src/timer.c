@@ -1,14 +1,4 @@
-#include <time.h>
-#include <signal.h> 
-#include <unistd.h>
-#include <sys/types.h>
-#include <pthread.h>
-#include <stdio.h>
-#include <sys/syscall.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
-#include "analysis.hpp" 
+#include "timer.h"
 
 // These defines come from asm-generic/siginfo.h, are necessary, but are not included by signal.h.
 #define sigev_notify_thread_id	_sigev_un._tid

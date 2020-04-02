@@ -1,6 +1,6 @@
 #include "requestReceived.hpp"
 
-void RequestReceived::notify(Pair *pair, Flow* flow) {
+void RequestReceived::notify(_protocol::Pair *pair, Flow* flow) {
     for (Observer *observer : observers) {
         observer->onRequestReceived(pair, flow);
     }

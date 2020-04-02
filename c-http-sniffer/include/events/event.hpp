@@ -4,15 +4,16 @@
 #include <vector>
 #include <algorithm>
 
-using namespace std;
-
 class Observer;
+
 class Event {
     protected:
-        vector<Observer*> observers;
+        std::vector<Observer*> observers;
     public:
         void add(Observer* obs);
         void remove(Observer* obs);
 };
+
+#include "observer.hpp"
 
 #endif

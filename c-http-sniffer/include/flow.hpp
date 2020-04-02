@@ -10,20 +10,17 @@
 #include <unistd.h>
 #include <iostream>
 
-#include "util.h"
-#include "tcp.h"
-#include "packet.h"
-#include "order.h"
-#include "util.h"
-#include "protocol.hpp"
-
 #define CLIENT_CLOSE	0x01
 #define SERVER_CLOSE	0x02
 #define FORCED_CLOSE	0x04
 
 class Flow;
+class Queue;
 class FlowHashTable;
 typedef struct _hash_mb_t hash_mb_t;
+typedef struct _packet_t packet_t;
+typedef struct _order_t order_t;
+typedef struct _seq_t seq_t;
 
 /**
  * flow socket
@@ -36,6 +33,10 @@ struct _flow_s
 	u_int16_t	sport;
 	u_int16_t	dport;
 };
+
+namespace _protocol {
+    class Pair;
+}
 
 class Flow {
 	public:
@@ -69,8 +70,8 @@ class Flow {
             u_int32_t	payload_src;	/* bytes of payload sent from source to destination */
             u_int32_t 	payload_dst;	/* bytes of payload sent from destination to source */
         
-            Pair		*pair_f;	    /* front of pair queue */
-            Pair		*pair_e;	    /* end of pair queue */
+            _protocol::Pair		*pair_f;	    /* front of pair queue */
+            _protocol::Pair		*pair_e;	    /* end of pair queue */
         /* Control */
             time_t		last_action_sec;	/* latest modified time to the flow in seconds */
             time_t		last_action_usec;	/* latest modified time to the flow in microseconds */
@@ -89,11 +90,17 @@ class Flow {
 		int cal_packet(packet_t *packet, bool src);
 		int compare_sequence_time(seq_t *seq1, seq_t *seq2);
 		int flow_socket_cmp(flow_s *fs);
-		int add_pair(Pair *h);
+		int add_pair(_protocol::Pair *h);
 		int add_packet(packet_t *packet, register bool src);
 };
 
 #include "flowHashTable.hpp"
 #include "queue.hpp"
+#include "util.h"
+#include "tcp.h"
+#include "packet.h"
+#include "order.h"
+#include "util.h"
+#include "protocol.hpp"
 
 #endif

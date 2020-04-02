@@ -9,9 +9,6 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include "util.h"
-#include "packet.h"
-
 #define HASH_SIZE	13200
 
 #define HASH_FLOW(flow_socket) ( \
@@ -23,6 +20,7 @@ class Flow;
 class Queue;
 struct _flow_s;
 typedef struct _flow_s	flow_s;
+typedef struct _packet_t packet_t;
 
 /**
  * Hash management block
@@ -58,5 +56,7 @@ class FlowHashTable {
 
 #include "flow.hpp"
 #include "queue.hpp"
+#include "util.h"
+#include "packet.h"
 
 #endif

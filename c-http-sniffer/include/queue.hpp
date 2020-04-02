@@ -9,10 +9,6 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include "util.h"
-
-using namespace std;
-
 class Qnode {
     public:
         void* elem;
@@ -35,5 +31,7 @@ class Queue {
 		int len();
 		void print();
 };
+
+#include "util.h"
 
 #endif

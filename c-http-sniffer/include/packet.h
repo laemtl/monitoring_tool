@@ -15,8 +15,6 @@
 #include <sys/types.h>
 #include <pcap/pcap.h>
 
-#include "util.h"
-
 /* Ethernet header structure */
 typedef struct ethernet_header ethhdr;
 struct ethernet_header
@@ -119,5 +117,6 @@ free_iphdr(iphdr *h);					/* Free a IP header object */
 void
 free_tcphdr(tcphdr *h);					/* Free a TCP header object */
 
+#include "util.h"
 
 #endif /* __PACKET_H__ */

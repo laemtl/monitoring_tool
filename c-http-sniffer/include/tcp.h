@@ -8,10 +8,10 @@
 #ifndef __TCP_H__
 #define __TCP_H__
 
-#include "order.h"
-#include "util.h"
-
 int tcp_order(order_t *ord, seq_t *new_seq, bool src);
 int tcp_order_check(order_t *order);	// for debugging
+
+#include "order.h"
+#include "util.h"
 
 #endif /* __TCP_H__ */

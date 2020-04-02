@@ -1,14 +1,16 @@
 #ifndef __CLIENTS_H__
 #define __CLIENTS_H__
 
-#include "cf_list.h"
 #include <inttypes.h>
 #include <sys/types.h>
-#include "hashTable.hpp"
+
 #include "metricCumDistr.hpp"
 
 class Flow;
 class Analysis;
+namespace _protocol {
+	class Protocol;
+}
 
 class Addr2 : public Hashable
 {
@@ -26,7 +28,7 @@ class Client : public MetricCumDistr
 		Hash* ht;
 
 	public:
-		Client(Protocol* protocol, Analysis* analysis);
+		Client(_protocol::Protocol* protocol, Analysis* analysis);
         void subscribe(EventManager* em);
         void cflAdd(Hashable* addr, int cnt);
 		void cflAdd(int i, int cnt);
@@ -34,8 +36,8 @@ class Client : public MetricCumDistr
 
         void onNewFlowReceived(Flow* flow);
 		void onFlowUpdate(Flow *flow);
-		void onRequestReceived(Pair *pair, Flow* flow);
-		void onResponseReceived(Pair *pair, Flow* flow);
+		void onRequestReceived(_protocol::Pair *pair, Flow* flow);
+		void onResponseReceived(_protocol::Pair *pair, Flow* flow);
 		void onTimerExpired();
         void onIntervalExpired();
         void onAnalysisEnded();
@@ -43,5 +45,7 @@ class Client : public MetricCumDistr
 
 #include "analysis.hpp"
 #include "flow.hpp"
+#include "cf_list.h"
+#include "hashTable.hpp"
 
 #endif

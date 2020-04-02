@@ -2,7 +2,7 @@
 
 #include "reqRate.hpp"
 
-ReqRate::ReqRate(Protocol* protocol, Analysis* analysis) 
+ReqRate::ReqRate(_protocol::Protocol* protocol, Analysis* analysis) 
 : MetricAvg(protocol, analysis, "req_rate", "Request rate") {
 }
 
@@ -17,11 +17,11 @@ double ReqRate::getAvg() {
 	return sum->get()/analysis->interval;
 }
 
-void ReqRate::onRequestReceived(Pair *pair, Flow* flow) {
+void ReqRate::onRequestReceived(_protocol::Pair *pair, Flow* flow) {
 	subtotal->add(1);
 }
 
-void ReqRate::onResponseReceived(Pair *pair, Flow* flow) {
+void ReqRate::onResponseReceived(_protocol::Pair *pair, Flow* flow) {
 }
 
 void ReqRate::onTimerExpired() {

@@ -4,15 +4,13 @@
 #include <sys/types.h>
 #include <time.h>
 #include <vector>
-#include "packet.h"
-#include "util.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
 #include <map>
-#include "ResponseStatus.hpp"
-#include "RequestMethod.hpp"
+#include "requestMethod.hpp"
+#include "responseStatus.hpp"
 #include "protocol.hpp"
 
 namespace _http { 
@@ -27,9 +25,7 @@ namespace _http {
 
     class Http : public _protocol::Protocol {
         public:
-            std::vector<int> ports;
             Http(Analysis* analysis);
-            bool isPacketOf(u_int16_t sport, u_int16_t dport);	/* If the packet carries HTTP(request or response) data */
             bool isHeaderPacket(const char *ptr, const int datalen);
             char* isRequest(const char *p, const int datalen);	    /* If the packet carries HTTP request data */
             char* isResponse(const char *p, const int datalen);	    /* If the packet carries HTTP response data */
@@ -94,6 +90,9 @@ namespace _http {
             virtual bool hasErrorStatus();
     };
 }
+
+#include "packet.h"
+#include "util.h"
 
 using namespace _http;
 

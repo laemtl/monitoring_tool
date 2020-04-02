@@ -1,6 +1,6 @@
 #include "reqPath.hpp"
 
-ReqPath::ReqPath(Protocol* protocol, Analysis* analysis) 
+ReqPath::ReqPath(_protocol::Protocol* protocol, Analysis* analysis) 
 : MetricCumDistr(protocol, analysis, "req_path", "Requests path"), reqTotal(0) {
 	ht = new Hash();
 }
@@ -16,8 +16,6 @@ void ReqPath::cflAdd(Hashable* elem, int cnt) {
 
 	if(freq > MIN_FREQ) {
 		// Item is freed on cfl_delete so we need a copy
-		//char* reqPath = CALLOC(char, strlen((char*)elem->value)+1);
-	  	//strcpy(reqPath, (char*)elem->value);
 		char* reqPath = strdup((char*)elem->value);
 		cfl_add(reqPath, freq, &cfl);	
 	}
@@ -26,7 +24,7 @@ void ReqPath::cflAdd(Hashable* elem, int cnt) {
 void ReqPath::cflAdd(int i, int cnt) {
 }
 
-void ReqPath::onRequestReceived(Pair *pair, Flow* flow) {
+void ReqPath::onRequestReceived(_protocol::Pair *pair, Flow* flow) {
 	reqTotal++;
 	const char *uri = ((_http::Request*)pair->request_header)->uri;
 	
@@ -40,17 +38,17 @@ void ReqPath::onRequestReceived(Pair *pair, Flow* flow) {
 
 char* ReqPath::extractReqPath(const char* uri) {
     char* reqPath;
-	string str(uri);
+	std::string str(uri);
 
 	size_t last = str.find_last_of('/'); 
-	if (last == string::npos) {
+	if (last == std::string::npos) {
 		size_t query = str.find('?');
-		string substr = str.substr(0, query);
+		std::string substr = str.substr(0, query);
 
 		reqPath = CALLOC(char, substr.length()+1);
   		strcpy(reqPath, substr.c_str());
 	} else {
-		string substr = str.substr(0, last+1);
+		std::string substr = str.substr(0, last+1);
 		reqPath = CALLOC(char, substr.length()+1);
   		strcpy(reqPath, substr.c_str());
 	}
@@ -74,7 +72,7 @@ void ReqPath::onNewFlowReceived(Flow* flow) {
 void ReqPath::onFlowUpdate(Flow* flow) {
 }
 
-void ReqPath::onResponseReceived(Pair *pair, Flow* flow) {
+void ReqPath::onResponseReceived(_protocol::Pair *pair, Flow* flow) {
 }
 
 void ReqPath::onTimerExpired() {

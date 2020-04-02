@@ -1,8 +1,14 @@
 #include "memcached.hpp"
 
 MemCached::MemCached(Analysis* analysis) : Protocol(analysis) {
-    //reqType = new int[statusCode.size()]{};
-    ports.insert(ports.end(), {11211});
+    serverPorts.push_back(11211);
+
+    metrics.push_back(new Rst(this, analysis));
+    metrics.push_back(new ErrRate(this, analysis));
+    metrics.push_back(new Tp(this, analysis));
+    metrics.push_back(new TpRev(this, analysis));
+    metrics.push_back(new ReqType(this, analysis));
+    metrics.push_back(new RspStatus(this, analysis));
 }
 
 /*
@@ -89,31 +95,22 @@ int _memcached::Response::parseStatus(const char *line, int len) {
         //st[tokenlen] = '\0';
     }
     
-    /* search enum */
-    vector<const char*>::iterator it;
-    it = find(statusName.begin(), statusName.end(), st);
-    if (it != statusName.end()) statusCode = distance(statusName.begin(), it);
+    for (auto &s : status) {
+        if (s.second == st) {
+            statusCode = s.first;
+            break;
+        }
+    }
     free(st);
 
     return statusCode;
 }
 
 bool _memcached::Response::hasErrorStatus() {
-    statusName.push_back("ERROR");
-    statusName.push_back("CLIENT_ERROR");
-    statusName.push_back("SERVER_ERROR");
-    statusName.push_back("BADCLASS");
-    
-    
-    
-    statusName.push_back("DELETED");
-    statusName.push_back("TOUCHED");
-    statusName.push_back("BUSY");
-    statusName.push_back("NOTFULL");
-    statusName.push_back("UNSAFE");
-    statusName.push_back("SAME");
-    statusName.push_back("STAT");
-    statusName.push_back("VERSION");
+    if(status[statusCode] == "ERROR"
+    || status[statusCode] == "CLIENT_ERROR"
+    || status[statusCode] == "SERVER_ERROR"
+    || status[statusCode] == "BADCLASS") return true;
 
     return false;
 }
@@ -134,19 +131,11 @@ char* MemCached::isResponse(const char *ptr, const int datalen) {
     _memcached::Response* rsp = new _memcached::Response();
 	statusCode = rsp->parseStatus(linesp, lnl);
     
-    if (rsp->statusName[statusCode] == "NONE"){
+    if (rsp->status[statusCode] == "NONE"){
 		return NULL;
 	} else {
 		return head_end;
 	}
-}
-
-bool MemCached::isPacketOf(u_int16_t sport, u_int16_t dport) {
-    if(find(ports.begin(), ports.end(), sport) != ports.end()
-    || find(ports.begin(), ports.end(), dport) != ports.end()) {
-		return true;
-	}
-    return false;
 }
 
 bool MemCached::isHeaderPacket(const char *ptr, const int datalen) {
@@ -165,14 +154,14 @@ bool MemCached::isHeaderPacket(const char *ptr, const int datalen) {
 
 _memcached::Request::~Request() {
     if (!keys.empty())
-        vector<const char*>(keys).swap(keys);
+        std::vector<const char*>(keys).swap(keys);
     if(time != NULL)
         free(time);
 }
 
 _memcached::Response::~Response() {
      if (!keys.empty())
-        vector<const char*>(keys).swap(keys);
+        std::vector<const char*>(keys).swap(keys);
 }
 
 
@@ -287,32 +276,15 @@ _memcached::Request::Request(const char *data, const char *dataend, char *time, 
 }
 
 _memcached::Response::Response() {
-    statusName.push_back("NONE");
-    statusName.push_back("VALUE");
-    statusName.push_back("OK");
-    statusName.push_back("END");
-    statusName.push_back("STORED");
-    statusName.push_back("NOT_STORED");
-    statusName.push_back("EXISTS");
-    statusName.push_back("NOT_FOUND");
-    statusName.push_back("ERROR");
-    statusName.push_back("CLIENT_ERROR");
-    statusName.push_back("SERVER_ERROR");
-    statusName.push_back("DELETED");
-    statusName.push_back("TOUCHED");
-    statusName.push_back("BUSY");
-    statusName.push_back("BADCLASS");
-    statusName.push_back("NOTFULL");
-    statusName.push_back("UNSAFE");
-    statusName.push_back("SAME");
-    statusName.push_back("STAT");
-    statusName.push_back("VERSION");
-    
-    for (std::size_t i = 0; i != statusName.size(); ++i) {
-        status[i];
+    char statusName[20][50] = { "NONE", "VALUE", "OK", "END", "STORED", "NOT_STORED", "EXISTS",
+    "NOT_FOUND", "ERROR", "CLIENT_ERROR", "SERVER_ERROR", "DELETED", "TOUCHED",
+    "BUSY", "BADCLASS", "NOTFULL", "UNSAFE", "SAME", "STAT", "VERSION" };
+
+    int cnt = sizeof(statusName)/sizeof(statusName[0]);
+    for (int i = 0; i != cnt; ++i) {
+        status.insert({i, statusName[i]});
     }
 }
-
 
 /*
  * Extract response message from data.
@@ -338,11 +310,11 @@ _memcached::Response::Response(const char *data, const char *dataend, long ack) 
 	linesp = (char*) data;
 	statusCode = parseStatus(linesp, hdl);
 	
-    if (statusName[statusCode] == "NONE"){
+    if (status[statusCode] == "NONE"){
 		return;
 	}
     
-    if (statusName[statusCode] == "VALUE")
+    if (status[statusCode] == "VALUE")
     {
         tokenlen = Protocol::get_token_len(linesp, eoh, &next_token);
         if (tokenlen != 0 && linesp[tokenlen] == ' ' ) {

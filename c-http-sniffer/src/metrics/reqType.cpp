@@ -1,7 +1,7 @@
 #include "reqType.hpp"
-#include "RequestMethod.hpp"
+#include "requestMethod.hpp"
 
-ReqType::ReqType(Protocol* protocol, Analysis* analysis) 
+ReqType::ReqType(_protocol::Protocol* protocol, Analysis* analysis) 
 : MetricCumDistr(protocol, analysis, "req_type", "Request type"), reqTotal(0) {
 }
 
@@ -13,28 +13,26 @@ void ReqType::subscribe(EventManager* em) {
 void ReqType::cflAdd(Hashable* elem, int cnt) {
 }
 
-void ReqType::cflAdd(int index, int cnt) {
-}
-
-void ReqType::onRequestReceived(Pair *pair, Flow* flow) {
+void ReqType::onRequestReceived(_protocol::Pair *pair, Flow* flow) {
 	reqTotal++;
 
 	RequestMethod* req = (RequestMethod*)pair->request_header;
 	int methodCode = req->methodCode;	
 	char* methodName = req->getMethodName(methodCode);
-    ++reqType[methodName];
+    if(methodName != NULL) ++reqType[methodName];
 }
 
 void ReqType::onIntervalExpired() {
 	if(reqTotal <= 0) return;
 	
 	for ( it = reqType.begin(); it != reqType.end(); it++ ) {
-    	char* value = it->first;
-		int cnt = it->second;
+    	int cnt = it->second;
 		double freq = (double) cnt / reqTotal;
 
 		if(freq > MIN_FREQ) {
-			cfl_add(value, freq, &cfl);	
+			// Item is freed on cfl_delete so we need a copy
+			char* reqMethod = strdup((char*)it->first);
+			cfl_add(reqMethod, freq, &cfl);	
 		}
 	}
 
@@ -52,7 +50,7 @@ void ReqType::onNewFlowReceived(Flow* flow) {
 void ReqType::onFlowUpdate(Flow* flow) {
 }
 
-void ReqType::onResponseReceived(Pair *pair, Flow* flow) {
+void ReqType::onResponseReceived(_protocol::Pair *pair, Flow* flow) {
 }
 
 void ReqType::onTimerExpired() {

@@ -1,5 +1,4 @@
 #include "protocol.hpp"
-#include <iostream>
 
 int	Pair::addRequest(Request *req) {
     if(request_header == NULL){
@@ -16,17 +15,17 @@ req_lb_usec(0), rsp_fb_sec(0), rsp_fb_usec(0), rsp_lb_sec(0), rsp_lb_usec(0), re
 rsp_total_len(0), req_body_len(0), rsp_body_len(0), next(NULL) {
 }
 
-Request::Request() : time(NULL), hdlen(0), processed(false) {
+_protocol::Request::Request() : time(NULL), hdlen(0), processed(false) {
 }
 
 // override
-Request::Request(const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq) : Request() {
+_protocol::Request::Request(const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq) : Request() {
 }
 
-Response::Response() : hdlen(0), processed(false) {
+_protocol::Response::Response() : hdlen(0), processed(false) {
 }
            
-Response::Response(const char *data, const char *dataend, long ack) : Response() {           
+_protocol::Response::Response(const char *data, const char *dataend, long ack) : Response() {           
 }
 
 int Pair::addResponse(Response *rsp) {
@@ -38,7 +37,7 @@ int Pair::addResponse(Response *rsp) {
 	}
 }
 
-Protocol::Protocol(Analysis* analysis) : analysis(analysis) {
+Protocol::Protocol(Analysis* analysis) : analysis(analysis), hasClientIp(false), hasServerIp(false) {
     eventManager = new EventManager();
     
     /* Initialization of packet and flow data structures */
@@ -66,28 +65,20 @@ void Protocol::flowHashProcess() {
 }
 
 void Protocol::extractData(Flow* flow){	
-    if(analysis->hasClientIp) {
-        if(analysis->client.ip != flow->socket.saddr) {
-            return;
-        }
-        
-        if(analysis->hasClientPort) {
-            if(analysis->client.port != flow->socket.sport) {
-                return;
-            }
-        }
+    if(hasClientIp && clientIp != flow->socket.saddr) {
+        return;
+    }
+    
+    if (clientPorts.size() && !std::count(clientPorts.begin(), clientPorts.end(), flow->socket.sport)) {
+        return;
+    }
 
-        if(analysis->hasServerIp) {
-            if(analysis->server.ip != flow->socket.daddr) {
-                return;
-            }
-            
-            if(analysis->hasServerPort) {
-                if(analysis->server.port != flow->socket.dport) {
-                    return;
-                }
-            }
-        }
+    if(hasServerIp && serverIp != flow->socket.daddr) {
+        return;
+    }
+
+    if (serverPorts.size() && !std::count(serverPorts.begin(), serverPorts.end(), flow->socket.dport)) {
+        return;
     }
 
     if(!flow->processed) {
@@ -133,14 +124,14 @@ void Protocol::extractData(Flow* flow){
 }
 
 void Protocol::activeMetrics(int activeMetrics) {
-    for (int i = metricManager->metrics.size() - 1; i >= 0; i--) {
+    for (int i = metrics.size() - 1; i >= 0; i--) {
         bool status = activeMetrics & (1<<i);
         
         if(!status) {
-            metricManager->metrics.erase(metricManager->metrics.begin() + i);
+            metrics.erase(metrics.begin() + i);
         } else {
             // Register metric to its attached events
-            metricManager->metrics.at(i)->subscribe(eventManager);
+            metrics.at(i)->subscribe(eventManager);
         }	
     }
 }
@@ -787,4 +778,30 @@ int Protocol::extractPair(Flow* flow, bool closed){
     }
 
     return 0;
+}
+
+void Protocol::setClientIp(u_int32_t ip) {
+    hasClientIp = true;
+    clientIp = ip;				
+}
+
+void Protocol::addClientPort(u_int16_t port) {
+    clientPorts.push_back(port);	
+}
+
+void Protocol::setServerIp(u_int32_t ip) {
+    hasServerIp = true;
+    serverIp = ip;	
+}
+
+void Protocol::addServerPort(u_int16_t port) {
+    serverPorts.push_back(port);	
+}
+
+bool Protocol::isPacketOf(u_int16_t sport, u_int16_t dport) {
+    if(find(serverPorts.begin(), serverPorts.end(), sport) != serverPorts.end()
+    || find(serverPorts.begin(), serverPorts.end(), dport) != serverPorts.end()) {
+		return true;
+	}
+    return false;
 }

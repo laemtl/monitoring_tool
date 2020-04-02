@@ -1,11 +1,3 @@
-/* util.c */
-
-#include <stdio.h>
-#include <string.h>
-#include <pthread.h>
-#include <stdlib.h>
-#include <ctype.h>
-
 #include "util.h"
 
 /* Simple wrapper around the malloc() function */
@@ -137,7 +129,7 @@ u_int32_t ip_ston(char *cp){
 }
 
 void error(char* s) {
-    perror(s);
+	perror(s);
 	
 	int v = 1;
 	pthread_exit(&v);

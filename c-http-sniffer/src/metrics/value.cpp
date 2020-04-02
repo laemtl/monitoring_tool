@@ -6,7 +6,7 @@ Value::Value() {
 }
 
 double Value::get() {
-    if(isClose(numeric_limits<double>::max())) {
+    if(isClose(std::numeric_limits<double>::max())) {
         return 0;
     }
     

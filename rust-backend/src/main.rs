@@ -20,7 +20,6 @@ use tokio_io::AsyncRead;
 use tokio_tcp::TcpStream;
 
 use std::str::FromStr;
-//use std::time::{Duration, Instant};
 use actix::prelude::*;
 use actix_files as fs;
 use actix_web::{
@@ -176,7 +175,7 @@ impl StreamHandler<ws::Message, ws::ProtocolError> for Ws {
                     Result::Err(err) => {panic!("Unable to parse json: {}",err)}
                 };
 
-                println!("{:?}", m);
+                println!("Message received: {:?}", m);
 
                 match m {
                     Msg::Init { net_ints, interval, duration } => {
@@ -187,11 +186,10 @@ impl StreamHandler<ws::Message, ws::ProtocolError> for Ws {
                         let n_ints = RepeatedField::from_vec(net_ints);
                         init.set_netInts(n_ints);
 
-                        println!("{:?}", init);
+                        println!("Message sent {:?}", init);
 
                         let ws_addr: Addr<_> = ctx.address();
                         
-                        //let ip = resolve("bmj-cluster.cs.mcgill.ca:15430");
                         SnifferServer::connect("127.0.0.1:3000", init, ws_addr);
                     }
                     Msg::Data { time: _, net_int: _, rst: _, tp: _, tp_rev: _, err_rate: _, req_rate: _, conn_rate: _, client: _, req_path: _, req_method: _, req_type: _, rsp_status: _ } => println!("Got Data"),
@@ -244,7 +242,7 @@ impl Handler<MetricMsg> for Ws {
         let msg = Msg::Metric {
             name: metric.get_name().to_string(),    
             time: metric.get_time(),
-            net_int: metric.get_netInts().to_string(),
+            net_int: metric.get_netInt().to_string(),
             client_id: 0,
             metric_avg: metric_avg,
             metric_cum_distr: metric_cum_distr
@@ -278,6 +276,9 @@ impl SnifferServer {
                     init.write_length_delimited_to(&mut os).expect("Could not write to the buffer.");
                     os.flush().expect("Could not flush the buffer.");
                     
+                    let s = init.get_cached_size();
+                    println!("size sent: {}", s);
+
                     SnifferServer::create(|ctx| {
                         SnifferServer::add_stream(FramedRead::new(r, codec::SnifferCodec), ctx);
                         SnifferServer {

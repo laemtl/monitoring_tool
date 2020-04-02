@@ -1,12 +1,14 @@
 #ifndef __ANALYSIS_H__
 #define __ANALYSIS_H__
 
-#include "addr.hpp"
-#include "protocol.hpp"
 #include <vector>
 #include <cstdint>
+#include <pthread.h>
 
-using namespace std;
+class Queue;
+namespace _protocol {
+    class Protocol;
+}
 
 class Analysis {
     public:
@@ -24,31 +26,18 @@ class Analysis {
         uint32_t int_step;
         uint32_t duration;
         
-        bool hasClientIp;
-        bool hasClientPort;
-        Addr client;
-
-        bool hasServerIp;
-        bool hasServerPort;
-        Addr server;
-        
-        Addr destination;
-        
-        vector<Protocol*> protocols;
+        std::vector<_protocol::Protocol*> protocols;
 
         // raw packet queue
         Queue* rpq;
 
         Analysis(int socket, const char* netInt, uint32_t interval, uint32_t duration); 
-
         bool isServerMode();
-        void setClientIp(u_int32_t ip);
-        void setClientPort(u_int16_t port);
-        void setServerIp(u_int32_t ip);
-        void setServerPort(u_int16_t port);
-        
         void stop();
         bool isStopped();
 };
+
+#include "addr.hpp"
+#include "protocol.hpp"
 
 #endif

@@ -4,6 +4,11 @@
 #define __UTIL_H__
 
 #include <sys/types.h>
+#include <stdio.h>
+#include <string.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include <ctype.h>
 
 /************************Macros*****************************/
 #define MALLOC(type, num)  (type *) check_malloc((num) * sizeof(type))

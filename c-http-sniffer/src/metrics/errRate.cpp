@@ -1,7 +1,7 @@
 #include "errRate.hpp"
-#include "ResponseStatus.hpp"
+#include "responseStatus.hpp"
 
-ErrRate::ErrRate(Protocol* protocol, Analysis* analysis) 
+ErrRate::ErrRate(_protocol::Protocol* protocol, Analysis* analysis) 
 : MetricAvg(protocol, analysis, "err_rate", "Error rate"){
 }
 
@@ -17,7 +17,7 @@ void ErrRate::subscribe(EventManager* em) {
 	em->intervalExpired->add(this);
 }
 
-void ErrRate::onResponseReceived(Pair *pair, Flow* flow) {
+void ErrRate::onResponseReceived(_protocol::Pair *pair, Flow* flow) {
 	// total number of received response
 	subtotal->add(1);
 	total->add(1);
@@ -45,5 +45,5 @@ void ErrRate::onNewFlowReceived(Flow* flow) {
 void ErrRate::onFlowUpdate(Flow* flow) {
 }
 
-void ErrRate::onRequestReceived(Pair *pair, Flow* flow) {
+void ErrRate::onRequestReceived(_protocol::Pair *pair, Flow* flow) {
 }

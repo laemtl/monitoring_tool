@@ -1,25 +1,24 @@
 #ifndef __METRIC_H__
 #define __METRIC_H__
 
-#include "eventManager.hpp"
-#include "analysis.pb-c.h"
 #include <string>
-#include "protocol.hpp"
 
-//#include "server.h"
-
-using namespace std;
 class Analysis;
+class EventManager;
+namespace _protocol {
+    class Protocol;
+}
+
 class Metric {
     public:  
-        string name;
-        string desc;
-		Protocol* protocol;
+        std::string name;
+        std::string desc;
+		_protocol::Protocol* protocol;
         Analysis* analysis;
-        Metric(Protocol* protocol, Analysis* analysis, string name, string desc) : analysis(analysis), protocol(protocol), name(name), desc(desc) {};
+        Metric(_protocol::Protocol* protocol, Analysis* analysis, std::string name, std::string desc) : analysis(analysis), protocol(protocol), name(name), desc(desc) {};
         virtual void subscribe(EventManager* em) = 0;
 };
 
-#include "analysis.hpp"
+#include "analysis.pb-c.h"
 
 #endif

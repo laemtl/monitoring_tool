@@ -295,7 +295,7 @@ capture_main(void* a){
 	if ( analysis->livemode == 1 ) {
 		cap = pcap_open_live(interface, 65535, 0, 1000, errbuf);
 	} else {
-		cout << "Offline mode" << endl;
+		std::cout << "Offline mode" << std::endl;
 		cap = pcap_open_offline(interface, errbuf);
 	}
 

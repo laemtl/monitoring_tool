@@ -4,9 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
-
 #include "packet.h"
-#include "util.h"
 
 class PacketQueue {
 	public:
@@ -22,5 +20,7 @@ class PacketQueue {
 		unsigned int len();
         void print();
 };
+
+#include "util.h"
 
 #endif

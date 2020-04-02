@@ -4,16 +4,17 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <cstdlib>
+#include <iostream>
 #include <vector>
 
 class Analysis;
 class FlowQueue;
 class FlowHashTable;
 class EventManager;
-class MetricManager;
 class PacketQueue;
 class Queue;
 class Flow;
+class Metric;
 
 namespace _protocol {
 
@@ -77,7 +78,7 @@ namespace _protocol {
     class Protocol {
         public:
             EventManager* eventManager;
-            MetricManager* metricManager;
+            std::vector<Metric*> metrics;
             Analysis* analysis;
             int req_tot;
             int rsp_tot;
@@ -92,13 +93,21 @@ namespace _protocol {
             // flow hash table
             FlowHashTable* fht;
 
+            bool hasClientIp;
+            u_int32_t	clientIp;
+            std::vector<u_int16_t>	clientPorts;
+
+            bool hasServerIp;
+            u_int32_t	serverIp;
+            std::vector<u_int16_t> serverPorts;
+
             Protocol(Analysis* analysis);
-            virtual bool isPacketOf(u_int16_t sport, u_int16_t dport) = 0;
             virtual bool isHeaderPacket(const char *ptr, const int datalen) = 0;
             virtual char* isRequest(const char *p, const int datalen) = 0;
             virtual char* isResponse(const char *p, const int datalen) = 0;
             virtual Request* getRequest(const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq) = 0;
             virtual Response* getResponse(const char *data, const char *dataend, long ack) = 0;     
+            bool isPacketOf(u_int16_t sport, u_int16_t dport);
             void flowHashProcess();
             int extractPair(Flow* flow, bool closed);
             void extractData(Flow* flow);
@@ -108,18 +117,35 @@ namespace _protocol {
             static int get_token_len(const char *linep, const char *lineend, const char **next_token);
             static char* find_header_end(const char *data, const char *dataend, int *line_cnt);
             void onAnalysisEnded();
+            void setClientIp(u_int32_t ip);
+            void addClientPort(u_int16_t port);
+            void setServerIp(u_int32_t ip);
+            void addServerPort(u_int16_t port);
+        
     };
 }
 
-using namespace _protocol;
-
+#include "metric.hpp"
 #include "eventManager.hpp"
-#include "metricManager.hpp"
 #include "analysis.hpp"
 #include "packetQueue.hpp"
 #include "flow.hpp"
 #include "flowHashTable.hpp"
 #include "flowQueue.hpp"
 #include "queue.hpp"
+
+#include "rst.hpp"
+#include "reqRate.hpp"
+#include "errRate.hpp"
+#include "tp.hpp"
+#include "tpRev.hpp"
+#include "connRate.hpp"
+#include "client.hpp"
+#include "reqPath.hpp"
+#include "reqMethod.hpp"
+#include "reqType.hpp"
+#include "rspStatus.hpp"
+
+using namespace _protocol;
 
 #endif

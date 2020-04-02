@@ -3,16 +3,14 @@
 
 #include <stdlib.h>
 #include <inttypes.h>
-
 #include <string>
 #include <stdio.h>
 #include <iostream>
-#include "util.h"
+
 #include "hashTable.hpp"
 #include "cf_list.h"
-#include "analysis.hpp"
 #include "metric.hpp"
-#include "server.h"
+#include "observer.hpp"
 
 #define CFL_SIZE 100
 #define MIN_FREQ (double)1/CFL_SIZE
@@ -25,14 +23,16 @@ class MetricCumDistr: public Metric, public Observer
 
     public:
 		void subscribe(EventManager* em);
-		MetricCumDistr(Protocol* protocol, Analysis* analysis, string name, string desc);
+		MetricCumDistr(_protocol::Protocol* protocol, Analysis* analysis, std::string name, std::string desc);
 		~MetricCumDistr();
 		void cflUpdate(Hash* ht);
-		void cflUpdate(int* array, int size);
 		virtual void cflAdd(Hashable* elem, int cnt) = 0;
-		virtual void cflAdd(int i, int cnt) = 0;
 		void print();
 		void sendMsg();
 };
+
+#include "util.h"
+#include "analysis.hpp"
+#include "server.h"
 
 #endif

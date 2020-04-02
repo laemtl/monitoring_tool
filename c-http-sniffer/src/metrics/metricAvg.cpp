@@ -2,7 +2,7 @@
 #include "metricAvg.hpp"
 #include <inttypes.h>
 
-MetricAvg::MetricAvg(Protocol* protocol, Analysis* analysis, string name, string desc) 
+MetricAvg::MetricAvg(_protocol::Protocol* protocol, Analysis* analysis, std::string name, std::string desc) 
 : Metric(protocol, analysis, name, desc) {
 	subtotal = new Value();
     total = new Value();
@@ -28,7 +28,7 @@ double MetricAvg::getAvg() {
 
 void MetricAvg::print() {
 	if(analysis->debug)
-		cout << name << " (avg, min, max): " << avg->get() << " " << min->get() << " " << max->get() << endl;
+		std::cout << name << " (avg, min, max): " << avg->get() << " " << min->get() << " " << max->get() << std::endl;
 }
 
 void MetricAvg::reset() {
@@ -38,7 +38,7 @@ void MetricAvg::reset() {
 	subsum->set(0);
 
 	avg->set(0);
-	min->set(numeric_limits<double>::max());
+	min->set(std::numeric_limits<double>::max());
 	max->set(0);
 }
 
@@ -65,7 +65,7 @@ void MetricAvg::sendMsg() {
 	Analysis__MetricAvgMsg avgMsg = ANALYSIS__METRIC_AVG_MSG__INIT;
 	msg.metricavg = &avgMsg;
 	msg.name = (char*)name.c_str();
-	msg.netints = (char*)analysis->interface;
+	msg.netint = (char*)analysis->interface;
 	msg.time = time(0);
 	msg.metricavg->avg = avg->get();
 	msg.metricavg->min = min->get();
@@ -82,7 +82,7 @@ void MetricAvg::sendMsg() {
 	
 	// send
 	if(send(analysis->socket, buf, varint_len_len + msg_len, MSG_NOSIGNAL) < 0) {
-		cout << "Error sending response for metric" << name << endl;
+		std::cout << "Error sending response for metric" << name << std::endl;
 		error("Error sending response\n");
 	} 
 

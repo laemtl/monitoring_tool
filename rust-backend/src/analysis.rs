@@ -28,220 +28,14 @@ use protobuf::ProtobufEnum as ProtobufEnum_imported_for_functions;
 
 #[derive(PartialEq,Clone,Default)]
 #[cfg_attr(feature = "with-serde", derive(Serialize, Deserialize))]
-pub struct IP {
-    // message fields
-    ip: ::std::option::Option<u32>,
-    ports: ::std::option::Option<u32>,
-    // special fields
-    #[cfg_attr(feature = "with-serde", serde(skip))]
-    pub unknown_fields: ::protobuf::UnknownFields,
-    #[cfg_attr(feature = "with-serde", serde(skip))]
-    pub cached_size: ::protobuf::CachedSize,
-}
-
-impl<'a> ::std::default::Default for &'a IP {
-    fn default() -> &'a IP {
-        <IP as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl IP {
-    pub fn new() -> IP {
-        ::std::default::Default::default()
-    }
-
-    // optional uint32 ip = 1;
-
-
-    pub fn get_ip(&self) -> u32 {
-        self.ip.unwrap_or(0)
-    }
-    pub fn clear_ip(&mut self) {
-        self.ip = ::std::option::Option::None;
-    }
-
-    pub fn has_ip(&self) -> bool {
-        self.ip.is_some()
-    }
-
-    // Param is passed by value, moved
-    pub fn set_ip(&mut self, v: u32) {
-        self.ip = ::std::option::Option::Some(v);
-    }
-
-    // optional uint32 ports = 2;
-
-
-    pub fn get_ports(&self) -> u32 {
-        self.ports.unwrap_or(0)
-    }
-    pub fn clear_ports(&mut self) {
-        self.ports = ::std::option::Option::None;
-    }
-
-    pub fn has_ports(&self) -> bool {
-        self.ports.is_some()
-    }
-
-    // Param is passed by value, moved
-    pub fn set_ports(&mut self, v: u32) {
-        self.ports = ::std::option::Option::Some(v);
-    }
-}
-
-impl ::protobuf::Message for IP {
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::ProtobufResult<()> {
-        while !is.eof()? {
-            let (field_number, wire_type) = is.read_tag_unpack()?;
-            match field_number {
-                1 => {
-                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
-                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
-                    }
-                    let tmp = is.read_uint32()?;
-                    self.ip = ::std::option::Option::Some(tmp);
-                },
-                2 => {
-                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
-                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
-                    }
-                    let tmp = is.read_uint32()?;
-                    self.ports = ::std::option::Option::Some(tmp);
-                },
-                _ => {
-                    ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u32 {
-        let mut my_size = 0;
-        if let Some(v) = self.ip {
-            my_size += ::protobuf::rt::value_size(1, v, ::protobuf::wire_format::WireTypeVarint);
-        }
-        if let Some(v) = self.ports {
-            my_size += ::protobuf::rt::value_size(2, v, ::protobuf::wire_format::WireTypeVarint);
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
-        self.cached_size.set(my_size);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::ProtobufResult<()> {
-        if let Some(v) = self.ip {
-            os.write_uint32(1, v)?;
-        }
-        if let Some(v) = self.ports {
-            os.write_uint32(2, v)?;
-        }
-        os.write_unknown_fields(self.get_unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn get_cached_size(&self) -> u32 {
-        self.cached_size.get()
-    }
-
-    fn get_unknown_fields(&self) -> &::protobuf::UnknownFields {
-        &self.unknown_fields
-    }
-
-    fn mut_unknown_fields(&mut self) -> &mut ::protobuf::UnknownFields {
-        &mut self.unknown_fields
-    }
-
-    fn as_any(&self) -> &dyn (::std::any::Any) {
-        self as &dyn (::std::any::Any)
-    }
-    fn as_any_mut(&mut self) -> &mut dyn (::std::any::Any) {
-        self as &mut dyn (::std::any::Any)
-    }
-    fn into_any(self: Box<Self>) -> ::std::boxed::Box<dyn (::std::any::Any)> {
-        self
-    }
-
-    fn descriptor(&self) -> &'static ::protobuf::reflect::MessageDescriptor {
-        Self::descriptor_static()
-    }
-
-    fn new() -> IP {
-        IP::new()
-    }
-
-    fn descriptor_static() -> &'static ::protobuf::reflect::MessageDescriptor {
-        static mut descriptor: ::protobuf::lazy::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::lazy::Lazy {
-            lock: ::protobuf::lazy::ONCE_INIT,
-            ptr: 0 as *const ::protobuf::reflect::MessageDescriptor,
-        };
-        unsafe {
-            descriptor.get(|| {
-                let mut fields = ::std::vec::Vec::new();
-                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
-                    "ip",
-                    |m: &IP| { &m.ip },
-                    |m: &mut IP| { &mut m.ip },
-                ));
-                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
-                    "ports",
-                    |m: &IP| { &m.ports },
-                    |m: &mut IP| { &mut m.ports },
-                ));
-                ::protobuf::reflect::MessageDescriptor::new::<IP>(
-                    "IP",
-                    fields,
-                    file_descriptor_proto()
-                )
-            })
-        }
-    }
-
-    fn default_instance() -> &'static IP {
-        static mut instance: ::protobuf::lazy::Lazy<IP> = ::protobuf::lazy::Lazy {
-            lock: ::protobuf::lazy::ONCE_INIT,
-            ptr: 0 as *const IP,
-        };
-        unsafe {
-            instance.get(IP::new)
-        }
-    }
-}
-
-impl ::protobuf::Clear for IP {
-    fn clear(&mut self) {
-        self.ip = ::std::option::Option::None;
-        self.ports = ::std::option::Option::None;
-        self.unknown_fields.clear();
-    }
-}
-
-impl ::std::fmt::Debug for IP {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for IP {
-    fn as_ref(&self) -> ::protobuf::reflect::ProtobufValueRef {
-        ::protobuf::reflect::ProtobufValueRef::Message(self)
-    }
-}
-
-#[derive(PartialEq,Clone,Default)]
-#[cfg_attr(feature = "with-serde", derive(Serialize, Deserialize))]
 pub struct Protocol {
     // message fields
     id: ::protobuf::SingularField<::std::string::String>,
     activeMetrics: ::std::option::Option<u32>,
-    client: ::protobuf::SingularPtrField<IP>,
-    server: ::protobuf::SingularPtrField<IP>,
+    clientIp: ::std::option::Option<u32>,
+    clientPorts: ::std::vec::Vec<u32>,
+    serverIp: ::std::option::Option<u32>,
+    serverPorts: ::std::vec::Vec<u32>,
     // special fields
     #[cfg_attr(feature = "with-serde", serde(skip))]
     pub unknown_fields: ::protobuf::UnknownFields,
@@ -315,70 +109,92 @@ impl Protocol {
         self.activeMetrics = ::std::option::Option::Some(v);
     }
 
-    // optional .analysis.IP client = 3;
+    // optional uint32 clientIp = 3;
 
 
-    pub fn get_client(&self) -> &IP {
-        self.client.as_ref().unwrap_or_else(|| IP::default_instance())
+    pub fn get_clientIp(&self) -> u32 {
+        self.clientIp.unwrap_or(0)
     }
-    pub fn clear_client(&mut self) {
-        self.client.clear();
-    }
-
-    pub fn has_client(&self) -> bool {
-        self.client.is_some()
+    pub fn clear_clientIp(&mut self) {
+        self.clientIp = ::std::option::Option::None;
     }
 
-    // Param is passed by value, moved
-    pub fn set_client(&mut self, v: IP) {
-        self.client = ::protobuf::SingularPtrField::some(v);
-    }
-
-    // Mutable pointer to the field.
-    // If field is not initialized, it is initialized with default value first.
-    pub fn mut_client(&mut self) -> &mut IP {
-        if self.client.is_none() {
-            self.client.set_default();
-        }
-        self.client.as_mut().unwrap()
-    }
-
-    // Take field
-    pub fn take_client(&mut self) -> IP {
-        self.client.take().unwrap_or_else(|| IP::new())
-    }
-
-    // optional .analysis.IP server = 4;
-
-
-    pub fn get_server(&self) -> &IP {
-        self.server.as_ref().unwrap_or_else(|| IP::default_instance())
-    }
-    pub fn clear_server(&mut self) {
-        self.server.clear();
-    }
-
-    pub fn has_server(&self) -> bool {
-        self.server.is_some()
+    pub fn has_clientIp(&self) -> bool {
+        self.clientIp.is_some()
     }
 
     // Param is passed by value, moved
-    pub fn set_server(&mut self, v: IP) {
-        self.server = ::protobuf::SingularPtrField::some(v);
+    pub fn set_clientIp(&mut self, v: u32) {
+        self.clientIp = ::std::option::Option::Some(v);
+    }
+
+    // repeated uint32 clientPorts = 4;
+
+
+    pub fn get_clientPorts(&self) -> &[u32] {
+        &self.clientPorts
+    }
+    pub fn clear_clientPorts(&mut self) {
+        self.clientPorts.clear();
+    }
+
+    // Param is passed by value, moved
+    pub fn set_clientPorts(&mut self, v: ::std::vec::Vec<u32>) {
+        self.clientPorts = v;
     }
 
     // Mutable pointer to the field.
-    // If field is not initialized, it is initialized with default value first.
-    pub fn mut_server(&mut self) -> &mut IP {
-        if self.server.is_none() {
-            self.server.set_default();
-        }
-        self.server.as_mut().unwrap()
+    pub fn mut_clientPorts(&mut self) -> &mut ::std::vec::Vec<u32> {
+        &mut self.clientPorts
     }
 
     // Take field
-    pub fn take_server(&mut self) -> IP {
-        self.server.take().unwrap_or_else(|| IP::new())
+    pub fn take_clientPorts(&mut self) -> ::std::vec::Vec<u32> {
+        ::std::mem::replace(&mut self.clientPorts, ::std::vec::Vec::new())
+    }
+
+    // optional uint32 serverIp = 5;
+
+
+    pub fn get_serverIp(&self) -> u32 {
+        self.serverIp.unwrap_or(0)
+    }
+    pub fn clear_serverIp(&mut self) {
+        self.serverIp = ::std::option::Option::None;
+    }
+
+    pub fn has_serverIp(&self) -> bool {
+        self.serverIp.is_some()
+    }
+
+    // Param is passed by value, moved
+    pub fn set_serverIp(&mut self, v: u32) {
+        self.serverIp = ::std::option::Option::Some(v);
+    }
+
+    // repeated uint32 serverPorts = 6;
+
+
+    pub fn get_serverPorts(&self) -> &[u32] {
+        &self.serverPorts
+    }
+    pub fn clear_serverPorts(&mut self) {
+        self.serverPorts.clear();
+    }
+
+    // Param is passed by value, moved
+    pub fn set_serverPorts(&mut self, v: ::std::vec::Vec<u32>) {
+        self.serverPorts = v;
+    }
+
+    // Mutable pointer to the field.
+    pub fn mut_serverPorts(&mut self) -> &mut ::std::vec::Vec<u32> {
+        &mut self.serverPorts
+    }
+
+    // Take field
+    pub fn take_serverPorts(&mut self) -> ::std::vec::Vec<u32> {
+        ::std::mem::replace(&mut self.serverPorts, ::std::vec::Vec::new())
     }
 }
 
@@ -390,16 +206,6 @@ impl ::protobuf::Message for Protocol {
         if self.activeMetrics.is_none() {
             return false;
         }
-        for v in &self.client {
-            if !v.is_initialized() {
-                return false;
-            }
-        };
-        for v in &self.server {
-            if !v.is_initialized() {
-                return false;
-            }
-        };
         true
     }
 
@@ -418,10 +224,24 @@ impl ::protobuf::Message for Protocol {
                     self.activeMetrics = ::std::option::Option::Some(tmp);
                 },
                 3 => {
-                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.client)?;
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint32()?;
+                    self.clientIp = ::std::option::Option::Some(tmp);
                 },
                 4 => {
-                    ::protobuf::rt::read_singular_message_into(wire_type, is, &mut self.server)?;
+                    ::protobuf::rt::read_repeated_uint32_into(wire_type, is, &mut self.clientPorts)?;
+                },
+                5 => {
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint32()?;
+                    self.serverIp = ::std::option::Option::Some(tmp);
+                },
+                6 => {
+                    ::protobuf::rt::read_repeated_uint32_into(wire_type, is, &mut self.serverPorts)?;
                 },
                 _ => {
                     ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
@@ -441,14 +261,18 @@ impl ::protobuf::Message for Protocol {
         if let Some(v) = self.activeMetrics {
             my_size += ::protobuf::rt::value_size(2, v, ::protobuf::wire_format::WireTypeVarint);
         }
-        if let Some(ref v) = self.client.as_ref() {
-            let len = v.compute_size();
-            my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+        if let Some(v) = self.clientIp {
+            my_size += ::protobuf::rt::value_size(3, v, ::protobuf::wire_format::WireTypeVarint);
         }
-        if let Some(ref v) = self.server.as_ref() {
-            let len = v.compute_size();
-            my_size += 1 + ::protobuf::rt::compute_raw_varint32_size(len) + len;
+        for value in &self.clientPorts {
+            my_size += ::protobuf::rt::value_size(4, *value, ::protobuf::wire_format::WireTypeVarint);
+        };
+        if let Some(v) = self.serverIp {
+            my_size += ::protobuf::rt::value_size(5, v, ::protobuf::wire_format::WireTypeVarint);
         }
+        for value in &self.serverPorts {
+            my_size += ::protobuf::rt::value_size(6, *value, ::protobuf::wire_format::WireTypeVarint);
+        };
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
         self.cached_size.set(my_size);
         my_size
@@ -461,16 +285,18 @@ impl ::protobuf::Message for Protocol {
         if let Some(v) = self.activeMetrics {
             os.write_uint32(2, v)?;
         }
-        if let Some(ref v) = self.client.as_ref() {
-            os.write_tag(3, ::protobuf::wire_format::WireTypeLengthDelimited)?;
-            os.write_raw_varint32(v.get_cached_size())?;
-            v.write_to_with_cached_sizes(os)?;
+        if let Some(v) = self.clientIp {
+            os.write_uint32(3, v)?;
         }
-        if let Some(ref v) = self.server.as_ref() {
-            os.write_tag(4, ::protobuf::wire_format::WireTypeLengthDelimited)?;
-            os.write_raw_varint32(v.get_cached_size())?;
-            v.write_to_with_cached_sizes(os)?;
+        for v in &self.clientPorts {
+            os.write_uint32(4, *v)?;
+        };
+        if let Some(v) = self.serverIp {
+            os.write_uint32(5, v)?;
         }
+        for v in &self.serverPorts {
+            os.write_uint32(6, *v)?;
+        };
         os.write_unknown_fields(self.get_unknown_fields())?;
         ::std::result::Result::Ok(())
     }
@@ -523,15 +349,25 @@ impl ::protobuf::Message for Protocol {
                     |m: &Protocol| { &m.activeMetrics },
                     |m: &mut Protocol| { &mut m.activeMetrics },
                 ));
-                fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<IP>>(
-                    "client",
-                    |m: &Protocol| { &m.client },
-                    |m: &mut Protocol| { &mut m.client },
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
+                    "clientIp",
+                    |m: &Protocol| { &m.clientIp },
+                    |m: &mut Protocol| { &mut m.clientIp },
                 ));
-                fields.push(::protobuf::reflect::accessor::make_singular_ptr_field_accessor::<_, ::protobuf::types::ProtobufTypeMessage<IP>>(
-                    "server",
-                    |m: &Protocol| { &m.server },
-                    |m: &mut Protocol| { &mut m.server },
+                fields.push(::protobuf::reflect::accessor::make_vec_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
+                    "clientPorts",
+                    |m: &Protocol| { &m.clientPorts },
+                    |m: &mut Protocol| { &mut m.clientPorts },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
+                    "serverIp",
+                    |m: &Protocol| { &m.serverIp },
+                    |m: &mut Protocol| { &mut m.serverIp },
+                ));
+                fields.push(::protobuf::reflect::accessor::make_vec_accessor::<_, ::protobuf::types::ProtobufTypeUint32>(
+                    "serverPorts",
+                    |m: &Protocol| { &m.serverPorts },
+                    |m: &mut Protocol| { &mut m.serverPorts },
                 ));
                 ::protobuf::reflect::MessageDescriptor::new::<Protocol>(
                     "Protocol",
@@ -557,8 +393,10 @@ impl ::protobuf::Clear for Protocol {
     fn clear(&mut self) {
         self.id.clear();
         self.activeMetrics = ::std::option::Option::None;
-        self.client.clear();
-        self.server.clear();
+        self.clientIp = ::std::option::Option::None;
+        self.clientPorts.clear();
+        self.serverIp = ::std::option::Option::None;
+        self.serverPorts.clear();
         self.unknown_fields.clear();
     }
 }
@@ -1077,7 +915,7 @@ impl ::protobuf::reflect::ProtobufValue for Init {
 pub struct Data {
     // message fields
     time: ::std::option::Option<i64>,
-    netInts: ::protobuf::SingularField<::std::string::String>,
+    netInt: ::protobuf::SingularField<::std::string::String>,
     rstAvg: ::std::option::Option<f64>,
     rstMin: ::std::option::Option<f64>,
     rstMax: ::std::option::Option<f64>,
@@ -1141,40 +979,40 @@ impl Data {
         self.time = ::std::option::Option::Some(v);
     }
 
-    // required string netInts = 2;
+    // required string netInt = 2;
 
 
-    pub fn get_netInts(&self) -> &str {
-        match self.netInts.as_ref() {
+    pub fn get_netInt(&self) -> &str {
+        match self.netInt.as_ref() {
             Some(v) => &v,
             None => "",
         }
     }
-    pub fn clear_netInts(&mut self) {
-        self.netInts.clear();
+    pub fn clear_netInt(&mut self) {
+        self.netInt.clear();
     }
 
-    pub fn has_netInts(&self) -> bool {
-        self.netInts.is_some()
+    pub fn has_netInt(&self) -> bool {
+        self.netInt.is_some()
     }
 
     // Param is passed by value, moved
-    pub fn set_netInts(&mut self, v: ::std::string::String) {
-        self.netInts = ::protobuf::SingularField::some(v);
+    pub fn set_netInt(&mut self, v: ::std::string::String) {
+        self.netInt = ::protobuf::SingularField::some(v);
     }
 
     // Mutable pointer to the field.
     // If field is not initialized, it is initialized with default value first.
-    pub fn mut_netInts(&mut self) -> &mut ::std::string::String {
-        if self.netInts.is_none() {
-            self.netInts.set_default();
+    pub fn mut_netInt(&mut self) -> &mut ::std::string::String {
+        if self.netInt.is_none() {
+            self.netInt.set_default();
         }
-        self.netInts.as_mut().unwrap()
+        self.netInt.as_mut().unwrap()
     }
 
     // Take field
-    pub fn take_netInts(&mut self) -> ::std::string::String {
-        self.netInts.take().unwrap_or_else(|| ::std::string::String::new())
+    pub fn take_netInt(&mut self) -> ::std::string::String {
+        self.netInt.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     // optional double rstAvg = 3;
@@ -1707,7 +1545,7 @@ impl ::protobuf::Message for Data {
         if self.time.is_none() {
             return false;
         }
-        if self.netInts.is_none() {
+        if self.netInt.is_none() {
             return false;
         }
         for v in &self.client {
@@ -1750,7 +1588,7 @@ impl ::protobuf::Message for Data {
                     self.time = ::std::option::Option::Some(tmp);
                 },
                 2 => {
-                    ::protobuf::rt::read_singular_string_into(wire_type, is, &mut self.netInts)?;
+                    ::protobuf::rt::read_singular_string_into(wire_type, is, &mut self.netInt)?;
                 },
                 3 => {
                     if wire_type != ::protobuf::wire_format::WireTypeFixed64 {
@@ -1929,7 +1767,7 @@ impl ::protobuf::Message for Data {
         if let Some(v) = self.time {
             my_size += ::protobuf::rt::value_size(1, v, ::protobuf::wire_format::WireTypeVarint);
         }
-        if let Some(ref v) = self.netInts.as_ref() {
+        if let Some(ref v) = self.netInt.as_ref() {
             my_size += ::protobuf::rt::string_size(2, &v);
         }
         if let Some(v) = self.rstAvg {
@@ -2024,7 +1862,7 @@ impl ::protobuf::Message for Data {
         if let Some(v) = self.time {
             os.write_int64(1, v)?;
         }
-        if let Some(ref v) = self.netInts.as_ref() {
+        if let Some(ref v) = self.netInt.as_ref() {
             os.write_string(2, &v)?;
         }
         if let Some(v) = self.rstAvg {
@@ -2163,9 +2001,9 @@ impl ::protobuf::Message for Data {
                     |m: &mut Data| { &mut m.time },
                 ));
                 fields.push(::protobuf::reflect::accessor::make_singular_field_accessor::<_, ::protobuf::types::ProtobufTypeString>(
-                    "netInts",
-                    |m: &Data| { &m.netInts },
-                    |m: &mut Data| { &mut m.netInts },
+                    "netInt",
+                    |m: &Data| { &m.netInt },
+                    |m: &mut Data| { &mut m.netInt },
                 ));
                 fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeDouble>(
                     "rstAvg",
@@ -2320,7 +2158,7 @@ impl ::protobuf::Message for Data {
 impl ::protobuf::Clear for Data {
     fn clear(&mut self) {
         self.time = ::std::option::Option::None;
-        self.netInts.clear();
+        self.netInt.clear();
         self.rstAvg = ::std::option::Option::None;
         self.rstMin = ::std::option::Option::None;
         self.rstMax = ::std::option::Option::None;
@@ -2369,7 +2207,7 @@ pub struct MetricMsg {
     // message fields
     name: ::protobuf::SingularField<::std::string::String>,
     time: ::std::option::Option<i64>,
-    netInts: ::protobuf::SingularField<::std::string::String>,
+    netInt: ::protobuf::SingularField<::std::string::String>,
     clientId: ::std::option::Option<i64>,
     // message oneof groups
     pub values: ::std::option::Option<MetricMsg_oneof_values>,
@@ -2453,40 +2291,40 @@ impl MetricMsg {
         self.time = ::std::option::Option::Some(v);
     }
 
-    // required string netInts = 3;
+    // required string netInt = 3;
 
 
-    pub fn get_netInts(&self) -> &str {
-        match self.netInts.as_ref() {
+    pub fn get_netInt(&self) -> &str {
+        match self.netInt.as_ref() {
             Some(v) => &v,
             None => "",
         }
     }
-    pub fn clear_netInts(&mut self) {
-        self.netInts.clear();
+    pub fn clear_netInt(&mut self) {
+        self.netInt.clear();
     }
 
-    pub fn has_netInts(&self) -> bool {
-        self.netInts.is_some()
+    pub fn has_netInt(&self) -> bool {
+        self.netInt.is_some()
     }
 
     // Param is passed by value, moved
-    pub fn set_netInts(&mut self, v: ::std::string::String) {
-        self.netInts = ::protobuf::SingularField::some(v);
+    pub fn set_netInt(&mut self, v: ::std::string::String) {
+        self.netInt = ::protobuf::SingularField::some(v);
     }
 
     // Mutable pointer to the field.
     // If field is not initialized, it is initialized with default value first.
-    pub fn mut_netInts(&mut self) -> &mut ::std::string::String {
-        if self.netInts.is_none() {
-            self.netInts.set_default();
+    pub fn mut_netInt(&mut self) -> &mut ::std::string::String {
+        if self.netInt.is_none() {
+            self.netInt.set_default();
         }
-        self.netInts.as_mut().unwrap()
+        self.netInt.as_mut().unwrap()
     }
 
     // Take field
-    pub fn take_netInts(&mut self) -> ::std::string::String {
-        self.netInts.take().unwrap_or_else(|| ::std::string::String::new())
+    pub fn take_netInt(&mut self) -> ::std::string::String {
+        self.netInt.take().unwrap_or_else(|| ::std::string::String::new())
     }
 
     // required int64 clientId = 4;
@@ -2615,7 +2453,7 @@ impl ::protobuf::Message for MetricMsg {
         if self.time.is_none() {
             return false;
         }
-        if self.netInts.is_none() {
+        if self.netInt.is_none() {
             return false;
         }
         if self.clientId.is_none() {
@@ -2649,7 +2487,7 @@ impl ::protobuf::Message for MetricMsg {
                     self.time = ::std::option::Option::Some(tmp);
                 },
                 3 => {
-                    ::protobuf::rt::read_singular_string_into(wire_type, is, &mut self.netInts)?;
+                    ::protobuf::rt::read_singular_string_into(wire_type, is, &mut self.netInt)?;
                 },
                 4 => {
                     if wire_type != ::protobuf::wire_format::WireTypeVarint {
@@ -2688,7 +2526,7 @@ impl ::protobuf::Message for MetricMsg {
         if let Some(v) = self.time {
             my_size += ::protobuf::rt::value_size(2, v, ::protobuf::wire_format::WireTypeVarint);
         }
-        if let Some(ref v) = self.netInts.as_ref() {
+        if let Some(ref v) = self.netInt.as_ref() {
             my_size += ::protobuf::rt::string_size(3, &v);
         }
         if let Some(v) = self.clientId {
@@ -2718,7 +2556,7 @@ impl ::protobuf::Message for MetricMsg {
         if let Some(v) = self.time {
             os.write_int64(2, v)?;
         }
-        if let Some(ref v) = self.netInts.as_ref() {
+        if let Some(ref v) = self.netInt.as_ref() {
             os.write_string(3, &v)?;
         }
         if let Some(v) = self.clientId {
@@ -2791,9 +2629,9 @@ impl ::protobuf::Message for MetricMsg {
                     |m: &mut MetricMsg| { &mut m.time },
                 ));
                 fields.push(::protobuf::reflect::accessor::make_singular_field_accessor::<_, ::protobuf::types::ProtobufTypeString>(
-                    "netInts",
-                    |m: &MetricMsg| { &m.netInts },
-                    |m: &mut MetricMsg| { &mut m.netInts },
+                    "netInt",
+                    |m: &MetricMsg| { &m.netInt },
+                    |m: &mut MetricMsg| { &mut m.netInt },
                 ));
                 fields.push(::protobuf::reflect::accessor::make_option_accessor::<_, ::protobuf::types::ProtobufTypeInt64>(
                     "clientId",
@@ -2834,7 +2672,7 @@ impl ::protobuf::Clear for MetricMsg {
     fn clear(&mut self) {
         self.name.clear();
         self.time = ::std::option::Option::None;
-        self.netInts.clear();
+        self.netInt.clear();
         self.clientId = ::std::option::Option::None;
         self.values = ::std::option::Option::None;
         self.values = ::std::option::Option::None;
@@ -3646,18 +3484,18 @@ impl ::protobuf::reflect::ProtobufValue for Close {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0eanalysis.proto\x12\x08analysis\"*\n\x02IP\x12\x0e\n\x02ip\x18\x01\
-    \x20\x01(\rR\x02ip\x12\x14\n\x05ports\x18\x02\x20\x01(\rR\x05ports\"\x8c\
-    \x01\n\x08Protocol\x12\x0e\n\x02id\x18\x01\x20\x02(\tR\x02id\x12$\n\ract\
-    iveMetrics\x18\x02\x20\x02(\rR\ractiveMetrics\x12$\n\x06client\x18\x03\
-    \x20\x01(\x0b2\x0c.analysis.IPR\x06client\x12$\n\x06server\x18\x04\x20\
-    \x01(\x0b2\x0c.analysis.IPR\x06server\"J\n\x06NetInt\x12\x0e\n\x02id\x18\
+    \n\x0eanalysis.proto\x12\x08analysis\"\xbc\x01\n\x08Protocol\x12\x0e\n\
+    \x02id\x18\x01\x20\x02(\tR\x02id\x12$\n\ractiveMetrics\x18\x02\x20\x02(\
+    \rR\ractiveMetrics\x12\x1a\n\x08clientIp\x18\x03\x20\x01(\rR\x08clientIp\
+    \x12\x20\n\x0bclientPorts\x18\x04\x20\x03(\rR\x0bclientPorts\x12\x1a\n\
+    \x08serverIp\x18\x05\x20\x01(\rR\x08serverIp\x12\x20\n\x0bserverPorts\
+    \x18\x06\x20\x03(\rR\x0bserverPorts\"J\n\x06NetInt\x12\x0e\n\x02id\x18\
     \x01\x20\x02(\tR\x02id\x120\n\tprotocols\x18\x02\x20\x03(\x0b2\x12.analy\
     sis.ProtocolR\tprotocols\"j\n\x04Init\x12*\n\x07netInts\x18\x01\x20\x03(\
     \x0b2\x10.analysis.NetIntR\x07netInts\x12\x1a\n\x08interval\x18\x02\x20\
     \x02(\rR\x08interval\x12\x1a\n\x08duration\x18\x03\x20\x02(\rR\x08durati\
-    on\"\xec\x06\n\x04Data\x12\x12\n\x04time\x18\x01\x20\x02(\x03R\x04time\
-    \x12\x18\n\x07netInts\x18\x02\x20\x02(\tR\x07netInts\x12\x16\n\x06rstAvg\
+    on\"\xea\x06\n\x04Data\x12\x12\n\x04time\x18\x01\x20\x02(\x03R\x04time\
+    \x12\x16\n\x06netInt\x18\x02\x20\x02(\tR\x06netInt\x12\x16\n\x06rstAvg\
     \x18\x03\x20\x01(\x01R\x06rstAvg\x12\x16\n\x06rstMin\x18\x04\x20\x01(\
     \x01R\x06rstMin\x12\x16\n\x06rstMax\x18\x05\x20\x01(\x01R\x06rstMax\x12\
     \x1c\n\trstClient\x18\x06\x20\x01(\x01R\trstClient\x12\x18\n\x07errRate\
@@ -3679,18 +3517,18 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x05tpMax\x18\x19\x20\x01(\x01R\x05tpMax\x12\x1a\n\x08tpRevAvg\x18\x1a\
     \x20\x01(\x01R\x08tpRevAvg\x12\x1a\n\x08tpRevMin\x18\x1b\x20\x01(\x01R\
     \x08tpRevMin\x12\x1a\n\x08tpRevMax\x18\x1c\x20\x01(\x01R\x08tpRevMax\"\
-    \xf2\x01\n\tMetricMsg\x12\x12\n\x04name\x18\x01\x20\x02(\tR\x04name\x12\
-    \x12\n\x04time\x18\x02\x20\x02(\x03R\x04time\x12\x18\n\x07netInts\x18\
-    \x03\x20\x02(\tR\x07netInts\x12\x1a\n\x08clientId\x18\x04\x20\x02(\x03R\
-    \x08clientId\x126\n\tmetricAvg\x18\x05\x20\x01(\x0b2\x16.analysis.Metric\
-    AvgMsgH\0R\tmetricAvg\x12E\n\x0emetricCumDistr\x18\x06\x20\x01(\x0b2\x1b\
-    .analysis.MetricCumDistrMsgH\0R\x0emetricCumDistrB\x08\n\x06values\"D\n\
-    \x0cMetricAvgMsg\x12\x10\n\x03avg\x18\x05\x20\x02(\x01R\x03avg\x12\x10\n\
-    \x03min\x18\x06\x20\x02(\x01R\x03min\x12\x10\n\x03max\x18\x07\x20\x02(\
-    \x01R\x03max\".\n\x04Freq\x12\x12\n\x04name\x18\x01\x20\x02(\tR\x04name\
-    \x12\x12\n\x04freq\x18\x02\x20\x02(\x01R\x04freq\"9\n\x11MetricCumDistrM\
-    sg\x12$\n\x05freqs\x18\x01\x20\x03(\x0b2\x0e.analysis.FreqR\x05freqs\"\
-    \x07\n\x05Close\
+    \xf0\x01\n\tMetricMsg\x12\x12\n\x04name\x18\x01\x20\x02(\tR\x04name\x12\
+    \x12\n\x04time\x18\x02\x20\x02(\x03R\x04time\x12\x16\n\x06netInt\x18\x03\
+    \x20\x02(\tR\x06netInt\x12\x1a\n\x08clientId\x18\x04\x20\x02(\x03R\x08cl\
+    ientId\x126\n\tmetricAvg\x18\x05\x20\x01(\x0b2\x16.analysis.MetricAvgMsg\
+    H\0R\tmetricAvg\x12E\n\x0emetricCumDistr\x18\x06\x20\x01(\x0b2\x1b.analy\
+    sis.MetricCumDistrMsgH\0R\x0emetricCumDistrB\x08\n\x06values\"D\n\x0cMet\
+    ricAvgMsg\x12\x10\n\x03avg\x18\x05\x20\x02(\x01R\x03avg\x12\x10\n\x03min\
+    \x18\x06\x20\x02(\x01R\x03min\x12\x10\n\x03max\x18\x07\x20\x02(\x01R\x03\
+    max\".\n\x04Freq\x12\x12\n\x04name\x18\x01\x20\x02(\tR\x04name\x12\x12\n\
+    \x04freq\x18\x02\x20\x02(\x01R\x04freq\"9\n\x11MetricCumDistrMsg\x12$\n\
+    \x05freqs\x18\x01\x20\x03(\x0b2\x0e.analysis.FreqR\x05freqs\"\x07\n\x05C\
+    lose\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy {

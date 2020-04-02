@@ -1,28 +1,16 @@
 #ifndef __METRIC_AVG_H__
 #define __METRIC_AVG_H__
 
-#include "metric.hpp"
-//#include "metricValue.hpp"
-#include "value.hpp"
-#include "observer.hpp"
 #include <stdio.h>
-#include "analysis.hpp"
-#include "server.h"
+#include "metric.hpp"
+#include "observer.hpp"
 
-/*class MAItem {
-    double avg;
-    double min;
-    double max;
-};
+class Value;
 
-class MAValue : public MetricValue  
-{
-	MAItem value;
-};*/
+namespace _protocol {
+	class Protocol;
+}
 
-using namespace std; 
-
-//class Analysis;
 class MetricAvg : public Metric, public Observer
 {
 	protected:
@@ -37,7 +25,7 @@ class MetricAvg : public Metric, public Observer
         Value* max;
 
     public:
-		MetricAvg(Protocol* protocol, Analysis* analysis, string name, string desc);
+		MetricAvg(_protocol::Protocol* protocol, Analysis* analysis, std::string name, std::string desc);
 		void subscribe(EventManager* em);
 		virtual void reset();
 		virtual double getAvg();
@@ -48,5 +36,9 @@ class MetricAvg : public Metric, public Observer
 		void prepareMsg(double avg, double min, double max);
 		void sendMsg(); 
 };
+
+#include "value.hpp"
+#include "analysis.hpp"
+#include "server.h"
 
 #endif

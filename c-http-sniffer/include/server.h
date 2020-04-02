@@ -10,13 +10,11 @@
 #include <errno.h>
 #include <syslog.h>
 #include <pthread.h>
+#include <string.h>
+#include <inttypes.h>
+#include <unistd.h>
 
-#include "packet.h"
-#include "analysis.pb-c.h"
-#include "analysis.hpp"
-#include "timer.h"
-#include "http.hpp"
-#include "memcached.hpp"
+class Analysis;
 
 class Config {
     public:
@@ -34,8 +32,12 @@ void connection_handler(Config* config);
 void stop_server();
 void onExit(int signum);
 
-/*typedef struct analysis_conn_ {
-    uint32_t socket;
-} Client;*/
+#include "packet.h"
+#include "analysis.pb-c.h"
+#include "analysis.hpp"
+#include "timer.h"
+#include "http.hpp"
+#include "memcached.hpp"
+#include "analysis.hpp"
 
 #endif

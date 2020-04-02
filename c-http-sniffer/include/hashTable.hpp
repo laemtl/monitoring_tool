@@ -10,7 +10,6 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <inttypes.h>
-#include "util.h"
 #include "hashable.hpp"
 
 #define HASH_SIZE	13200
@@ -69,5 +68,7 @@ class Hash
         int getScnt();
         void print();
 };
+
+#include "util.h"
 
 #endif

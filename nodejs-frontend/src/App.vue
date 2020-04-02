@@ -145,21 +145,19 @@ export default {
           for (let p of n.protocols) {
             let protocol = {
               id: p.id,
-              active_metrics: 0,
-              client: {
-                ip: el.ip2int(p.client.ip),
-                ports: parseInt(p.client.ports)
-              },
-              server: {
-                ip:  el.ip2int(p.server.ip),
-                ports:  parseInt(p.server.ports),
-              }
+              activeMetrics: 0,
+              
+              clientIp: el.ip2int(p.client.ip),
+              clientPorts: ((p.client.ports != null) ? p.client.ports.split(",").map(i => parseInt(i)) : []),
+              
+              serverIp: el.ip2int(p.server.ip),
+              serverPorts: ((p.server.ports != null) ? p.server.ports.split(",").map(i => parseInt(i)) : []),
             };
 
             let i = 0;
             for (let m in p.metrics) {
               if (p.metrics[m].active) {
-                protocol.active_metrics |= 1 << i;
+                protocol.activeMetrics |= 1 << i;
               }
               i++;
             }

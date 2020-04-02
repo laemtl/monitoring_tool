@@ -12,8 +12,6 @@
 
 #define EPSILON	1e-7
 
-using namespace std; 
-
 class Value {
     double val;
     pthread_mutex_t mutex;
