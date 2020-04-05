@@ -46,7 +46,7 @@ namespace _memcached {
     /*
     * Cache response header
     */
-    class Response : public _protocol::Response, public ResponseStatus {
+    class Response : public ResponseStatus {
         public:
             long acknowledgement;
             std::vector<const char*> keys;

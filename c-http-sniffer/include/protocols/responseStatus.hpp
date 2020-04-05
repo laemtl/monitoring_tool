@@ -2,10 +2,10 @@
 #define __RESPONSESTATUS_H__
 
 #include <algorithm>
-#include <vector>
 #include <map>
+#include "protocol.hpp"
 
-class ResponseStatus {
+class ResponseStatus : public _protocol::Response {
     public:
         std::map<int, char*> status;
         int statusCode;
