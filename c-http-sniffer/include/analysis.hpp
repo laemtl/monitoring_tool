@@ -16,6 +16,7 @@ class Analysis {
         int livemode;
         int socket;
         const char* interface;
+        uint32_t interfaceId;
         uint32_t interval;
    
         bool serverMode;        
@@ -31,7 +32,7 @@ class Analysis {
         // raw packet queue
         Queue* rpq;
 
-        Analysis(int socket, const char* netInt, uint32_t interval, uint32_t duration); 
+        Analysis(int socket, const char* netInt, uint32_t netIntId, uint32_t interval, uint32_t duration); 
         bool isServerMode();
         void stop();
         bool isStopped();

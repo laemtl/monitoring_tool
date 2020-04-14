@@ -1,7 +1,7 @@
 #include "analysis.hpp"
 
-Analysis::Analysis(int socket, const char* interface, uint32_t interval, uint32_t duration) 
-: interface(interface), socket(socket), interval(interval), duration(duration), serverMode(true), int_step(0), debug(false), status(0), livemode(1) {
+Analysis::Analysis(int socket, const char* interface, uint32_t netIntId, uint32_t interval, uint32_t duration) 
+: interface(interface), interfaceId(netIntId), socket(socket), interval(interval), duration(duration), serverMode(true), int_step(0), debug(false), status(0), livemode(1) {
 	rpq = new Queue();
 }
 

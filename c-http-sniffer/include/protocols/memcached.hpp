@@ -17,7 +17,7 @@ namespace _memcached {
 
     class MemCached : public _protocol::Protocol {
         public:
-            MemCached(Analysis* analysis, char* protocolName);
+            MemCached(Analysis* analysis, char* protocolName, uint32_t protocolId);
             
             bool isHeaderPacket(const char *ptr, const int datalen);
             char* isRequest(const char *p, const int datalen);	    /* If the packet carries HTTP request data */
@@ -63,7 +63,6 @@ namespace _memcached {
 
 #include "packet.h"
 #include "util.h"
-#include "protocol.hpp"
 
 using namespace _memcached;
 

@@ -69,19 +69,11 @@ void connection_handler(Config* config) {
 			// display the message's fields.
 			printf("Received: interval: %d\n", init->interval);  // required field
 			printf("Received: duration: %d\n", init->duration);  // required field
-			
-			//printf("Received: active_metric: %d\n", init->activemetric);  // required field
-			//printf("Received: client IP: %s\n", ip_ntos(init->clientip));
-			//printf("Received: client port: %d\n", init->clientport);
-
-			//printf("Received: server IP: %s\n", ip_ntos(init->serverip));
-			//printf("Received: server port: %d\n", init->serverport);
-
 
 			for (unsigned i = 0; i < init->n_netints; i++) { // Iterate through all repeated netInt
 				printf ("netInt: %s\n\n", init->netints[i]->id);
 				
-				Analysis* analysis = new Analysis(config->socket, init->netints[i]->id, init->interval, init->duration);
+				Analysis* analysis = new Analysis(config->socket, init->netints[i]->id, i, init->interval, init->duration);
 				analysis->debug = config->debug;
 				
 				for (unsigned j = 0; j < init->netints[i]->n_protocols; j++) { // Iterate through all repeated protocols
@@ -90,29 +82,41 @@ void connection_handler(Config* config) {
 					char* protocolName = init->netints[i]->protocols[j]->id;
 
 					if(strcmp(protocolName, "HTTP") == 0) {
-						protocol = new Http(analysis, protocolName);
+						protocol = new Http(analysis, protocolName, j);
+						printf("Http picked \n");
 					} else if(strcmp(protocolName, "MEMCACHED") == 0) {
-						protocol = new MemCached(analysis, protocolName);
+						printf("Memcached picked \n");
+						protocol = new MemCached(analysis, protocolName, j);
 					} else {
 						error(strcat("Unrecognized protocol", protocolName));
 					}
 					
-					protocol->activeMetrics(init->netints[i]->protocols[j]->activemetrics);
+					uint32_t activeMetrics = init->netints[i]->protocols[j]->activemetrics; 
+					protocol->activeMetrics(activeMetrics);
+					printf("Received: active_metric: %d\n", activeMetrics);  // required field
 
-					if(protocol->hasClientIp) {
-						protocol->setClientIp(init->netints[i]->protocols[j]->clientip);
+					if(init->netints[i]->protocols[j]->has_clientip) {
+						uint32_t clientIp = init->netints[i]->protocols[j]->clientip;
+						protocol->setClientIp(clientIp);
+						printf("Received: client IP: %s\n", ip_ntos(clientIp));
 					}
 					
 					for (unsigned k = 0; k < init->netints[i]->protocols[j]->n_clientports; k++) {
-						protocol->addClientPort(init->netints[i]->protocols[j]->clientports[k]);
+						uint32_t clientPort = init->netints[i]->protocols[j]->clientports[k];
+						printf("Received: client port: %d\n", clientPort);
+						protocol->addClientPort(clientPort);
 					}
 					
-					if(protocol->hasServerIp) {
-						protocol->setServerIp(init->netints[i]->protocols[j]->serverip);
+					if(init->netints[i]->protocols[j]->has_serverip) {
+						uint32_t serverIp = init->netints[i]->protocols[j]->serverip;
+						protocol->setServerIp(serverIp);
+						printf("Received: server IP: %s\n", ip_ntos(serverIp));
 					}
 					
 					for (unsigned k = 0; k < init->netints[i]->protocols[j]->n_serverports; k++) {
-						protocol->addClientPort(init->netints[i]->protocols[j]->serverports[k]);
+						uint32_t serverPort = init->netints[i]->protocols[j]->serverports[k];
+						printf("Received: server port: %d\n", serverPort);
+						protocol->addServerPort(serverPort);
 					}
 
 					analysis->protocols.push_back(protocol);

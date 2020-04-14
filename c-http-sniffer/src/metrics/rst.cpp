@@ -10,6 +10,9 @@ void Rst::subscribe(EventManager* em) {
 }
 
 void Rst::onResponseReceived(_protocol::Pair *pair, Flow* flow) {
+	
+	printf("Response received \n");
+
 	// Compute response time
 	double rst = (pair->rsp_fb_sec + pair->rsp_fb_usec * 0.000001) - (pair->req_fb_sec + pair->req_fb_usec * 0.000001);	
 	total->add(1);

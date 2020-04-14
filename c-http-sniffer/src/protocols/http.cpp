@@ -91,7 +91,7 @@ char* Http::isResponse(const char *ptr, const int datalen) {
 	}
 }
 
-Http::Http(Analysis* analysis, char* protocolName) : _protocol::Protocol(analysis, protocolName) {
+Http::Http(Analysis* analysis, char* protocolName, uint32_t protocolId) : _protocol::Protocol(analysis, protocolName, protocolId) {
     serverPorts.insert(serverPorts.end(), {80, 8080, 8000});
 
     metrics.push_back(new Rst(this, analysis));
@@ -308,7 +308,7 @@ int _http::Response::parseStatus(const char *line, int len) {
 		return statusCode;
 	}
 
-    for (auto &s : status) {
+    for (auto &s : status) {    
         if (s.first == val) {
             statusCode = s.first;
             break;
@@ -323,7 +323,7 @@ _protocol::Request* Http::getRequest(const char *data, const char *dataend, char
 }
 
 _protocol::Response* Http::getResponse(const char *data, const char *dataend, long ack) {
-    return new Response(data, dataend, ack);
+    return new _http::Response(data, dataend, ack);
 }
 
 _http::Request::Request() {
@@ -482,7 +482,7 @@ _http::Response::Response() {
  * Extract response message from data.
  * But only the header fields are extracted.
  */
-_http::Response::Response(const char *data, const char *dataend, long ack) {
+_http::Response::Response(const char *data, const char *dataend, long ack) : Response() {
 	char *eoh, *eol, *linesp, *lineep;
 	int line_cnt = 0, lnl = 0, hdl = 0;
 	

@@ -43,7 +43,7 @@ namespace _mysql {
             std::vector<int> ports;
             std::vector<char*> cmd;
 
-            MySQL(Analysis* analysis, char* protocolName);
+            MySQL(Analysis* analysis, char* protocolName, uint32_t protocolId);
             bool isHeaderPacket(const char *ptr, const int datalen);
             char* isRequest(const char *p, const int datalen);	    /* If the packet carries MySQL request data */
             char* isResponse(const char *p, const int datalen);	    /* If the packet carries MySQL response data */

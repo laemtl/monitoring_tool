@@ -25,7 +25,7 @@ namespace _http {
 
     class Http : public _protocol::Protocol {
         public:
-            Http(Analysis* analysis, char* protocolName);
+            Http(Analysis* analysis, char* protocolName, uint32_t protocolId);
             bool isHeaderPacket(const char *ptr, const int datalen);
             char* isRequest(const char *p, const int datalen);	    /* If the packet carries HTTP request data */
             char* isResponse(const char *p, const int datalen);	    /* If the packet carries HTTP response data */
@@ -66,7 +66,7 @@ namespace _http {
     /*
     * HTTP response header
     */
-    class Response : public _protocol::Response, public ResponseStatus {
+    class Response : public ResponseStatus {
         public:
             Version	        version;
             char*			server;

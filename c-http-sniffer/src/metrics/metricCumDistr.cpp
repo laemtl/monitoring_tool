@@ -59,14 +59,14 @@ void MetricCumDistr::sendMsg() {
 	Analysis__MetricCumDistrMsg cumDistrMsg = ANALYSIS__METRIC_CUM_DISTR_MSG__INIT;
 	msg.metriccumdistr = &cumDistrMsg;
 	msg.name = (char*)name.c_str();
-	msg.protocolname = protocol->name;
-	msg.protocolid = 0;
+	msg.netint = (char*)analysis->interface;
+	msg.netintid = analysis->interfaceId;
+	msg.protocol = protocol->name;
+	msg.protocolid = protocol->id;
 	msg.time = time(0);
 	Analysis__Freq **freqs = MALLOC(Analysis__Freq*, cfl.count); 
 	msg.metriccumdistr->freqs = freqs;
 	msg.metriccumdistr->n_freqs = cfl.count;
-
-	msg.netint = (char*)analysis->interface;
 
 	for(int i = 0; i < cfl.count; i++) {
 		Analysis__Freq* freq = MALLOC(Analysis__Freq, 1);

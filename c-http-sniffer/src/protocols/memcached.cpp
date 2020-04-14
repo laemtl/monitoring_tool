@@ -1,8 +1,8 @@
 #include "memcached.hpp"
 
-MemCached::MemCached(Analysis* analysis, char* protocolName) : Protocol(analysis, protocolName) {
+MemCached::MemCached(Analysis* analysis, char* protocolName, uint32_t protocolId) : Protocol(analysis, protocolName, protocolId) {
     serverPorts.push_back(11211);
-
+    
     metrics.push_back(new Rst(this, analysis));
     metrics.push_back(new ErrRate(this, analysis));
     metrics.push_back(new Tp(this, analysis));
@@ -31,10 +31,9 @@ int _memcached::Request::parseMethod(const char *data, int linelen)
     }
 
     for (std::size_t i = 0; i != methodsName.size(); ++i) {
-        if (strcmp(data, methodsName[i]) == 0) {
+        if (strncmp(data, methodsName[i], index) == 0) {
             return i;
         }
-        break;
     }
 
     return 0;
@@ -46,7 +45,7 @@ int _memcached::Request::parseMethod(const char *data, int linelen)
  * If it's true, the head end char pointer will be returned, else NULL.
  */
 char* MemCached::isRequest(const char *ptr, const int datalen) {
-	int methodCode = 0;
+    int methodCode = 0;
 	char *eol,*linesp,*head_end = NULL;
     int lnl;
     
@@ -57,9 +56,9 @@ char* MemCached::isRequest(const char *ptr, const int datalen) {
     _memcached::Request* req = new _memcached::Request();
     methodCode = req->parseMethod(linesp, lnl);
 	if (methodCode == 0){
-		return NULL;
+        return NULL;
 	} else {
-		return head_end;
+        return head_end;
 	}
 }
 
@@ -132,9 +131,9 @@ char* MemCached::isResponse(const char *ptr, const int datalen) {
 	statusCode = rsp->parseStatus(linesp, lnl);
     
     if (rsp->status[statusCode] == "NONE"){
-		return NULL;
+        return NULL;
 	} else {
-		return head_end;
+        return head_end;
 	}
 }
 

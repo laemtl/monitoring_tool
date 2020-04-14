@@ -44,8 +44,8 @@ export default {
   },
   mounted() {
     this.initChart();
-
-    bus.$on(this.data.protocolIndex + '_' + this.data.metricId, message => {
+    console.log(this.data.netIntIndex + '_' + this.data.protocolIndex + '_' + this.data.metricId);
+    bus.$on(this.data.netIntIndex + '_' + this.data.protocolIndex + '_' + this.data.metricId, message => {
       this.processMessage(message);
     });
   },

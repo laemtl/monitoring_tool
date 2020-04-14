@@ -1019,7 +1019,7 @@ const ProtobufCMessageDescriptor analysis__data__descriptor =
   (ProtobufCMessageInit) analysis__data__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[8] =
+static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[9] =
 {
   {
     "name",
@@ -1034,12 +1034,36 @@ static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[8]
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "protocolName",
+    "netInt",
     2,
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof(Analysis__MetricMsg, protocolname),
+    offsetof(Analysis__MetricMsg, netint),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "netIntId",
+    3,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_UINT32,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__MetricMsg, netintid),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "protocol",
+    4,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_STRING,
+    0,   /* quantifier_offset */
+    offsetof(Analysis__MetricMsg, protocol),
     NULL,
     NULL,
     0,             /* flags */
@@ -1047,7 +1071,7 @@ static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[8]
   },
   {
     "protocolId",
-    3,
+    5,
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
@@ -1059,7 +1083,7 @@ static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[8]
   },
   {
     "time",
-    4,
+    6,
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_INT64,
     0,   /* quantifier_offset */
@@ -1070,20 +1094,8 @@ static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[8]
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "netInt",
-    5,
-    PROTOBUF_C_LABEL_REQUIRED,
-    PROTOBUF_C_TYPE_STRING,
-    0,   /* quantifier_offset */
-    offsetof(Analysis__MetricMsg, netint),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-  {
     "clientId",
-    6,
+    7,
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_INT64,
     0,   /* quantifier_offset */
@@ -1095,7 +1107,7 @@ static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[8]
   },
   {
     "metricAvg",
-    7,
+    8,
     PROTOBUF_C_LABEL_OPTIONAL,
     PROTOBUF_C_TYPE_MESSAGE,
     offsetof(Analysis__MetricMsg, values_case),
@@ -1107,7 +1119,7 @@ static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[8]
   },
   {
     "metricCumDistr",
-    8,
+    9,
     PROTOBUF_C_LABEL_OPTIONAL,
     PROTOBUF_C_TYPE_MESSAGE,
     offsetof(Analysis__MetricMsg, values_case),
@@ -1119,19 +1131,20 @@ static const ProtobufCFieldDescriptor analysis__metric_msg__field_descriptors[8]
   },
 };
 static const unsigned analysis__metric_msg__field_indices_by_name[] = {
-  5,   /* field[5] = clientId */
-  6,   /* field[6] = metricAvg */
-  7,   /* field[7] = metricCumDistr */
+  6,   /* field[6] = clientId */
+  7,   /* field[7] = metricAvg */
+  8,   /* field[8] = metricCumDistr */
   0,   /* field[0] = name */
-  4,   /* field[4] = netInt */
-  2,   /* field[2] = protocolId */
-  1,   /* field[1] = protocolName */
-  3,   /* field[3] = time */
+  1,   /* field[1] = netInt */
+  2,   /* field[2] = netIntId */
+  3,   /* field[3] = protocol */
+  4,   /* field[4] = protocolId */
+  5,   /* field[5] = time */
 };
 static const ProtobufCIntRange analysis__metric_msg__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 0, 8 }
+  { 0, 9 }
 };
 const ProtobufCMessageDescriptor analysis__metric_msg__descriptor =
 {
@@ -1141,7 +1154,7 @@ const ProtobufCMessageDescriptor analysis__metric_msg__descriptor =
   "Analysis__MetricMsg",
   "analysis",
   sizeof(Analysis__MetricMsg),
-  8,
+  9,
   analysis__metric_msg__field_descriptors,
   analysis__metric_msg__field_indices_by_name,
   1,  analysis__metric_msg__number_ranges,

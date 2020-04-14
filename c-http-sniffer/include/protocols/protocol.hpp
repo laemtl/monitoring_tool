@@ -78,6 +78,7 @@ namespace _protocol {
     class Protocol {
         public:
             char* name;
+            uint32_t id;
             EventManager* eventManager;
             std::vector<Metric*> metrics;
             Analysis* analysis;
@@ -102,7 +103,7 @@ namespace _protocol {
             u_int32_t	serverIp;
             std::vector<u_int16_t> serverPorts;
 
-            Protocol(Analysis* analysis, char* protocolName);
+            Protocol(Analysis* analysis, char* protocolName, uint32_t protocolId);
             virtual bool isHeaderPacket(const char *ptr, const int datalen) = 0;
             virtual char* isRequest(const char *p, const int datalen) = 0;
             virtual char* isResponse(const char *p, const int datalen) = 0;

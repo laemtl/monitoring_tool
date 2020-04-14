@@ -86,17 +86,6 @@ void create_timer(long start, long interval, Analysis* analysis, void (*callback
 
 	while (!analysis->isStopped()) usleep(100);
 
-		/*if ((sig = sigwaitinfo(&mask, &si)) < 0) {
-			error("Error with sigwaitinfo\n");
-		}
-			
-		if (sig != PERIOD_SIG) {
-			// printf("signal: %d", sig);
-			continue;
-		}
-		
-		callback(analysis);*/
-
 	timer_delete(timerid);
 }
 
@@ -105,6 +94,7 @@ void start_duration_timer(Analysis* analysis) {
 }
 
 void start_timer(Analysis* analysis) {
+	printf("timer id : %d\n", getpid());
 	pthread_t timer_duration;
     if(analysis->duration > 0) {	    
 	    pthread_create(&timer_duration, NULL, (void*)start_duration_timer, analysis);

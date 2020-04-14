@@ -49,7 +49,7 @@ SQL_command _mysql::parseSqlCommand(const char *data, int len){
     }
 }
 
-MySQL::MySQL(Analysis* analysis, char* protocolName) : Protocol(analysis, protocolName) {
+MySQL::MySQL(Analysis* analysis, char* protocolName, uint32_t protocolId) : Protocol(analysis, protocolName, protocolId) {
     ports.insert(ports.end(), {3306});
 }
 

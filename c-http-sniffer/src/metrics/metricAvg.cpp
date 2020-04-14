@@ -65,9 +65,10 @@ void MetricAvg::sendMsg() {
 	Analysis__MetricAvgMsg avgMsg = ANALYSIS__METRIC_AVG_MSG__INIT;
 	msg.metricavg = &avgMsg;
 	msg.name = (char*)name.c_str();
-	msg.protocolname = protocol->name;
-	msg.protocolid = 0;
 	msg.netint = (char*)analysis->interface;
+	msg.netintid = analysis->interfaceId;
+	msg.protocol = protocol->name;
+	msg.protocolid = protocol->id;
 	msg.time = time(0);
 	msg.metricavg->avg = avg->get();
 	msg.metricavg->min = min->get();

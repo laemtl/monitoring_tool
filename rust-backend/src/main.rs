@@ -115,10 +115,11 @@ enum Msg {
 
     Metric {
         name: String,
-        protocol_name: String,
+        net_int: String,
+        net_int_id: u32,
+        protocol: String,
         protocol_id: u32,    
         time: i64,
-        net_int: String,
         client_id: i64,
         #[serde(skip_serializing_if = "Option::is_none")]
         metric_avg: std::option::Option<MetricAvg>,
@@ -243,10 +244,11 @@ impl Handler<MetricMsg> for Ws {
 
         let msg = Msg::Metric {
             name: metric.get_name().to_string(),
-            protocol_name: metric.get_protocolName().to_string(),   
+            net_int: metric.get_netInt().to_string(),
+            net_int_id: metric.get_netIntId(),
+            protocol: metric.get_protocol().to_string(),   
             protocol_id: metric.get_protocolId(),    
             time: metric.get_time(),
-            net_int: metric.get_netInt().to_string(),
             client_id: 0,
             metric_avg: metric_avg,
             metric_cum_distr: metric_cum_distr

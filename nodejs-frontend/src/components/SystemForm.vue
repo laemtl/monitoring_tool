@@ -19,7 +19,7 @@
               <v-flex md6 class="py-0">
                 <v-text-field
                   class="pa-0 ma-0"
-                  v-model="interval"
+                  v-model="$root.interval"
                   :rules="[rules.requiredRules, rules.timeRules]"
                   validate-on-blur
                   label="Interval (s)"
@@ -28,7 +28,7 @@
               <v-flex md6 class="py-0">
                 <v-text-field
                   class="pa-0 ma-0"
-                  v-model="duration"
+                  v-model="$root.duration"
                   :rules="[rules.requiredRules, rules.timeRules]"
                   validate-on-blur
                   label="Duration (s)"
@@ -60,8 +60,6 @@ export default {
     return {
       drawer: null,
       status: true,
-      interval: this.$root.interval,
-      duration: this.$root.duration,
       rules: {
         requiredRules: value => !!value || "Required",
         timeRules: value => (!isNaN(value) && value > 0) || "Invalid value"

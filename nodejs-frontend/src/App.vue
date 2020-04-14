@@ -101,17 +101,13 @@ export default {
           var data = JSON.parse(message.data);
           
           console.log(data);
-
-          //if(typeof el.selectedProtocols[data.name] === 'undefined') return;
-          
+          console.log(data.net_int_id + '_' + data.protocol_id + '_' + data.name);
           if(typeof data.metric_avg !== "undefined") {
-            bus.$emit(data.protocol_id + '_' + data.name, {
-              //netInts: data.netInts,
+            bus.$emit(data.net_int_id + '_' + data.protocol_id + '_' + data.name, {
               data: data.metric_avg
             });
           } else if(typeof data.metric_cum_distr !== "undefined") {
-            bus.$emit(data.protocol_id + '_' + data.name, {
-              //netInts: data.netInts,
+            bus.$emit(data.net_int_id + '_' + data.protocol_id + '_' + data.name, {
               data: data.metric_cum_distr
             });
           }
@@ -174,7 +170,7 @@ export default {
           duration: parseInt(el.$root.duration)
         };
 
-        console.log(msg);
+        //console.log(msg);
 
         el.ws.send(
           JSON.stringify(msg)

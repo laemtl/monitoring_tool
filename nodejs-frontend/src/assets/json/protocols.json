@@ -33,7 +33,7 @@
         "conn_rate": {
             "label": "Connection rate",
             "type": "line",
-            "max": 2,
+            "max": 5,
             "active": true
         },
         "clients": {

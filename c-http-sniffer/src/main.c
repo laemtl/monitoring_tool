@@ -131,8 +131,10 @@ void packet_preprocess(Analysis* analysis, char *raw_data, const struct pcap_pkt
 			if(pkt->tcp_dl != 0){
 				cp = cp + pkt->tcp_hl;
 				int i = 0;
+				
 				if((*protocol)->isHeaderPacket(cp, pkt->tcp_dl)){
 					/* Yes, it's a packet of interest */
+					printf("packet of interest \n");
 					char *head_end = NULL;
 					head_end = (*protocol)->isRequest(cp, pkt->tcp_dl);
 					
@@ -140,13 +142,15 @@ void packet_preprocess(Analysis* analysis, char *raw_data, const struct pcap_pkt
 						/* First packet of request. */
 						req_n++;
 						pkt->type = REQ;
-					}
+					} else {
+						
+						head_end = (*protocol)->isResponse(cp, pkt->tcp_dl);
+						if( head_end != NULL ){
+							/* First packet of response. */
+							pkt->type = RSP;
+							rsp_n++;
+						}
 
-					head_end = (*protocol)->isResponse(cp, pkt->tcp_dl);
-					if( head_end != NULL ){
-						/* First packet of response. */
-						pkt->type = RSP;
-						rsp_n++;
 					}
 					
 					if( head_end != NULL ){
@@ -167,6 +171,7 @@ void packet_preprocess(Analysis* analysis, char *raw_data, const struct pcap_pkt
 					pkt->tcp_odata = NULL;
 					pkt->tcp_data = pkt->tcp_odata;
 				}
+				
 				(*protocol)->pq->enq(pkt);
 			}
 			break;
@@ -208,11 +213,13 @@ process_packet_queue(Analysis* analysis){
 	packet_t *pkt = NULL;
 	
 	while(1){
+		if (analysis->isStopped()) {
+			break;
+		}
+
 		for (auto protocol = begin (analysis->protocols); protocol != end (analysis->protocols); ++protocol) {
 			pkt = (*protocol)->pq->deq();
-			if (analysis->isStopped()) {
-				break;
-			} else if (pkt != NULL){
+			if (pkt != NULL){
 				(*protocol)->fht->add_packet(pkt);
 				pak_deq++;
 				
@@ -234,12 +241,14 @@ process_flow_queue(Analysis* analysis){
 	Flow *flow = NULL;
 	
 	while(1){
+		if (analysis->isStopped()) {
+			break;
+		}
+		
 		for (auto protocol = begin (analysis->protocols); protocol != end (analysis->protocols); ++protocol) {
 			flow = (*protocol)->fq->deq();
 
-			if (analysis->isStopped()) {
-				break;
-			} else if(flow != NULL){
+			if(flow != NULL){
 				(*protocol)->extractPair(flow, true);
 				(*protocol)->extractData(flow);
 				delete flow;
@@ -266,14 +275,13 @@ scrubbing_flow_htbl(Analysis* analysis){
 			if (analysis->isStopped()){
 				num = (*protocol)->fht->flow_scrubber(-1); // cleanse all flows
 				printf("Cleaned: %d flows \n", num);
-				break;
+				pthread_exit(NULL);
 			} else {
 				num = (*protocol)->fht->flow_scrubber(60*10);	// flow timeout in seconds
 				printf("Cleaned: %d flows \n", num);
 			}
 		}
 	}
-	pthread_exit(NULL);
 }
 
 /**
@@ -387,7 +395,7 @@ void start_analysis(char* ipaddress, Analysis* analysis) {
 	pthread_join(job_flow_q, &thread_result);
 	pthread_join(job_scrb_htbl, &thread_result);
 	pthread_join(job_pkt, &thread_result);
-
+	
 #if DEBUGGING == 1
 	pthread_join(job_debug_p, &thread_result);
 #endif
@@ -453,16 +461,16 @@ int main(int argc, char *argv[]){
 
 		// If both interface and tracefile are provided, default behaviour is to use the interface        
         if (interface == NULL) {
-			analysis = new Analysis(-1, tracefile, 5, 600);
+			analysis = new Analysis(-1, tracefile, 0, 5, 600);
 			analysis->livemode = 0;
 		} else {
-			analysis = new Analysis(-1, interface, 5, 600);
+			analysis = new Analysis(-1, interface, 0, 5, 600);
 			analysis->livemode = 1;
 		}
 
 		analysis->serverMode = false;
 		analysis->debug = debug;
-		MemCached* http = new MemCached(analysis, "MEMCACHED");
+		MemCached* http = new MemCached(analysis, "MEMCACHED", 0);
 		http->activeMetrics(std::numeric_limits<int>::max());
 		analysis->protocols.push_back(http);
 

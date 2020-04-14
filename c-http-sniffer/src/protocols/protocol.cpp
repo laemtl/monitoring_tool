@@ -37,7 +37,7 @@ int Pair::addResponse(Response *rsp) {
 	}
 }
 
-Protocol::Protocol(Analysis* analysis, char* protocolName) : analysis(analysis), hasClientIp(false), hasServerIp(false), name(protocolName) {
+Protocol::Protocol(Analysis* analysis, char* protocolName, uint32_t protocolId) : analysis(analysis), hasClientIp(false), hasServerIp(false), name(protocolName), id(protocolId) {
     eventManager = new EventManager();
     
     /* Initialization of packet and flow data structures */
@@ -72,12 +72,12 @@ void Protocol::extractData(Flow* flow){
     if (clientPorts.size() && !std::count(clientPorts.begin(), clientPorts.end(), flow->socket.sport)) {
         return;
     }
-
+    
     if(hasServerIp && serverIp != flow->socket.daddr) {
         return;
     }
-
-    if (serverPorts.size() && !std::count(serverPorts.begin(), serverPorts.end(), flow->socket.dport)) {
+    
+    if (serverPorts.size() && !std::count(serverPorts.begin(), serverPorts.end(), flow->socket.dport) && !std::count(serverPorts.begin(), serverPorts.end(), flow->socket.sport)) {
         return;
     }
 

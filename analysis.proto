@@ -62,15 +62,16 @@ message Data {
 
 message MetricMsg {
     required string name = 1;
-    required string protocolName = 2;
-    required uint32 protocolId = 3;    
-    required int64 time = 4;
-    required string netInt = 5;
-    required int64 clientId = 6;
+    required string netInt = 2;
+    required uint32 netIntId = 3;
+    required string protocol = 4;
+    required uint32 protocolId = 5;    
+    required int64 time = 6;
+    required int64 clientId = 7;
 
     oneof values {
-        MetricAvgMsg metricAvg = 7;
-        MetricCumDistrMsg metricCumDistr = 8;
+        MetricAvgMsg metricAvg = 8;
+        MetricCumDistrMsg metricCumDistr = 9;
     }
 };
 

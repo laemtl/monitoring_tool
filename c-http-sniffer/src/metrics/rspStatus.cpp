@@ -49,7 +49,6 @@ void RspStatus::onResponseReceived(_protocol::Pair *pair, Flow* flow) {
 	
 	ResponseStatus* rsp = (ResponseStatus*)pair->response_header;
     int statusCode = rsp->statusCode;
-	printf("statusCode: %d", statusCode);
 	char* statusName = rsp->getStatusName(statusCode);
 	if(statusName != NULL) ++rspStatus[statusName];
 }
