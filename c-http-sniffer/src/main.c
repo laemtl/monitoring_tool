@@ -134,7 +134,6 @@ void packet_preprocess(Analysis* analysis, char *raw_data, const struct pcap_pkt
 				
 				if((*protocol)->isHeaderPacket(cp, pkt->tcp_dl)){
 					/* Yes, it's a packet of interest */
-					printf("packet of interest \n");
 					char *head_end = NULL;
 					head_end = (*protocol)->isRequest(cp, pkt->tcp_dl);
 					

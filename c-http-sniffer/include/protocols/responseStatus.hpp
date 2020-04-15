@@ -22,7 +22,7 @@ class ResponseStatus : public _protocol::Response {
                 return NULL;
             } else {
                 // found
-                return status[statusCode];
+	            return status[statusCode];
             }
         }   
 };

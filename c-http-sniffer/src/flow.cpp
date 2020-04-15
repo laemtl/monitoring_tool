@@ -126,7 +126,7 @@ int Flow::cal_packet(packet_t *packet, bool src){
     return 0;
 }
 
-/* Compare seq_t objects if equel */
+/* Compare seq_t objects if equal */
 int Flow::compare_sequence_time(seq_t *seq1, seq_t *seq2){
     u_int32_t	sec1 = seq1->cap_sec;
     u_int32_t	usec1 = seq1->cap_usec;
@@ -245,7 +245,7 @@ int Flow::add_packet(packet_t *packet, register bool src){
         cal_packet(packet, src);
         packet_free(packet);
 
-        if(close == CLIENT_CLOSE  || close == SERVER_CLOSE){		/* && or || */
+        if(close == CLIENT_CLOSE || close == SERVER_CLOSE){		/* && or || */
             /* flow finished and send it to the flow queue */
             close = true;
             fq->enq(fht->remove(this));

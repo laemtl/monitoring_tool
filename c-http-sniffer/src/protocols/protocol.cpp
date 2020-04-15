@@ -478,7 +478,7 @@ int Protocol::extractPair(Flow* flow, bool closed){
             else
                 break;
         }
-    }else{
+    } else {
         /* No FIN packet found.*/
         while(seq != NULL){
             pkt = seq->pkt;
@@ -516,7 +516,7 @@ int Protocol::extractPair(Flow* flow, bool closed){
                 req = getRequest(pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,time,pkt->tcp_seq,pkt->tcp_seq+pkt->tcp_dl);
                 /* Add the request object to the foregoing HTTP pair object */
                 new_pair->addRequest(req);
-            }else{
+            } else {
                 /* Omit the TCP handshake sequences.*/
                 /* or already processed sequence */
                 if(new_pair == NULL || seq->processed){
@@ -577,7 +577,7 @@ int Protocol::extractPair(Flow* flow, bool closed){
                 * Similar to the request parsing, a new response is
                 * added to the first pair without response
                 */
-                //rspn++;
+                rspn++;
 
                 u_int32_t ack = pkt->tcp_ack;
                 //raw_rsp++;

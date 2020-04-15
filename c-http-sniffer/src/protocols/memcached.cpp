@@ -63,44 +63,54 @@ char* MemCached::isRequest(const char *ptr, const int datalen) {
 }
 
 int _memcached::Response::parseStatus(const char *line, int len) {
-    const char *next_token;
+    /*const char *next_token;
     const char *lineend;
     const char *st;
     int statusCode;
-    int tokenlen;
+    int tokenlen;*/
+    const char *ptr;
+    int	index = 0;
     
-    lineend = line + len;
-    statusCode = 0;
+    //lineend = line + len;
+    statusCode = status.size()-1;
 
-    /* The first token is the protocol and version */
-    tokenlen = Protocol::get_token_len(line, lineend, &next_token);
+    // The first token is the protocol and version
+    /*tokenlen = Protocol::get_token_len(line, lineend, &next_token);
     if (tokenlen == 0 || line[tokenlen] != ' ') {
         return statusCode;
     }
 
     line = next_token;
-    /* The next token is status value. */
+    // The next token is status value.
     tokenlen = Protocol::get_token_len(line, lineend, &next_token);
     if (tokenlen == 0 || (line[tokenlen] != ' ' && line[tokenlen] != '\r' && line[tokenlen] != '\n')) {
         return statusCode;
     }
 
-    /*
-     * Parse response status value.
-     */
-    st = MALLOC(char, tokenlen+1);
+    // Parse response status value.
+    //st = MALLOC(char, tokenlen+1);
     if (st != NULL) {
         memcpy(st, line, tokenlen);
-        //st[tokenlen] = '\0';
-    }
+    }*/
     
+    ptr = line;
+    /* Look for the space following the Method */
+    while (index < len) {
+        if (*ptr == ' ')
+            break;
+        else {
+            ptr++;
+            index++;
+        }
+    }
+
     for (auto &s : status) {
-        if (s.second == st) {
+        if (strncmp(s.second, line, index) == 0) {
             statusCode = s.first;
             break;
         }
     }
-    free(st);
+    //free(st);
 
     return statusCode;
 }
@@ -121,7 +131,7 @@ bool _memcached::Response::hasErrorStatus() {
 char* MemCached::isResponse(const char *ptr, const int datalen) {
 	char *eol, *linesp, *head_end = NULL;
     int lnl;
-    int statusCode = 0;
+    int statusCode;
 
     linesp = (char*) ptr;
 	head_end = Protocol::find_line_end(linesp, datalen, &eol);
@@ -275,14 +285,35 @@ _memcached::Request::Request(const char *data, const char *dataend, char *time, 
 }
 
 _memcached::Response::Response() {
-    char statusName[20][50] = { "NONE", "VALUE", "OK", "END", "STORED", "NOT_STORED", "EXISTS",
+    /*char statusName[20][50] = { "VALUE", "OK", "END", "STORED", "NOT_STORED", "EXISTS",
     "NOT_FOUND", "ERROR", "CLIENT_ERROR", "SERVER_ERROR", "DELETED", "TOUCHED",
-    "BUSY", "BADCLASS", "NOTFULL", "UNSAFE", "SAME", "STAT", "VERSION" };
+    "BUSY", "BADCLASS", "NOTFULL", "UNSAFE", "SAME", "STAT", "VERSION", "NONE" };
 
     int cnt = sizeof(statusName)/sizeof(statusName[0]);
-    for (int i = 0; i != cnt; ++i) {
+    for (int i = 0; i < cnt; ++i) {
         status.insert({i, statusName[i]});
-    }
+    }*/
+
+    status.insert({0, "VALUE"});
+    status.insert({1, "OK"});
+    status.insert({2, "END"});
+    status.insert({3, "STORED"});
+    status.insert({4, "NOT_STORED"});
+    status.insert({5, "EXISTS"});
+    status.insert({6, "NOT_FOUND"});
+    status.insert({7, "ERROR"});
+    status.insert({8, "CLIENT_ERROR"});
+    status.insert({9, "SERVER_ERROR"});
+    status.insert({10, "DELETED"});
+    status.insert({11, "TOUCHED"});
+    status.insert({12, "BUSY"});
+    status.insert({13, "BADCLASS"});
+    status.insert({14, "NOTFULL"});
+    status.insert({15, "UNSAFE"});
+    status.insert({16, "SAME"});
+    status.insert({17, "STAT"});
+    status.insert({18, "VERSION"});
+    status.insert({19, "NONE"});
 }
 
 /*
