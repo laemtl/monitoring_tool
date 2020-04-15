@@ -31,7 +31,6 @@ namespace _memcached {
     class Request : public RequestMethod  {
         public:
             u_int32_t   seq;
-            u_int32_t   nxt_seq;
             std::vector<const char*> keys;
             char*       time;
             u_int32_t expiration;

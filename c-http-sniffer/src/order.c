@@ -57,7 +57,7 @@ seq_t *seq_pkt(packet_t *p){
 	s->seq = p->tcp_seq;
 	if((p->tcp_flags & TH_SYN) == TH_SYN || (p->tcp_flags & TH_FIN) == TH_FIN){
 		s->nxt_seq = p->tcp_seq + p->tcp_dl +1;
-	}else{
+	} else {
 		s->nxt_seq = p->tcp_seq + p->tcp_dl;
 	}
 	s->th_flags = p->tcp_flags;

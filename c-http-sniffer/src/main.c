@@ -62,10 +62,10 @@ print_usage(const char* pro_name){
 void packet_preprocess(Analysis* analysis, char *raw_data, const struct pcap_pkthdr *pkthdr)
 {
 	packet_t	*pkt = NULL;	/* new packet */
-	char 	*cp = raw_data;
-	ethhdr	*eth_hdr = NULL;
-	iphdr	*ip_hdr = NULL;
-	tcphdr	*tcp_hdr = NULL;
+	char 		*cp = raw_data;
+	ethhdr		*eth_hdr = NULL;
+	iphdr		*ip_hdr = NULL;
+	tcphdr		*tcp_hdr = NULL;
 
 	/* Parse libpcap packet header */
 	pkt = packet_new();
@@ -141,15 +141,13 @@ void packet_preprocess(Analysis* analysis, char *raw_data, const struct pcap_pkt
 						/* First packet of request. */
 						req_n++;
 						pkt->type = REQ;
-					} else {
-						
+					} else {	
 						head_end = (*protocol)->isResponse(cp, pkt->tcp_dl);
 						if( head_end != NULL ){
 							/* First packet of response. */
-							pkt->type = RSP;
 							rsp_n++;
+							pkt->type = RSP;
 						}
-
 					}
 					
 					if( head_end != NULL ){

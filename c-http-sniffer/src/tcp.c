@@ -29,7 +29,7 @@ int tcp_order(order_t *ord, seq_t *new_seq, bool src){
 	if(src == true){
 		plist = &(ord->src);
 		plist_last = &(ord->last_src);
-	}else{
+	} else {
 		plist = &(ord->dst);
 		plist_last = &(ord->last_dst);
 	}
@@ -40,7 +40,7 @@ int tcp_order(order_t *ord, seq_t *new_seq, bool src){
 		(*plist_last) = new_seq;
 		ord->num++;
 		return 0;
-	}else{
+	} else {
 		/* set some variables fr,pre,cp,aft,bk to add a new seq to order */
 		if((*plist_last)->nxt_seq == new_seq->seq){
 			fr = ((*plist_last)->seq);
@@ -63,7 +63,7 @@ int tcp_order(order_t *ord, seq_t *new_seq, bool src){
 				(*plist_last) = new_seq;
 				ord->num++;
 				return 0;
-			}else{
+			} else {
 				fr = pre->seq;				/* start of continuous segment */
 				cp = tcp_cont_seq(pre);	 	/* the last seq_t in a continuous segment */
 				aft = cp->next;
@@ -76,7 +76,7 @@ int tcp_order(order_t *ord, seq_t *new_seq, bool src){
 				/* retransmission */
 				seq_free(new_seq);
 				return 1;
-			}else{
+			} else {
 				/* adjust the packet */
 				u_int32_t	delta = (new_seq->nxt_seq-1) - bk;
 				if(new_seq->pkt != NULL){
@@ -97,7 +97,7 @@ int tcp_order(order_t *ord, seq_t *new_seq, bool src){
 						(*plist_last) = new_seq;
 						ord->num++;
 						return 0;
-					}else{
+					} else {
 						/* partially overlapped */
 						if(new_seq->pkt != NULL){
 							new_seq->pkt->tcp_dl -= (new_seq->nxt_seq - aft->seq);
@@ -112,7 +112,7 @@ int tcp_order(order_t *ord, seq_t *new_seq, bool src){
 
 				return 0;
 			}
-		}else{
+		} else {
 			cp->next = new_seq;
 
 			if(aft != NULL){
@@ -121,7 +121,7 @@ int tcp_order(order_t *ord, seq_t *new_seq, bool src){
 					(*plist_last) = new_seq;
 					ord->num++;
 					return 0;
-				}else{
+				} else {
 					/* partially overlapped */
 					if(new_seq->pkt != NULL){
 						new_seq->pkt->tcp_dl -= (new_seq->nxt_seq - aft->seq);
@@ -153,11 +153,11 @@ int tcp_order_check(order_t *order){
 	ps = order->src;
 	if(ps == NULL){
 		src_check = 1;
-	}else{
+	} else {
 		while(ps->next != NULL){
 			if(ps->nxt_seq == ps->next->seq){
 				ps = ps->next;
-			}else{
+			} else {
 				printf("%"PRIu32"\t%"PRIu32"\n", ps->nxt_seq, ps->next->seq);
 				src_check = 0;
 				break;
@@ -171,11 +171,11 @@ int tcp_order_check(order_t *order){
 	ps = order->dst;
 	if( ps == NULL){
 		dst_check = 1;
-	}else{
+	} else {
 		while(ps->next != NULL){
 			if(ps->nxt_seq == ps->next->seq){
 				ps = ps->next;
-			}else{
+			} else {
 				printf("%"PRIu32"\t%"PRIu32"\n", ps->nxt_seq, ps->next->seq);
 				dst_check = 0;
 				break;

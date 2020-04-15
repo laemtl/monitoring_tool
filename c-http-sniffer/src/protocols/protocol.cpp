@@ -379,7 +379,7 @@ int Protocol::extractPair(Flow* flow, bool closed){
             fin_seq = dst_fin_seq;
             //fin_dir = 2;
         }
-    }else{
+    } else {
         fin_seq = NULL;
         //fin_dir = 0;
     }
@@ -400,7 +400,7 @@ int Protocol::extractPair(Flow* flow, bool closed){
     seq = flow->order->src;
     if( seq != NULL){
         seq_next = seq->next;
-    }else{
+    } else {
         seq_next = NULL;		/* NULL */
     }
     
@@ -438,10 +438,11 @@ int Protocol::extractPair(Flow* flow, bool closed){
                 **/
                 char time[20];
                 sprintf(time, "%ld", pkt->cap_usec);
+
                 req = getRequest(pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl, time, pkt->tcp_seq, pkt->tcp_seq+pkt->tcp_dl);
                 /* Add the request object to the foregoing HTTP pair object */
                 new_pair->addRequest(req);                
-            }else{
+            } else {
                 /* Omit the TCP handshake sequences.*/
                 /* or already processed sequence */
                 if(new_pair == NULL || seq->processed){
@@ -482,9 +483,10 @@ int Protocol::extractPair(Flow* flow, bool closed){
         /* No FIN packet found.*/
         while(seq != NULL){
             pkt = seq->pkt;
+
             if(pkt != NULL && pkt->type == REQ && !seq->processed){
                 seq->processed = true;
-
+                                
                 /* When a new HTTP request is found,
                 * create a HTTP pair object, then add the object to
                 * flow's HTTP chain.
@@ -511,7 +513,7 @@ int Protocol::extractPair(Flow* flow, bool closed){
                  *  header is parsed. 
                 **/
                 char time[20];
-                sprintf(time,"%ld",pkt->cap_usec);
+                sprintf(time, "%ld",pkt->cap_usec);
 
                 req = getRequest(pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl,time,pkt->tcp_seq,pkt->tcp_seq+pkt->tcp_dl);
                 /* Add the request object to the foregoing HTTP pair object */
@@ -580,26 +582,21 @@ int Protocol::extractPair(Flow* flow, bool closed){
                 rspn++;
 
                 u_int32_t ack = pkt->tcp_ack;
+                bool found = false;
                 //raw_rsp++;
 
                 /* Try to find the first pair without response */
-                while(tmp != NULL){
-                    /*if(tmp->request_header->nxt_seq > ack) {
-                        printf("ns: %" PRIu32 " ack: %" PRIu32" \n", tmp->request_header->nxt_seq, ack);
-                        tmp = NULL;
-                        break;
-                    }*/
-
-                    if(tmp->response_header == NULL /*&& tmp->request_header->nxt_seq == ack*/) {
-                        //printf("ns: %" PRIu32 " ack: %" PRIu32" \n", tmp->request_header->nxt_seq, ack);
+                while(tmp != NULL && tmp->request_header->nxt_seq <= ack){
+                    if(tmp->response_header == NULL && tmp->request_header->nxt_seq == ack) {
+                        found = true;
                         break;
                     }
                     tmp = tmp->next;
                 }
                 if(tmp == NULL) {
-                    /* no response empty, then return */
+                    /* no more empty response, return */
                     return 1;
-                } else {
+                } else if(found) {
                     /*Found!*/
                     found_pair = tmp;
                     first_seq = seq;
@@ -614,7 +611,7 @@ int Protocol::extractPair(Flow* flow, bool closed){
                     found_pair->addResponse(rsp);
                     first_packet = 1;	
                 }
-            }else{
+            } else {
                 if(found_pair == NULL || seq->processed){
                     seq = seq->next;
                     if(seq != NULL)
@@ -672,7 +669,7 @@ int Protocol::extractPair(Flow* flow, bool closed){
             else
                 break;
         }
-    }else{
+    } else {
         /*There is no FIN packet.*/
         int first_packet = 0;
         while(seq != NULL){
@@ -687,13 +684,14 @@ int Protocol::extractPair(Flow* flow, bool closed){
                 */
                 rspn++;
 
-                //u_int32_t ack = pkt->tcp_ack;
+                u_int32_t ack = pkt->tcp_ack;
+                bool found = false;
                 //raw_rsp++;
                 
                 /* Try to find the first pair without response */
-                while(tmp != NULL){
-                    
-                    if(tmp->response_header == NULL /*&& tmp->request_header->nxt_seq == ack*/) {
+                while(tmp != NULL && tmp->request_header->nxt_seq <= ack){
+                    if(tmp->response_header == NULL && tmp->request_header->nxt_seq == ack) {
+                        found = true;
                         break;
                     }
                     tmp = tmp->next;
@@ -701,11 +699,12 @@ int Protocol::extractPair(Flow* flow, bool closed){
                 if(tmp == NULL) {
                     /* no response empty, then return */
                     return 1;
-                } else {
+                } else if(found) {
                     /*Found!*/
                     first_packet = 1;
                     found_pair = tmp;
                     first_seq = seq;
+
                     found_pair->rsp_fb_sec = seq->cap_sec;
                     found_pair->rsp_fb_usec = seq->cap_usec;
 
@@ -716,7 +715,7 @@ int Protocol::extractPair(Flow* flow, bool closed){
                     rsp = getResponse(pkt->tcp_odata, pkt->tcp_odata + pkt->tcp_dl, pkt->tcp_ack);
                     found_pair->addResponse(rsp);
                 }
-            }else{
+            } else {
                 if(found_pair == NULL || seq->processed){
                     seq = seq->next;
                     if(seq != NULL)
@@ -740,7 +739,7 @@ int Protocol::extractPair(Flow* flow, bool closed){
                 strcat(found_pair->response_header->time, temp);
                 if (!first_packet){
                     sprintf(temp,",%d",seq->size);
-                }else{
+                } else {
                     sprintf(temp,"%d",seq->size);
                 }
                 strcat(found_pair->response_header->size, temp);

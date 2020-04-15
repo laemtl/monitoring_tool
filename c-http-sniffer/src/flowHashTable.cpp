@@ -31,7 +31,7 @@ Flow* FlowHashTable::create(flow_s s) {
 		f->next = NULL;
 		f->prev = NULL;
 		hm->first = f;
-	}else{
+	} else {
 		hm->last->next = f;
 		f->prev = hm->last;
 	}
@@ -52,14 +52,14 @@ Flow* FlowHashTable::remove(Flow* f) {
 	if( hm->elm_cnt == 1 && f == hm->first){
 		hm->first = NULL;
 		hm->last = NULL;
-	}else{
+	} else {
 		if(f->prev == NULL){	/* the first flow record */
 			hm->first = f->next;
 			hm->first->prev = NULL;
 		}else if(f->next == NULL){
 			hm->last = f->prev;
 			hm->last->next = NULL;
-		}else{
+		} else {
 			f->prev->next = f->next;
 			f->next->prev = f->prev;
 		}
@@ -84,7 +84,7 @@ Flow* FlowHashTable::find(flow_s s) {
 			if(flow->flow_socket_cmp(&s) == 0){
 				pthread_mutex_unlock(&(hm->mutex));
 				return flow;
-			}else{
+			} else {
 				flow = flow->next;
 				continue;
 			}
@@ -109,18 +109,18 @@ int FlowHashTable::add_packet(packet_t *packet) {
 	cs.dport = packet->sport;
 
 	f = find(cs);
-	if(f != NULL){
+	if(f != NULL) {
 		f->add_packet(packet, 0);
-	}else{
+	} else {
 		cs.saddr = packet->saddr;
 		cs.daddr = packet->daddr;
 		cs.sport = packet->sport;
 		cs.dport = packet->dport;
 
 		f = find(cs);
-		if(f != NULL){
+		if(f != NULL) {
 			f->add_packet(packet, 1);
-		}else{
+		} else {
 			/*
 			* New flow record.
 			*/
@@ -148,7 +148,7 @@ int FlowHashTable::add_packet(packet_t *packet) {
 			/*if(packet->tcp_flags == TH_SYN){
 				f = create(cs);
 				flow_add_packet(f, packet, 1);
-			}else{
+			} else {
 				packet_free(packet);
 			}*/
 		}

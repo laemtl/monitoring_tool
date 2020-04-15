@@ -216,11 +216,11 @@ int Flow::add_packet(packet_t *packet, register bool src){
     }
 
     /* TH_ACK: third handshake */
-    if(pkts_src == 1 && src == true){
+    /*if(pkts_src == 1 && src == true){
         if((packet->tcp_flags & TH_ACK) == TH_ACK){
             ack2_sec = packet->cap_sec;
             ack2_usec = packet->cap_usec;
-            /* round trip time in microsecond */
+            // round trip time in microsecond
             rtt = (ack2_sec - syn_sec) * 1000000 + (ack2_usec - syn_usec);
             
             packet->type = 0;
@@ -230,7 +230,7 @@ int Flow::add_packet(packet_t *packet, register bool src){
             pthread_mutex_unlock(&(hmb->mutex));
             return 0;
         }
-    }
+    }*/
 
     /* TH_FIN:
     * The flow will be closed if the both fins are detected */

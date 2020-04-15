@@ -54,8 +54,7 @@ namespace _http {
             char*		 content_length;
 
             u_int32_t   seq;
-            u_int32_t   nxt_seq;
-
+            
             Request();
             Request(const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq);   /* Parse the packet and store in a Request object */
             ~Request();

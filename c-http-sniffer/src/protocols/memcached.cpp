@@ -217,10 +217,10 @@ _memcached::Request::Request(const char *data, const char *dataend, char *time, 
     char *next_token, *key;
     unsigned int val;
 
-    seq = seq;
-    nxt_seq = nxt_seq;
+    this->seq = seq;
+    this->nxt_seq = nxt_seq;
 
-	eoh = Protocol::find_line_end(data, dataend, &eol);
+    eoh = Protocol::find_line_end(data, dataend, &eol);
 	hdl = eoh - data + 1;
 	hdlen = hdl;
 	time = strdup(time);

@@ -27,6 +27,7 @@ namespace _protocol {
             char* 		time;
             int			hdlen;	// Header length
             bool        processed;
+            u_int32_t   nxt_seq;
             
             Request();
             Request(const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq);
