@@ -72,9 +72,7 @@ void packet_preprocess(Analysis* analysis, char *raw_data, const struct pcap_pkt
 	pkt->cap_sec = pkthdr->ts.tv_sec;
 	pkt->cap_usec = pkthdr->ts.tv_usec;
 	pkt->raw_len = pkthdr->caplen;
-	//sprintf(pkt->time_string,"%ld\n",pkt->cap_sec);
-	//printf("time_string: %s\n",pkt->time_string);
-
+	
 	/* Parse ethernet header and check IP payload */
 	eth_hdr = packet_parse_ethhdr(cp);
 	if(eth_hdr->ether_type != 0x0800){
@@ -89,14 +87,6 @@ void packet_preprocess(Analysis* analysis, char *raw_data, const struct pcap_pkt
 	ip_hdr = packet_parse_iphdr(cp);
 	pkt->saddr = ip_hdr->saddr;
 	pkt->daddr = ip_hdr->daddr;
-
-	/*char *saddr = malloc(sizeof("aaa.bbb.ccc.ddd"));
-	char *daddr = malloc(sizeof("aaa.bbb.ccc.ddd"));
-	strncpy(saddr, ip_ntos(pkt->saddr), sizeof("aaa.bbb.ccc.ddd"));
-	strncpy(daddr, ip_ntos(pkt->daddr), sizeof("aaa.bbb.ccc.ddd"));
-	printf("%s||%s\n",saddr,daddr);
-	free(saddr);
-	free(daddr);*/
 	
 	pkt->ip_hl = (ip_hdr->ihl) << 2;	/* bytes */
 	pkt->ip_tol = ip_hdr->tot_len;
@@ -130,7 +120,6 @@ void packet_preprocess(Analysis* analysis, char *raw_data, const struct pcap_pkt
 			/* Process packets of flows which carry monitored protocol traffic */
 			if(pkt->tcp_dl != 0){
 				cp = cp + pkt->tcp_hl;
-				int i = 0;
 				
 				if((*protocol)->isHeaderPacket(cp, pkt->tcp_dl)){
 					/* Yes, it's a packet of interest */
@@ -285,17 +274,16 @@ scrubbing_flow_htbl(Analysis* analysis){
  * Main capture function
  */
 int
-capture_main(void* a){
+capture_main(void* _analysis){
 	char errbuf[PCAP_ERRBUF_SIZE];
 	memset(errbuf, 0, PCAP_ERRBUF_SIZE);
 	pcap_t *cap = NULL;
 	
-	Analysis* analysis = (Analysis*) a;
+	Analysis* analysis = (Analysis*) _analysis;
 	const char* interface = analysis->interface;
 	
 	const u_char *raw = NULL;
 	struct pcap_pkthdr pkthdr;
-	//packet_t *packet = NULL;
 	
 	if ( analysis->livemode == 1 ) {
 		cap = pcap_open_live(interface, 65535, 0, 1000, errbuf);
@@ -314,7 +302,7 @@ capture_main(void* a){
 
 	while(1){
 		raw = pcap_next(cap, &(pkthdr));
-		if(raw == NULL) continue;
+		if(raw == NULL) continue;	
 
 		size_t len = pkthdr.len;
 		// 60 is the minimum size for a valid ethernet packet size

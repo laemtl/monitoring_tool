@@ -5,7 +5,7 @@
 
 /* Create a new flow record and initiate its members */
 Flow::Flow(Queue* fq, FlowHashTable* fht) 
-: fht(fht), fq(fq), pkt_src_n(0), pkt_dst_n(0), pkts_src(0), init(false), pair_f(NULL), lb_sec(0), lb_usec(0), processed(false) {
+: fht(fht), fq(fq), pkt_src_n(0), pkt_dst_n(0), pkts_src(0), pkts_dst(0), init(false), pair_f(NULL), lb_sec(0), lb_usec(0), processed(false) {
     order = order_new();
 }
 
@@ -194,7 +194,7 @@ int Flow::add_pair(_protocol::Pair *h){
 /* Add a packet_t object to flow's packet_t chain */
 int Flow::add_packet(packet_t *packet, register bool src){
     pthread_mutex_lock(&(hmb->mutex));
-
+    
     /* TH_RST:
     * If the flow is reset by sender or receiver*/
     if((packet->tcp_flags & TH_RST) == TH_RST){
@@ -204,7 +204,7 @@ int Flow::add_packet(packet_t *packet, register bool src){
             delete fht->remove(this);
             pthread_mutex_unlock(&(hmb->mutex));
             return 1;
-        }else{
+        } else {
             packet->type = 0;
             cal_packet(packet, src);
             packet_free(packet);
@@ -234,10 +234,10 @@ int Flow::add_packet(packet_t *packet, register bool src){
 
     /* TH_FIN:
     * The flow will be closed if the both fins are detected */
-    if( (packet->tcp_flags & TH_FIN) == TH_FIN){
+    if((packet->tcp_flags & TH_FIN) == TH_FIN){
         if( src == true ){
             close = CLIENT_CLOSE;
-        }else{
+        } else {
             close = SERVER_CLOSE;
         }	
 
@@ -283,14 +283,14 @@ int Flow::add_packet(packet_t *packet, register bool src){
                     */
                     hook_packet(packet, src);
                     cal_packet(packet,src);
-                }else{
+                } else {
                     //packet->type = 0;
                     cal_packet(packet, src);
                     packet_free(packet);
                 }
             }
         }
-    }else{
+    } else {
         if(packet->type != 0){
             /*
             * only packets with payload
@@ -298,7 +298,7 @@ int Flow::add_packet(packet_t *packet, register bool src){
             */
             hook_packet(packet, src);
             cal_packet(packet, src);
-        }else{
+        } else {
             //packet->type = 0;
             cal_packet(packet, src);
             packet_free(packet);

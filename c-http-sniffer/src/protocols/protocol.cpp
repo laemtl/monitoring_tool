@@ -317,7 +317,7 @@ void Protocol::onAnalysisEnded() {
 // only if response
 
 /* Extract Pair objects from flow's packet_t chain */
-int Protocol::extractPair(Flow* flow, bool closed){    
+int Protocol::extractPair(Flow* flow, bool closed){   
     /*
     * Find the actual FIN sequences.
     */
@@ -481,12 +481,11 @@ int Protocol::extractPair(Flow* flow, bool closed){
         }
     } else {
         /* No FIN packet found.*/
-        while(seq != NULL){
+        while(seq != NULL){ 
             pkt = seq->pkt;
 
             if(pkt != NULL && pkt->type == REQ && !seq->processed){
                 seq->processed = true;
-                                
                 /* When a new HTTP request is found,
                 * create a HTTP pair object, then add the object to
                 * flow's HTTP chain.

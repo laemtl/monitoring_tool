@@ -379,8 +379,8 @@ _http::Request::Request(const char *data, const char *dataend, char *time, u_int
 	char *eoh, *eol, *linesp, *lineep;
 	int line_cnt = 0, lnl = 0, hdl = 0;
 
-    seq = seq;
-    nxt_seq = nxt_seq;
+    this->seq = seq;
+    this->nxt_seq = nxt_seq;
 
 	eoh = Protocol::find_header_end(data, dataend, &line_cnt);
 	hdl = eoh - data + 1;

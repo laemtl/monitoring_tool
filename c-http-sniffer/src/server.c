@@ -82,13 +82,16 @@ void connection_handler(Config* config) {
 					char* protocolName = init->netints[i]->protocols[j]->id;
 
 					if(strcmp(protocolName, "HTTP") == 0) {
-						protocol = new Http(analysis, protocolName, j);
 						printf("Http picked \n");
+						protocol = new Http(analysis, protocolName, j);
 					} else if(strcmp(protocolName, "MEMCACHED") == 0) {
 						printf("Memcached picked \n");
 						protocol = new MemCached(analysis, protocolName, j);
+					} else if(strcmp(protocolName, "MYSQL") == 0) {
+						printf("MySQL picked \n");
+						protocol = new MySQL(analysis, protocolName, j);
 					} else {
-						error(strcat("Unrecognized protocol", protocolName));
+						error("Unrecognized protocol");
 					}
 					
 					uint32_t activeMetrics = init->netints[i]->protocols[j]->activemetrics; 

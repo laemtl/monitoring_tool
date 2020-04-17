@@ -18,23 +18,19 @@ namespace _memcached {
     class MemCached : public _protocol::Protocol {
         public:
             MemCached(Analysis* analysis, char* protocolName, uint32_t protocolId);
-            
             bool isHeaderPacket(const char *ptr, const int datalen);
             char* isRequest(const char *p, const int datalen);	    /* If the packet carries HTTP request data */
             char* isResponse(const char *p, const int datalen);	    /* If the packet carries HTTP response data */
-
-            int extractPair(Flow* flow, bool closed);
             _protocol::Request* getRequest(const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq);
             _protocol::Response* getResponse(const char *data, const char *dataend, long ack);
     };
 
     class Request : public RequestMethod  {
         public:
-            u_int32_t   seq;
-            std::vector<const char*> keys;
-            char*       time;
-            u_int32_t expiration;
-            u_int8_t  flags; 
+            std::vector<const char*>    keys;
+            char*                       time;
+            u_int32_t                   expiration;
+            u_int8_t                    flags; 
 
             Request();
             Request(const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq);   /* Parse the packet and store in a Request object */

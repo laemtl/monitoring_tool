@@ -12,7 +12,6 @@ MemCached::MemCached(Analysis* analysis, char* protocolName, uint32_t protocolId
 }
 
 /*
- * From xplico.
  * Get Cache request method by parsing header line.
  */
 int _memcached::Request::parseMethod(const char *data, int linelen)
@@ -46,7 +45,7 @@ int _memcached::Request::parseMethod(const char *data, int linelen)
  */
 char* MemCached::isRequest(const char *ptr, const int datalen) {
     int methodCode = 0;
-	char *eol,*linesp,*head_end = NULL;
+	char *eol, *linesp, *head_end = NULL;
     int lnl;
     
     linesp = (char*) ptr;
@@ -55,6 +54,7 @@ char* MemCached::isRequest(const char *ptr, const int datalen) {
 	
     _memcached::Request* req = new _memcached::Request();
     methodCode = req->parseMethod(linesp, lnl);
+    
 	if (methodCode == 0){
         return NULL;
 	} else {
@@ -63,41 +63,14 @@ char* MemCached::isRequest(const char *ptr, const int datalen) {
 }
 
 int _memcached::Response::parseStatus(const char *line, int len) {
-    /*const char *next_token;
-    const char *lineend;
-    const char *st;
-    int statusCode;
-    int tokenlen;*/
     const char *ptr;
     int	index = 0;
-    
-    //lineend = line + len;
-    statusCode = status.size()-1;
-
-    // The first token is the protocol and version
-    /*tokenlen = Protocol::get_token_len(line, lineend, &next_token);
-    if (tokenlen == 0 || line[tokenlen] != ' ') {
-        return statusCode;
-    }
-
-    line = next_token;
-    // The next token is status value.
-    tokenlen = Protocol::get_token_len(line, lineend, &next_token);
-    if (tokenlen == 0 || (line[tokenlen] != ' ' && line[tokenlen] != '\r' && line[tokenlen] != '\n')) {
-        return statusCode;
-    }
-
-    // Parse response status value.
-    //st = MALLOC(char, tokenlen+1);
-    if (st != NULL) {
-        memcpy(st, line, tokenlen);
-    }*/
-    
+    statusCode = status.size()-1;    
     ptr = line;
+
     /* Look for the space following the Method */
     while (index < len) {
-        if (*ptr == ' ')
-            break;
+        if (*ptr == ' ') break;
         else {
             ptr++;
             index++;
@@ -107,10 +80,9 @@ int _memcached::Response::parseStatus(const char *line, int len) {
     for (auto &s : status) {
         if (strncmp(s.second, line, index) == 0) {
             statusCode = s.first;
-            break;
+            return statusCode;
         }
     }
-    //free(st);
 
     return statusCode;
 }
@@ -172,7 +144,6 @@ _memcached::Response::~Response() {
      if (!keys.empty())
         std::vector<const char*>(keys).swap(keys);
 }
-
 
 _protocol::Request* MemCached::getRequest(const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq) {
     return new Request(data, dataend, time, seq, nxt_seq);
@@ -237,7 +208,6 @@ _memcached::Request::Request(const char *data, const char *dataend, char *time, 
             key = MALLOC(char, tokenlen+1);
             if (key != NULL) {
                 memcpy(key, linesp, tokenlen);
-                //key[tokenlen] = '\0';
                 keys.push_back(key);
                             }
             linesp = next_token;
@@ -249,7 +219,6 @@ _memcached::Request::Request(const char *data, const char *dataend, char *time, 
             key = MALLOC(char, tokenlen+1);
             if (key != NULL) {
                 memcpy(key, linesp, tokenlen);
-                //key[tokenlen] = '\0';
                 keys.push_back(key);
             }
 
@@ -285,15 +254,6 @@ _memcached::Request::Request(const char *data, const char *dataend, char *time, 
 }
 
 _memcached::Response::Response() {
-    /*char statusName[20][50] = { "VALUE", "OK", "END", "STORED", "NOT_STORED", "EXISTS",
-    "NOT_FOUND", "ERROR", "CLIENT_ERROR", "SERVER_ERROR", "DELETED", "TOUCHED",
-    "BUSY", "BADCLASS", "NOTFULL", "UNSAFE", "SAME", "STAT", "VERSION", "NONE" };
-
-    int cnt = sizeof(statusName)/sizeof(statusName[0]);
-    for (int i = 0; i < cnt; ++i) {
-        status.insert({i, statusName[i]});
-    }*/
-
     status.insert({0, "VALUE"});
     status.insert({1, "OK"});
     status.insert({2, "END"});

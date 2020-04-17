@@ -29,8 +29,6 @@ namespace _http {
             bool isHeaderPacket(const char *ptr, const int datalen);
             char* isRequest(const char *p, const int datalen);	    /* If the packet carries HTTP request data */
             char* isResponse(const char *p, const int datalen);	    /* If the packet carries HTTP response data */
-
-            int extractPair(Flow* flow, bool closed);
             _protocol::Request* getRequest(const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq);
             _protocol::Response* getResponse(const char *data, const char *dataend, long ack);
     };
@@ -53,8 +51,6 @@ namespace _http {
             char*		 content_encoding;
             char*		 content_length;
 
-            u_int32_t   seq;
-            
             Request();
             Request(const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq);   /* Parse the packet and store in a Request object */
             ~Request();

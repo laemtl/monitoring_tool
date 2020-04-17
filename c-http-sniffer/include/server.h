@@ -38,6 +38,7 @@ void onExit(int signum);
 #include "timer.h"
 #include "http.hpp"
 #include "memcached.hpp"
+#include "mysql.hpp"
 #include "analysis.hpp"
 
 #endif
