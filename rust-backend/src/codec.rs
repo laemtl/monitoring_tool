@@ -33,7 +33,7 @@ impl Decoder for SnifferCodec {
             } else {
                 src.split_to(1);
                 let str = src.split_to(len);
-                let metric: MetricMsg = protobuf::parse_from_bytes(&str).unwrap();
+                let metric: MetricMsg = protobuf::parse_from_bytes(&str)?;
                 //println!("len: {}", len);
                 Ok(Some(metric))
             }

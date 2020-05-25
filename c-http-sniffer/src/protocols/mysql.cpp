@@ -42,20 +42,6 @@ MySQL::MySQL(Analysis* analysis, char* protocolName, uint32_t protocolId) : Prot
     metrics.push_back(new ReqType(this, analysis));
 }
 
-bool MySQL::isHeaderPacket(const char *ptr, const int datalen) {
-    char *req_head_end = NULL;
-    char *rsp_head_end = NULL;
-
-    req_head_end = isRequest(ptr, datalen);
-    rsp_head_end = isResponse(ptr, datalen);
-
-    if ( (req_head_end != NULL) || (rsp_head_end != NULL)){
-        return true;
-    }
-
-    return false;
-}
-
 _mysql::Request::Request(const char *data, const char *dataend, char *time, u_int32_t seq, u_int32_t nxt_seq) : Request() {
     this->seq = seq;
     this->nxt_seq = nxt_seq;

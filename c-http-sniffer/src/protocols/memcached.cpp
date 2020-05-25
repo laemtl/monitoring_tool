@@ -1,8 +1,11 @@
 #include "memcached.hpp"
 
 MemCached::MemCached(Analysis* analysis, char* protocolName, uint32_t protocolId) : Protocol(analysis, protocolName, protocolId) {
+    // add 11211 to the list of default memcache ports 
+    // can be left empty
     serverPorts.push_back(11211);
     
+    // attach the metrics 
     metrics.push_back(new Rst(this, analysis));
     metrics.push_back(new ErrRate(this, analysis));
     metrics.push_back(new Tp(this, analysis));
@@ -117,20 +120,6 @@ char* MemCached::isResponse(const char *ptr, const int datalen) {
 	} else {
         return head_end;
 	}
-}
-
-bool MemCached::isHeaderPacket(const char *ptr, const int datalen) {
-    char *req_head_end = NULL;
-	char *rsp_head_end = NULL;
-
-	req_head_end = isRequest(ptr, datalen);
-	rsp_head_end = isResponse(ptr, datalen);
-
-	if ( (req_head_end != NULL) || (rsp_head_end != NULL)){
-		return true;
-	}
-
-	return false;
 }
 
 _memcached::Request::~Request() {

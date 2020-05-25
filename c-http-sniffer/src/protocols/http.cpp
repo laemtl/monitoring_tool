@@ -107,20 +107,6 @@ Http::Http(Analysis* analysis, char* protocolName, uint32_t protocolId) : _proto
     metrics.push_back(new RspStatus(this, analysis));
 }
 
-bool Http::isHeaderPacket(const char *ptr, const int datalen) {
-    char *req_head_end = NULL;
-	char *rsp_head_end = NULL;
-
-	req_head_end = isRequest(ptr, datalen);
-	rsp_head_end = isResponse(ptr, datalen);
-
-	if ( (req_head_end != NULL) || (rsp_head_end != NULL)){
-		return true;
-	}
-
-	return false;
-}
-
 _http::Request::~Request() {
 	if(host != NULL)
 		free(host);

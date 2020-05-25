@@ -106,7 +106,7 @@ namespace _protocol {
             std::vector<u_int16_t> serverPorts;
 
             Protocol(Analysis* analysis, char* protocolName, uint32_t protocolId);
-            virtual bool isHeaderPacket(const char *ptr, const int datalen) = 0;
+            bool isHeaderPacket(const char *ptr, const int datalen);
             virtual char* isRequest(const char *p, const int datalen) = 0;
             virtual char* isResponse(const char *p, const int datalen) = 0;
             virtual Request* getRequest(const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq) = 0;

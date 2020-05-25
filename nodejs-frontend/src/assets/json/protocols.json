@@ -3,7 +3,7 @@
         "rst": {
             "label": "Request service time",
             "type": "line",
-            "max": 0.5,
+            "max": 0.0001,
             "active": true
         },
         "req_rate": {
@@ -70,10 +70,13 @@
 
     "protocols": {
         "HTTP": {
-            "metrics": ["rst", "req_rate", "err_rate", "tp", "tp_rev", "conn_rate", "clients", "req_path", "req_method", "req_type", "rsp_status" ]
+            "metrics": ["rst", "req_rate", "err_rate", "tp", "tp_rev", "conn_rate", "clients", "req_path", "req_method", "req_type", "rsp_status"]
         },
         "MEMCACHED": {
             "metrics": ["rst", "err_rate", "tp", "tp_rev", "req_type", "rsp_status"]
+        },
+        "MYSQL": {
+            "metrics": ["rst", "req_rate", "tp", "tp_rev", "req_type"]
         }
     }
 }

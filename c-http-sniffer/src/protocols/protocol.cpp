@@ -18,7 +18,6 @@ rsp_total_len(0), req_body_len(0), rsp_body_len(0), next(NULL) {
 _protocol::Request::Request() : time(NULL), hdlen(0), processed(false) {
 }
 
-// override
 _protocol::Request::Request(const char *data, const char *dataend, char* time, u_int32_t seq, u_int32_t nxt_seq) : Request() {
 }
 
@@ -45,7 +44,21 @@ Protocol::Protocol(Analysis* analysis, char* protocolName, uint32_t protocolId) 
     fq = new Queue();
     fht = new FlowHashTable(fq);
 }
-        
+
+bool Protocol::isHeaderPacket(const char *ptr, const int datalen) {
+    char *req_head_end = NULL;
+	char *rsp_head_end = NULL;
+
+	req_head_end = isRequest(ptr, datalen);
+	rsp_head_end = isResponse(ptr, datalen);
+
+	if ( (req_head_end != NULL) || (rsp_head_end != NULL)){
+		return true;
+	}
+
+	return false;
+}
+
 void Protocol::flowHashProcess() {
     Flow* flow, *flow_next = NULL;
 

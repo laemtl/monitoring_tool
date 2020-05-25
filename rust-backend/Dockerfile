@@ -1,7 +1,7 @@
 FROM rust:1.35
 
 # Set the directory we want to run the next commands for
-WORKDIR /home/lfesse/www/rust-backend
+WORKDIR /home/lfesse/www/monitoring_tool/rust-backend
 
 # install protobuf from source
 RUN apt-get update && \
