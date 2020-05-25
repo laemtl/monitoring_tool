@@ -345,8 +345,9 @@ fn main() -> io::Result<()> {
             .service(fs::Files::new("/", "static/").index_file("index.html"))
     })
     
-    // start http server on 0.0.0.0:80
-    .bind("127.0.0.1:8081")?
+    // live: start http server on 0.0.0.0:80
+    // dev: start http server on 127.0.0.1:8081        
+    .bind("0.0.0.0:80")?
     .start();
 
     sys.run()
