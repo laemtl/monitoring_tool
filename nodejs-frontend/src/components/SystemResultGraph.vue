@@ -114,7 +114,7 @@ export default {
         graph: this.chart[0],
         orientation: "left",
         tickFormat: function(y) {
-          return y.toFixed(4);
+          return y.toFixed(5);
         },
         ticks: 5,
         element: document.querySelector(
